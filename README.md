@@ -2,4 +2,5 @@
 
 Contextual sound broadcasting application
 
-![Le pigeon Nelson logo](./images/le-pigeon-nelson-logo.svg =300x300)
+<img src="./images/le-pigeon-nelson-logo.svg" width="300px" height="300px" alt="Logo du pigeon Nelson">
+
