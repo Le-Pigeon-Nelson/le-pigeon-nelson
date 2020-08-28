@@ -2,4 +2,4 @@
 
 Contextual sound broadcasting application
 
-![Le pigeon Nelson logo](./images/le-pigeon-nelson-logo.svg)  <!-- .element height="50%" width="50%" -->
+![Le pigeon Nelson logo](./images/le-pigeon-nelson-logo.svg = 300x300)
