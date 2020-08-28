@@ -1,4 +1,4 @@
-<p style="text-align: right"><img src="./images/le-pigeon-nelson-logo.svg" width="200px" height="200px" alt="Logo du pigeon Nelson"></p>
+<img src="./images/le-pigeon-nelson-logo.svg" width="200px" height="200px" alt="Logo du pigeon Nelson" align="right">
 
 # Le pigeon Nelson : contextual sound broadcasting application
 
