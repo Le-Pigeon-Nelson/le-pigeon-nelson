@@ -12,9 +12,9 @@
    version="1.1"
    id="svg2"
    xml:space="preserve"
-   width="880"
-   height="880"
-   viewBox="0 0 880 880"
+   width="300"
+   height="300"
+   viewBox="0 0 300 300"
    sodipodi:docname="le-pigeon-nelson-logo.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"><metadata
      id="metadata8"><rdf:RDF><cc:Work
@@ -38,9 +38,9 @@
      inkscape:window-height="1033"
      id="namedview4"
      showgrid="false"
-     inkscape:zoom="0.53636364"
-     inkscape:cx="600.65318"
-     inkscape:cy="464.56812"
+     inkscape:zoom="1.0727273"
+     inkscape:cx="185.09166"
+     inkscape:cy="292.13441"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -48,9 +48,9 @@
      id="g10"
      inkscape:groupmode="layer"
      inkscape:label="pigeon-bird-publicdomainvectors.org"
-     transform="matrix(1.3333333,0,0,-1.3333333,0,880)"><g
+     transform="matrix(1.3333333,0,0,-1.3333333,0,300)"><g
        id="g1368"
-       transform="translate(17.16102,14.563941)"><g
+       transform="matrix(0.36649056,0,0,0.36649056,-1.7461766,-3.4059621)"><g
          id="g12"><g
            transform="translate(-11.865012,-83.055087)"
            id="g1275"><path
