@@ -22,3 +22,15 @@ A second mode of operation allows the user to request, at the frequency he wishe
 * Propose an audio-recorded tour of a neighborhood. The user is free to move around, and messages are triggered according to the constraints defined by the designers of the experience, who will have described this information on the server consulted.
 * Offer on-demand information on the services available in the area
 * Play selected music according to the location of the listener
+
+## License
+
+This project is provided under GPL v3.
+
+## Authors
+
+The initial idea has been discussed on August 2020 between Samuel Braikeh and Jean-Marie Favreau
+
+## About the name of the project
+
+Imagine for a moment a pigeon singing *On the rrrrrroad again* (Willie Nelson). That's it.
