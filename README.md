@@ -25,7 +25,7 @@ A second mode of operation allows the user to request, at the frequency he wishe
 
 ## License
 
-This project is provided under GPL v3.
+This project is [provided under GPL v3](./LICENSE).
 
 ## Authors
 
