@@ -42,7 +42,7 @@ See for example the [AudioRenderer](https://github.com/jmtrivial/pictoparle/blob
 
 A thread will be dedicated to the message production, another one will be dedicated to the cmmunication with the server. The communication between these two threads and the UI thread will be implemented using [loops, messages, and threadhandlers](https://blog.mindorks.com/android-core-looper-handler-and-handlerthread-bd54d69fe91a).
 
-## Reusability
+## Reusability
 
 Le pigeon Nelson will be implemented as a package to be reusable on other projects. The basic application will be a a demonstration of the possibilities of the tool.
 
