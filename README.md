@@ -17,6 +17,8 @@ The application can be set so that the messages can be cut, superimposed, or wai
 
 A second mode of operation allows the user to request, at the frequency he wishes, a message associated with his location.
 
+See [technical notes](technical-notes.md) if you're interested in technical details.
+
 ## Examples of use
 
 * Propose an audio-recorded tour of a neighborhood. The user is free to move around, and messages are triggered according to the constraints defined by the designers of the experience, who will have described this information on the server consulted.

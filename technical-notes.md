@@ -25,10 +25,10 @@ These responses contain a series of information and meta-information:
 
 the server response contains a list of messages corresponding to the information provided by the application. These responses contain a series of information and meta-information:
 
-* the conditions for the message to be broadcast (maximum distance to a reference point, maximum angle to a reference orientation, etc)
+* conditions for the message to be broadcast (maximum distance to a reference point, maximum angle to a reference orientation, etc)
 * conditions for the message to be forgotten (time or location constraint)
 * a text to be pronounced with the vocal synthesis, or the link to an mp3 to be played (in streaming, with possibly a duration if it is a stream)
-* a broadcast constraint (may or may not be cut by another message, may or may not cut another message)
+* a broadcast priority to decide if a message can stop a currently broadcasted message (higher priority), has to be queued (same priority), or ignored (smaller priority).
 
 ## Playing sound
 
@@ -38,4 +38,11 @@ If the text has to be transformed into an audio version, we can use [TextToSpeec
 
 See for example the [AudioRenderer](https://github.com/jmtrivial/pictoparle/blob/master/app/src/main/java/com/jmfavreau/pictoparle/interactions/AudioRenderer.java) from Pictoparle that contains both audio renderings in a single class.
 
+## Application performance
+
+A thread will be dedicated to the message production, another one will be dedicated to the cmmunication with the server, and a last one to handle message queue. The communication between these two threads and the UI thread will be implemented using [loops, messages, and threadhandlers](https://blog.mindorks.com/android-core-looper-handler-and-handlerthread-bd54d69fe91a).
+
+## Reusability
+
+Le pigeon Nelson will be implemented as a package to be reusable on other projects. The basic application will be a a demonstration of the possibilities of the tool.
 
