@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         // add an "hello world" server
         servers.add(new Server("Hello world",
                 "https",
-                "jmtrivial.info/lepigeonnelson/helloworld.json",
+                "jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/message.json",
                 433,
                 "A server which broadcast \"hello world\" every 30 seconds",
                 30));
