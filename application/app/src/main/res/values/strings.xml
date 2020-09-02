@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Le pigeon Nelson</string>
+    <string name="action_settings">Préférences</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="listen">Écouter</string>
+    <string name="stop_listening">Fin de l\'écoute</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+</resources>
