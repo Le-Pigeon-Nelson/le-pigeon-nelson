@@ -18,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class MessageCollector extends Handler {
@@ -47,7 +48,8 @@ public class MessageCollector extends Handler {
             @Override
             public void run() {
                 if (running) {
-                    long releaseTime = SystemClock.currentThreadTimeMillis() + server.getPeriodMilliseconds();
+                    Date d = new Date();
+                    long releaseTime = d.getTime() + server.getPeriodMilliseconds();
                     Log.d("MessageCollector", "get data from server");
 
                     // collect messages from the server
@@ -60,12 +62,14 @@ public class MessageCollector extends Handler {
                     }
 
                     // wait the desired period before collecting again
-                    long time = releaseTime - SystemClock.currentThreadTimeMillis();
+                    Date d2 = new Date();
+                    long time = releaseTime - d2.getTime();
                     if (time > 0) {
                         postDelayed(collectMessages, time);
                     }
-                    else
+                    else {
                         post(collectMessages);
+                    }
 
                 }
             }
@@ -122,7 +126,8 @@ public class MessageCollector extends Handler {
 
     private void readMessagesArray(JsonReader reader) throws IOException {
         newMessages.clear();
-        long ctime = SystemClock.currentThreadTimeMillis();
+        Date d = new Date();
+        long ctime = d.getTime();
         int i = 0;
 
         reader.beginArray();

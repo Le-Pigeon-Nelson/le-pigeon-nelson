@@ -1,5 +1,7 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 public class BMessage implements Comparable<BMessage> {

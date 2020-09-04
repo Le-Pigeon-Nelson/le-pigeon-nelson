@@ -1,6 +1,9 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 
 import android.os.SystemClock;
+import android.util.Log;
+
+import java.util.Date;
 
 public class TimeFromReceptionCondition implements MessageCondition {
 
@@ -14,7 +17,8 @@ public class TimeFromReceptionCondition implements MessageCondition {
 
     @Override
     public boolean satisfied(BMessage message) {
-        long timeFromReception = SystemClock.currentThreadTimeMillis() - message.getCollectedTime();
+        Date d = new Date();
+        long timeFromReception = d.getTime() - message.getCollectedTime();
         return Maths.compare(timeFromReception, comparison, parameterMs);
     }
 }

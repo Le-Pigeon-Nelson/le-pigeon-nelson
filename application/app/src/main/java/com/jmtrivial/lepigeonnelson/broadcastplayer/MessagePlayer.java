@@ -84,7 +84,7 @@ public class MessagePlayer extends Handler {
             }
         });
         map = new HashMap<String, String>();
-        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "LePigeonNelson");
 
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(STREAM_MUSIC);
@@ -106,6 +106,7 @@ public class MessagePlayer extends Handler {
 
     private void renderMessage() {
         if (currentMessage.isText()) {
+            Log.d("MessagePlayer", "sending message \"" + currentMessage.getTxt() + "\' to TTS");
             tts.setLanguage(new Locale(currentMessage.getLang()));
             tts.speak(currentMessage.getTxt(), TextToSpeech.QUEUE_FLUSH, map);
             isPlaying = true;
@@ -113,6 +114,7 @@ public class MessagePlayer extends Handler {
         else if (currentMessage.isAudio()) {
             // play audio file
             try {
+                Log.d("MessagePlayer", "send message to MediaPlayer");
                 mPlayer.reset();
                 mPlayer.setDataSource(currentMessage.getAudioURL());
                 mPlayer.prepare();
@@ -125,9 +127,11 @@ public class MessagePlayer extends Handler {
     }
 
     private void stopRendering() {
-        isPlaying = false;
-        tts.stop();
-        mPlayer.reset();
+        if (isPlaying) {
+            isPlaying = false;
+            tts.stop();
+            mPlayer.reset();
+        }
     }
 
     public void registerQueue(MessageQueue messageQueue) {

@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 1));
 
         // add a blabla / "bip" server
-        servers.add(new Server("5 messages",
+        servers.add(new Server("5 messages ou moins",
                 "Un serveur envoie 5 messages mal triés, avec une durée de vie courte",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/5-messages.json",
                 "UTF-8",

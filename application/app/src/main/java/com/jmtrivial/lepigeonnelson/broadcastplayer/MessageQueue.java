@@ -40,19 +40,18 @@ public class MessageQueue extends Handler {
             ArrayList<BMessage> newMessages = (ArrayList<BMessage>) msg.obj;
             queue.addAll(newMessages);
             Log.d("MessageQueue", "add " + newMessages.size() + " new message(s). Queue size: " + queue.size());
-            Collections.sort(queue);
-            // if something has to be played
             playNextMessage();
         }
         else if (msg.what == nextMessage) {
             Log.d("MessageQueue", "next message?");
-            removeForgettableMessages();
-            Collections.sort(queue);
             playNextMessage();
         }
     }
 
     private void playNextMessage() {
+        removeForgettableMessages();
+        Collections.sort(queue);
+
         BMessage currentMessage = messagePlayer.getCurrentMessage();
         Iterator<BMessage> iterator = queue.iterator();
         while (iterator.hasNext()) {

@@ -1,5 +1,7 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 
+import android.util.Log;
+
 public class Maths {
     public enum Comparison {smallerThan, greaterThan, smallerOrEqualTo, greaterOrEqualTo, unknown };
 
@@ -33,22 +35,24 @@ public class Maths {
     }
 
     static public Comparison getComparisonFromString(String comparison) {
-        if (comparison == null)
+        if (comparison == null) {
             return Comparison.unknown;
-        if (comparison == "smallerThan" || comparison == "<") {
+        }
+        else if (comparison.equals("smallerThan") || comparison.equals("<")) {
             return Comparison.smallerThan;
         }
-        else if(comparison == "smallerOrEqualTo" || comparison == "<=") {
+        else if(comparison.equals("smallerOrEqualTo") || comparison.equals("<=")) {
             return Comparison.smallerOrEqualTo;
         }
-        else if (comparison == "greaterThan" || comparison == ">") {
+        else if (comparison.equals("greaterThan") || comparison.equals(">")) {
             return Comparison.greaterThan;
         }
-        else if(comparison == "greaterOrEqualTo" || comparison == ">=") {
+        else if(comparison.equals("greaterOrEqualTo") || comparison.equals(">=")) {
             return Comparison.greaterOrEqualTo;
         }
-        else
+        else {
             return Comparison.unknown;
+        }
     }
 
 }
