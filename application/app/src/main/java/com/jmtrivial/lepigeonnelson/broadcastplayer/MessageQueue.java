@@ -38,8 +38,8 @@ public class MessageQueue extends Handler {
         else if (msg.what == addNewMessages) {
             removeForgettableMessages();
             ArrayList<BMessage> newMessages = (ArrayList<BMessage>) msg.obj;
-            Log.d("MessageQueue", "add " + newMessages.size() + " new message(s)");
             queue.addAll(newMessages);
+            Log.d("MessageQueue", "add " + newMessages.size() + " new message(s). Queue size: " + queue.size());
             Collections.sort(queue);
             // if something has to be played
             playNextMessage();

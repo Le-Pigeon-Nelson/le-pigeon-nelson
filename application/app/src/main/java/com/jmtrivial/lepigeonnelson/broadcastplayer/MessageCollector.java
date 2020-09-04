@@ -182,14 +182,19 @@ public class MessageCollector extends Handler {
     }
 
     private MessageCondition readCondition(JsonReader reader) throws IOException {
+        Integer lifespan = null;
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            // TODO: parse JSON (conditions)
-            reader.skipValue();
+            if (name.equals("lifespan")) {
+                lifespan = reader.nextInt();
+            }
+            else {
+                reader.skipValue();
+            }
         }
         reader.endObject();
-        return null;
+        return new MessageCondition(lifespan);
     }
 
 

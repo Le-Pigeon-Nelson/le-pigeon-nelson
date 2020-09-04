@@ -1,5 +1,12 @@
 [
     {
+        "txt": "Cinquième message",
+        "lang": "fr",
+        "priority": 0,
+        "requiredConditions": [ { "lifespan": 3 } ],
+        "forgettingConditions": []
+    },
+    {
         "txt": "Deuxième message",
         "lang": "fr",
         "priority": 1,
@@ -15,13 +22,6 @@
     },
     {
         "txt": "Quatrième message",
-        "lang": "fr",
-        "priority": 1,
-        "requiredConditions": [ { "lifespan": 3 } ],
-        "forgettingConditions": []
-    },
-    {
-        "txt": "Cinquième message",
         "lang": "fr",
         "priority": 1,
         "requiredConditions": [ { "lifespan": 3 } ],

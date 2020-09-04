@@ -49,7 +49,7 @@ public class BMessage implements Comparable<BMessage> {
 
     public boolean isPlayable() {
         for(MessageCondition condition: required) {
-            if (!condition.satisfied())
+            if (!condition.satisfied(this))
                 return false;
         }
         return true;
@@ -57,7 +57,7 @@ public class BMessage implements Comparable<BMessage> {
 
     public boolean isForgettable() {
         for(MessageCondition condition: forgettingConditions) {
-            if (condition.satisfied())
+            if (condition.satisfied(this))
                 return true;
         }
         return false;
@@ -80,9 +80,9 @@ public class BMessage implements Comparable<BMessage> {
     @Override
     public int compareTo(BMessage msg) {
         // first use priority
-        if (priority < msg.priority)
+        if (priority > msg.priority)
             return -1;
-        else if (priority > msg.priority)
+        else if (priority < msg.priority)
             return 1;
         else {
             // then collect time
