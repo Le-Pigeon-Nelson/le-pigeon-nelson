@@ -59,6 +59,7 @@ public class MessageQueue extends Handler {
             BMessage m = iterator.next();
             // find the first playable message
             if (m.isPlayable()) {
+                Log.d("MessageQueue", "found a next message to play");
                 // ask player to play this message
                 Message msgThread = messagePlayer.obtainMessage();
                 msgThread.obj = m;
