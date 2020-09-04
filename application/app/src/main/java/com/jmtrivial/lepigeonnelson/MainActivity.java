@@ -2,13 +2,11 @@ package com.jmtrivial.lepigeonnelson;
 
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +15,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<Server> servers;
+    public ArrayList<Server> servers;
+
+    private BroadcastPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,16 +32,26 @@ public class MainActivity extends AppCompatActivity {
     private void loadServers() {
         servers = new ArrayList<>();
 
+        player = new BroadcastPlayer(this);
+
         // add an "hello world" server
         servers.add(new Server("Hello world",
-                "https",
-                "jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/message.json",
-                433,
-                "A server which broadcast \"hello world\" every 30 seconds",
+                "One \"hello world\" message every 30 seconds",
+                "https://jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/message.json",
+                "UTF-8",
+                30));
+
+        // add an "bonjour le monde" (fr) server
+        servers.add(new Server("Bonjour le monde",
+                "Un message \"bonjour le monde\" toutes les 30 secondes",
+                "https://jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/message-fr.json",
+                "UTF-8",
                 30));
 
         // load servers stored in preferences
         // TODO
+
+        player.start();
     }
 
     @Override
@@ -60,9 +70,19 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            // TODO
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setActiveServer(Server activeServer) {
+        player.setServer(activeServer);
+        player.playBroadcast();
+    }
+
+    public void stopBroadcast() {
+        player.stopBroadcast();
     }
 }

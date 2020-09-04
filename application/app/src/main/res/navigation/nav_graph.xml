@@ -7,22 +7,22 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.jmtrivial.lepigeonnelson.ServerSelectionFragment"
+        android:name="com.jmtrivial.lepigeonnelson.ui.ServerSelectionFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_server_selection">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            android:id="@+id/action_ListFragment_to_ListenFragment"
             app:destination="@id/SecondFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.jmtrivial.lepigeonnelson.ListenBroadcastFragment"
+        android:name="com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_listen_broadcast">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            android:id="@+id/action_ListenFragment_to_ListFragment"
             app:destination="@id/FirstFragment" />
     </fragment>
 </navigation>

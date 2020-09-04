@@ -1,7 +1,7 @@
 [
     {
-        "txt": "Hello world!",
-        "lang": "en",
+        "txt": "Bonjour le monde!",
+        "lang": "fr",
         "priority": 1,
         "requiredConditions": [],
         "forgettingConditions": []

@@ -1,4 +1,4 @@
-package com.jmtrivial.lepigeonnelson;
+package com.jmtrivial.lepigeonnelson.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+
+import com.jmtrivial.lepigeonnelson.MainActivity;
+import com.jmtrivial.lepigeonnelson.R;
 
 public class ListenBroadcastFragment extends Fragment {
 
@@ -22,12 +25,14 @@ public class ListenBroadcastFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        final MainActivity activity = (MainActivity) getActivity();
 
         view.findViewById(R.id.button_second).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                activity.stopBroadcast();
                 NavHostFragment.findNavController(ListenBroadcastFragment.this)
-                        .navigate(R.id.action_SecondFragment_to_FirstFragment);
+                        .navigate(R.id.action_ListenFragment_to_ListFragment);
             }
         });
     }

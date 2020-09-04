@@ -1,21 +1,19 @@
-package com.jmtrivial.lepigeonnelson;
+package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
 public class Server {
 
+    private String encoding;
     private String name;
     private String url;
-    private String protocol;
-    private Integer port;
     private String description;
     private Integer period;
 
-    public Server(String name, String protocol, String url, Integer port, String description, Integer period) {
+    public Server(String name, String description, String url, String encoding, Integer period) {
         this.name = name;
-        this.protocol = protocol;
         this.url = url;
-        this.port = port;
         this.description = description;
         this.period = period;
+        this.encoding = encoding;
     };
 
     public String getDescription() {
@@ -24,5 +22,13 @@ public class Server {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getUrl() { return this.url; }
+
+    public String getEncoding() { return this.encoding; }
+
+    public long getPeriodMilliseconds() {
+        return period * 1000;
     }
 }
