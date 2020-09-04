@@ -48,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
                 "UTF-8",
                 30));
 
+        // add an "bonjour le monde" (fr) server
+        servers.add(new Server("Bonjour le monde (audio)",
+                "Un message \"bonjour le monde\" dit par un humain, toutes les 30 secondes",
+                "https://jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/audiomessage-fr.json",
+                "UTF-8",
+                30));
+
         // load servers stored in preferences
         // TODO: load servers stored in preferences
 

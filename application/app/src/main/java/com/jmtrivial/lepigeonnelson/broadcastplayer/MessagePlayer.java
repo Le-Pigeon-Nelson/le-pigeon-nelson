@@ -44,6 +44,18 @@ public class MessagePlayer extends Handler {
         }
 
     };
+
+    private MediaPlayer.OnCompletionListener onCompletionListener = new MediaPlayer.OnCompletionListener() {
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            isPlaying = false;
+            Log.d("MessagePlayer", "end of audio play");
+            messageQueue.sendEmptyMessage(messageQueue.nextMessage);
+        }
+
+    };
+
     private MessageQueue messageQueue;
 
 
@@ -66,11 +78,9 @@ public class MessagePlayer extends Handler {
         map = new HashMap<String, String>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
 
-
-
-
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(STREAM_MUSIC);
+        mPlayer.setOnCompletionListener(onCompletionListener);
     }
 
     @Override
