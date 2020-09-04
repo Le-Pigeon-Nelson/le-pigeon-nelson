@@ -1,0 +1,8 @@
+[
+    {
+        "audioURL": "https://jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/audio/bonjour-le-monde.json",
+        "priority": 1,
+        "requiredConditions": [],
+        "forgettingConditions": []
+    }
+]
