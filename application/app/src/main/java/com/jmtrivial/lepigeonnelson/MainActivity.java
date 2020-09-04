@@ -37,21 +37,21 @@ public class MainActivity extends AppCompatActivity {
         // add an "hello world" server
         servers.add(new Server("Hello world",
                 "One \"hello world\" message every 30 seconds",
-                "https://jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/message.json",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/message.json",
                 "UTF-8",
                 30));
 
         // add an "bonjour le monde" (fr) server
         servers.add(new Server("Bonjour le monde",
                 "Un message \"bonjour le monde\" toutes les 30 secondes",
-                "https://jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/message-fr.json",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/message-fr.json",
                 "UTF-8",
                 30));
 
         // add an "bonjour le monde" (fr) server
         servers.add(new Server("Bonjour le monde (audio)",
                 "Un message \"bonjour le monde\" dit par un humain, toutes les 30 secondes",
-                "https://jmtrivial.github.io/le-pigeon-nelson/servers/helloworld/audiomessage-fr.json",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/audiomessage-fr.json",
                 "UTF-8",
                 30));
 
