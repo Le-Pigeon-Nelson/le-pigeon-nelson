@@ -36,16 +36,17 @@ public class MessageQueue extends Handler {
             messagePlayer.sendEmptyMessage(messagePlayer.stopMessage);
         }
         else if (msg.what == addNewMessages) {
-            Log.d("MessageQueue", "add new messages");
             removeForgettableMessages();
-            queue.addAll((ArrayList<BMessage>) msg.obj);
+            ArrayList<BMessage> newMessages = (ArrayList<BMessage>) msg.obj;
+            Log.d("MessageQueue", "add " + newMessages.size() + " new message(s)");
+            queue.addAll(newMessages);
             Collections.sort(queue);
             // if something has to be played
             if (messagePlayer.isReadyToPlay())
                 playNextMessage();
         }
         else if (msg.what == nextMessage) {
-            Log.d("MessageQueue", "next message");
+            Log.d("MessageQueue", "next message?");
             removeForgettableMessages();
             Collections.sort(queue);
             playNextMessage();
