@@ -12,17 +12,20 @@ import android.util.Log;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.BMessage;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
 import static android.media.AudioManager.STREAM_MUSIC;
 
 public class MessagePlayer extends Handler {
-    private BroadcastPlayer bPlayer;
 
     public static final int playMessage = 0;
     public static final int stopMessage = 1;
 
     private TextToSpeech tts;
+    private HashMap<String, String> map;
     private MediaPlayer mPlayer;
+
+    private boolean isPlaying;
 
     private UtteranceProgressListener mProgressListener = new UtteranceProgressListener() {
         @Override
@@ -35,8 +38,11 @@ public class MessagePlayer extends Handler {
 
         @Override
         public void onDone(String utteranceId) {
+            isPlaying = false;
+            Log.d("MessagePlayer", "end of TTS");
             messageQueue.sendEmptyMessage(messageQueue.nextMessage);
         }
+
     };
     private MessageQueue messageQueue;
 
@@ -44,6 +50,7 @@ public class MessagePlayer extends Handler {
     public MessagePlayer(Context context) {
 
         this.messageQueue = null;
+        this.isPlaying = false;
 
         // set text-to-speech method with the good language
         tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
@@ -52,9 +59,15 @@ public class MessagePlayer extends Handler {
                 if(status != TextToSpeech.ERROR) {
                         tts.setLanguage(Locale.FRANCE);
                 }
+                Log.d("MessagePlayer", "set progress listener");
                 tts.setOnUtteranceProgressListener(mProgressListener);
             }
         });
+        map = new HashMap<String, String>();
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
+
+
+
 
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(STREAM_MUSIC);
@@ -74,7 +87,8 @@ public class MessagePlayer extends Handler {
     private void renderMessage(BMessage message) {
         if (message.isText()) {
             tts.setLanguage(new Locale(message.getLang()));
-            tts.speak(message.getTxt(), TextToSpeech.QUEUE_FLUSH, null);
+            tts.speak(message.getTxt(), TextToSpeech.QUEUE_FLUSH, map);
+            isPlaying = true;
         }
         else if (message.isAudio()) {
             // play audio file
@@ -83,13 +97,20 @@ public class MessagePlayer extends Handler {
                 mPlayer.setDataSource(message.getAudioURL());
                 mPlayer.prepare();
                 mPlayer.start();
+                isPlaying = true;
+                // TODO: detect end of rendering
             } catch (IOException e) {
             }
         }
 
     }
 
+    public boolean isReadyToPlay() {
+        return !isPlaying;
+    }
+
     private void stopRendering() {
+        isPlaying = false;
         tts.stop();
         mPlayer.reset();
     }

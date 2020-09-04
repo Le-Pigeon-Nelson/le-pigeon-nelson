@@ -40,6 +40,9 @@ public class MessageQueue extends Handler {
             removeForgettableMessages();
             queue.addAll((ArrayList<BMessage>) msg.obj);
             Collections.sort(queue);
+            // if something has to be played
+            if (messagePlayer.isReadyToPlay())
+                playNextMessage();
         }
         else if (msg.what == nextMessage) {
             Log.d("MessageQueue", "next message");
