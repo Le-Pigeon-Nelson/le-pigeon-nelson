@@ -4,8 +4,10 @@
 
 The aim of *le pigeon Nelson* is to provide a sound broadcasting tool according to your location and movement.
 
+<div>
 <img src="./images/Screenshot1.png" width="200px" alt="First screenshot: a list of servers to be played" align="left" margin="1em">
 <img src="./images/Screenshot2.png" width="200px" alt="Second screenshot: a playing server" align="left" margin="1em">
+</div>
 
 ## How it works
 
