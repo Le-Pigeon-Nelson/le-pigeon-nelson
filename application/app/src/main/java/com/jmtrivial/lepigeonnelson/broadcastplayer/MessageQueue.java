@@ -42,8 +42,7 @@ public class MessageQueue extends Handler {
             queue.addAll(newMessages);
             Collections.sort(queue);
             // if something has to be played
-            if (messagePlayer.isReadyToPlay())
-                playNextMessage();
+            playNextMessage();
         }
         else if (msg.what == nextMessage) {
             Log.d("MessageQueue", "next message?");
@@ -54,19 +53,24 @@ public class MessageQueue extends Handler {
     }
 
     private void playNextMessage() {
+        BMessage currentMessage = messagePlayer.getCurrentMessage();
         Iterator<BMessage> iterator = queue.iterator();
         while (iterator.hasNext()) {
             BMessage m = iterator.next();
             // find the first playable message
             if (m.isPlayable()) {
-                Log.d("MessageQueue", "found a next message to play");
-                // ask player to play this message
-                Message msgThread = messagePlayer.obtainMessage();
-                msgThread.obj = m;
-                msgThread.what = messagePlayer.playMessage;
-                messagePlayer.sendMessage(msgThread);
-                // remove this message from the queue
-                iterator.remove();
+                // play it only if it is a message with higher priority
+                if ((currentMessage == null) ||
+                            (currentMessage.getPriority() < m.getPriority())) {
+                    Log.d("MessageQueue", "found a next message to play");
+                    // ask player to play this message
+                    Message msgThread = messagePlayer.obtainMessage();
+                    msgThread.obj = m;
+                    msgThread.what = messagePlayer.playMessage;
+                    messagePlayer.sendMessage(msgThread);
+                    // remove this message from the queue
+                    iterator.remove();
+                }
                 break;
             }
         }

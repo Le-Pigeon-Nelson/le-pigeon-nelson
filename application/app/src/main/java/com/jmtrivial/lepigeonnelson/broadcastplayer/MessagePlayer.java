@@ -58,6 +58,15 @@ public class MessagePlayer extends Handler {
 
     private MessageQueue messageQueue;
 
+    public BMessage getCurrentMessage() {
+        if (isPlaying)
+            return currentMessage;
+        else
+            return null;
+    }
+
+    private BMessage currentMessage;
+
 
     public MessagePlayer(Context context) {
 
@@ -89,21 +98,23 @@ public class MessagePlayer extends Handler {
             stopRendering();
         } else if (msg.what == playMessage) {
             Log.d("MessagePlayer", "play message");
-            renderMessage((BMessage) msg.obj);
+            stopRendering();
+            currentMessage = (BMessage) msg.obj;
+            renderMessage();
         }
     }
 
-    private void renderMessage(BMessage message) {
-        if (message.isText()) {
-            tts.setLanguage(new Locale(message.getLang()));
-            tts.speak(message.getTxt(), TextToSpeech.QUEUE_FLUSH, map);
+    private void renderMessage() {
+        if (currentMessage.isText()) {
+            tts.setLanguage(new Locale(currentMessage.getLang()));
+            tts.speak(currentMessage.getTxt(), TextToSpeech.QUEUE_FLUSH, map);
             isPlaying = true;
         }
-        else if (message.isAudio()) {
+        else if (currentMessage.isAudio()) {
             // play audio file
             try {
                 mPlayer.reset();
-                mPlayer.setDataSource(message.getAudioURL());
+                mPlayer.setDataSource(currentMessage.getAudioURL());
                 mPlayer.prepare();
                 mPlayer.start();
                 isPlaying = true;
@@ -111,10 +122,6 @@ public class MessagePlayer extends Handler {
             }
         }
 
-    }
-
-    public boolean isReadyToPlay() {
-        return !isPlaying;
     }
 
     private void stopRendering() {

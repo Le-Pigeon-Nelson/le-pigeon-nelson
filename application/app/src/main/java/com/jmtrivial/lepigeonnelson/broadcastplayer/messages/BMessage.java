@@ -105,4 +105,8 @@ public class BMessage implements Comparable<BMessage> {
     public boolean isAudio() {
         return audioURL != null;
     }
+
+    public int getPriority() {
+        return priority;
+    }
 }
