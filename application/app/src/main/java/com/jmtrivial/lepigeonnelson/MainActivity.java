@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 30));
 
         // load servers stored in preferences
-        // TODO
+        // TODO: load servers stored in preferences
 
         player.start();
     }
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            // TODO
+            // TODO: implement preferences
             return true;
         }
 

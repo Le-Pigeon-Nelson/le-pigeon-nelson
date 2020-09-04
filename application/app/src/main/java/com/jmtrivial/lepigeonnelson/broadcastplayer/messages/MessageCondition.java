@@ -2,10 +2,10 @@ package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 
 public class MessageCondition {
 
-    // TODO
+    // TODO: implement message conditions
 
     public boolean satisfied() {
-        // TODO
+        // TODO: implement satisfaction test
         return false;
     }
 }

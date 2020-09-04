@@ -185,7 +185,7 @@ public class MessageCollector extends Handler {
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            // TODO
+            // TODO: parse JSON (conditions)
             reader.skipValue();
         }
         reader.endObject();
