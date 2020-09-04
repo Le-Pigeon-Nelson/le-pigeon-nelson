@@ -84,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public Server getActiveServer() {
+        return player.getServer();
+    }
+
     public void setActiveServer(Server activeServer) {
         player.setServer(activeServer);
         player.playBroadcast();

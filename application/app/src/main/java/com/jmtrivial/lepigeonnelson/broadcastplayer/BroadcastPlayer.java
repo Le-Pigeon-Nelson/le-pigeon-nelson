@@ -49,4 +49,7 @@ public class BroadcastPlayer extends HandlerThread {
     }
 
 
+    public Server getServer() {
+        return this.server;
+    }
 }
