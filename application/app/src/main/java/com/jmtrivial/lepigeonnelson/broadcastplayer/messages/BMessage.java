@@ -11,6 +11,11 @@ public class BMessage implements Comparable<BMessage> {
 
     private ArrayList<MessageCondition> required;
     private ArrayList<MessageCondition> forgettingConditions;
+
+    public long getCollectedTime() {
+        return collectedTime;
+    }
+
     private long collectedTime;
     private int localID;
 

@@ -1,16 +1,8 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 
-public class MessageCondition {
+public interface MessageCondition {
 
-    private Integer lifespan;
 
-    public MessageCondition(Integer lifespan) {
-        this.lifespan = lifespan;
-        // TODO: implement other message conditions
-    }
+    public boolean satisfied(BMessage message);
 
-    public boolean satisfied(BMessage message) {
-        // TODO: implement satisfaction test
-        return true;
-    }
 }

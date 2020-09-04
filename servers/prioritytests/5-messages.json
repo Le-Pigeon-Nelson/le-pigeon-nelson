@@ -3,35 +3,35 @@
         "txt": "Cinquième message",
         "lang": "fr",
         "priority": 0,
-        "requiredConditions": [ { "lifespan": 3 } ],
-        "forgettingConditions": []
+        "requiredConditions": [ ],
+        "forgettingConditions": [ { "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ]
     },
     {
         "txt": "Deuxième message",
         "lang": "fr",
         "priority": 1,
-        "requiredConditions": [ { "lifespan": 3 } ],
-        "forgettingConditions": []
+        "requiredConditions": [ ],
+        "forgettingConditions": [ { "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ]
     },
     {
         "txt": "Troisième message",
         "lang": "fr",
         "priority": 1,
-        "requiredConditions": [ { "lifespan": 3 } ],
-        "forgettingConditions": []
+        "requiredConditions": [ ],
+        "forgettingConditions": [ { "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ]
     },
     {
         "txt": "Quatrième message",
         "lang": "fr",
         "priority": 1,
-        "requiredConditions": [ { "lifespan": 3 } ],
-        "forgettingConditions": []
+        "requiredConditions": [ ],
+        "forgettingConditions": [ { "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ]
     },
     {
         "txt": "Premier message",
         "lang": "fr",
         "priority": 2,
-        "requiredConditions": [ { "lifespan": 3 } ],
-        "forgettingConditions": []
+        "requiredConditions": [ ],
+        "forgettingConditions": [ { "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ]
     }
 ]

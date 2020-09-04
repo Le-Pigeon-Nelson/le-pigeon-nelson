@@ -7,6 +7,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.BMessage;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.ConditionFactory;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.MessageCondition;
 
 import java.io.BufferedInputStream;
@@ -25,6 +26,8 @@ public class MessageCollector extends Handler {
 
     private MessageQueue msgQueue;
 
+    private ConditionFactory cFactory;
+
     private ArrayList<BMessage> newMessages;
 
     private Server server;
@@ -35,6 +38,7 @@ public class MessageCollector extends Handler {
 
     public MessageCollector(MessageQueue msg) {
 
+        cFactory = new ConditionFactory();
         this.newMessages = new ArrayList<>();
         this.msgQueue = msg;
         running = false;
@@ -124,10 +128,12 @@ public class MessageCollector extends Handler {
         reader.beginArray();
         while (reader.hasNext()) {
             BMessage msg = readMessage(reader);
-            msg.setCollectedTimestamp(ctime);
-            msg.setLocalID(i);
-            i += 1;
-            newMessages.add(msg);
+            if (msg != null) {
+                msg.setCollectedTimestamp(ctime);
+                msg.setLocalID(i);
+                i += 1;
+                newMessages.add(msg);
+            }
         }
         reader.endArray();
 
@@ -175,26 +181,40 @@ public class MessageCollector extends Handler {
         ArrayList<MessageCondition> result = new ArrayList<>();
         reader.beginArray();
         while (reader.hasNext()) {
-            result.add(readCondition(reader));
+            MessageCondition c = readCondition(reader);
+            if (c != null) {
+                result.add(c);
+            }
         }
         reader.endArray();
         return result;
     }
 
     private MessageCondition readCondition(JsonReader reader) throws IOException {
-        Integer lifespan = null;
+        String refVariable = null;
+        String comparison = null;
+        String parameter = null;
+        boolean reverse = false;
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            if (name.equals("lifespan")) {
-                lifespan = reader.nextInt();
+            if (name.equals("referenceVariable")) {
+                if (parameter != null)
+                    reverse = true;
+                refVariable = reader.nextString();
+            }
+            else if (name.equals("comparison")) {
+                comparison = reader.nextString();
+            }
+            else if (name.equals("parameter")) {
+                parameter = reader.nextString();
             }
             else {
                 reader.skipValue();
             }
         }
         reader.endObject();
-        return new MessageCondition(lifespan);
+        return cFactory.getCondition(refVariable, comparison, parameter, reverse);
     }
 
 
