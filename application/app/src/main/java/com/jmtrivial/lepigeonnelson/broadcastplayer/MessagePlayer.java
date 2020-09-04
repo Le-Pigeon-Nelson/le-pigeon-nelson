@@ -71,7 +71,6 @@ public class MessagePlayer extends Handler {
                 if(status != TextToSpeech.ERROR) {
                         tts.setLanguage(Locale.FRANCE);
                 }
-                Log.d("MessagePlayer", "set progress listener");
                 tts.setOnUtteranceProgressListener(mProgressListener);
             }
         });
@@ -108,7 +107,6 @@ public class MessagePlayer extends Handler {
                 mPlayer.prepare();
                 mPlayer.start();
                 isPlaying = true;
-                // TODO: detect end of rendering
             } catch (IOException e) {
             }
         }
