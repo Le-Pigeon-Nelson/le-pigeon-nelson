@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/audiomessage-fr.json",
                 "UTF-8",
                 30));
-        
+
         // add a blabla / "bip" server
         servers.add(new Server("Blabla bip",
                 "Un serveur qui raconte du blabla toutes les 15 secondes, mais qui est coupé par un bip",
@@ -62,6 +62,12 @@ public class MainActivity extends AppCompatActivity {
                 "UTF-8",
                 1));
 
+        // add a blabla / "bip" server
+        servers.add(new Server("5 messages",
+                "Un serveur envoie 5 messages mal triés, avec une durée de vie courte",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/5-messages.json",
+                "UTF-8",
+                15));
 
 
         // load servers stored in preferences

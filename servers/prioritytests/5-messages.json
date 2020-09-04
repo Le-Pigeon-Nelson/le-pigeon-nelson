@@ -1,0 +1,37 @@
+[
+    {
+        "txt": "Deuxième message",
+        "lang": "fr",
+        "priority": 1,
+        "requiredConditions": [ { "lifespan": 3 } ],
+        "forgettingConditions": []
+    },
+    {
+        "txt": "Troisième message",
+        "lang": "fr",
+        "priority": 1,
+        "requiredConditions": [ { "lifespan": 3 } ],
+        "forgettingConditions": []
+    },
+    {
+        "txt": "Quatrième message",
+        "lang": "fr",
+        "priority": 1,
+        "requiredConditions": [ { "lifespan": 3 } ],
+        "forgettingConditions": []
+    },
+    {
+        "txt": "Cinquième message",
+        "lang": "fr",
+        "priority": 1,
+        "requiredConditions": [ { "lifespan": 3 } ],
+        "forgettingConditions": []
+    },
+    {
+        "txt": "Premier message",
+        "lang": "fr",
+        "priority": 2,
+        "requiredConditions": [ { "lifespan": 3 } ],
+        "forgettingConditions": []
+    }
+]
