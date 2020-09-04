@@ -54,6 +54,14 @@ public class MainActivity extends AppCompatActivity {
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/audiomessage-fr.json",
                 "UTF-8",
                 30));
+        // add a blabla / "bip" server
+        servers.add(new Server("Blabla bip",
+                "Un serveur qui raconte du blabla toutes les 15 secondes, mais qui est coupé par un bip",
+                "https://lepigeonnelson.jmfavreau.info/blabla-bip.php",
+                "UTF-8",
+                1));
+
+
 
         // load servers stored in preferences
         // TODO: load servers stored in preferences
