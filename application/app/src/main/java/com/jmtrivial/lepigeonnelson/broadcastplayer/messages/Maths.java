@@ -7,16 +7,21 @@ public class Maths {
 
 
     public static boolean compare(long a, Comparison comparison, long b) {
-        if (comparison == Comparison.smallerThan)
-            return a < b ;
-        else if (comparison == Comparison.greaterThan)
+        if (comparison == Comparison.smallerThan) {
+            return a < b;
+        }
+        else if (comparison == Comparison.greaterThan) {
             return a > b;
-        else if (comparison == Comparison.smallerOrEqualTo)
+        }
+        else if (comparison == Comparison.smallerOrEqualTo) {
             return a <= b;
-        else if (comparison == Comparison.greaterOrEqualTo)
+        }
+        else if (comparison == Comparison.greaterOrEqualTo) {
             return a >= b;
-        else
+        }
+        else {
             return false;
+        }
     }
 
 

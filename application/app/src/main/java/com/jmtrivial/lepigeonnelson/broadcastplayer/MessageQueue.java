@@ -48,7 +48,7 @@ public class MessageQueue extends Handler {
             playNextMessage();
         }
         else if (msg.what == checkForPlayableMessage) {
-            Log.d("MessageQueue", "next message?");
+            Log.d("MessageQueue", "next message ready to play?");
             if (!messagePlayer.isPlaying()) {
                 playNextMessage();
             }
