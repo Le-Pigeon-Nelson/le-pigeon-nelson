@@ -5,12 +5,12 @@ import android.util.Log;
 public class ConditionFactory {
 
 
-    public MessageCondition getCondition(String refVariable,
+    public MessageCondition getCondition(String reference,
                                          String comparison,
                                          String parameter,
                                          boolean reverse) {
         Maths.Comparison c = Maths.getComparisonFromString(comparison);
-        if (refVariable == null || c == Maths.Comparison.unknown) {
+        if (reference == null || c == Maths.Comparison.unknown) {
             return null;
         }
 
@@ -18,7 +18,7 @@ public class ConditionFactory {
             c = Maths.reverseComparison(c);
         }
 
-        if (refVariable.equals("timeFromReception")) {
+        if (reference.equals("timeFromReception")) {
             return new TimeFromReceptionCondition(c, Integer.parseInt(parameter));
         }
         return null;

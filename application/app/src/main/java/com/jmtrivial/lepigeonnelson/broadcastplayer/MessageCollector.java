@@ -196,17 +196,17 @@ public class MessageCollector extends Handler {
     }
 
     private MessageCondition readCondition(JsonReader reader) throws IOException {
-        String refVariable = null;
+        String ref = null;
         String comparison = null;
         String parameter = null;
         boolean reverse = false;
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            if (name.equals("referenceVariable")) {
+            if (name.equals("reference")) {
                 if (parameter != null)
                     reverse = true;
-                refVariable = reader.nextString();
+                ref = reader.nextString();
             }
             else if (name.equals("comparison")) {
                 comparison = reader.nextString();
@@ -219,7 +219,7 @@ public class MessageCollector extends Handler {
             }
         }
         reader.endObject();
-        return cFactory.getCondition(refVariable, comparison, parameter, reverse);
+        return cFactory.getCondition(ref, comparison, parameter, reverse);
     }
 
 

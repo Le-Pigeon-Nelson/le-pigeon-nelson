@@ -3,14 +3,14 @@
         "txt": "Écho (ter)",
         "lang": "fr",
         "priority": 0,
-        "requiredConditions": [{ "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 6 } ],
+        "requiredConditions": [{ "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 6 } ],
         "forgettingConditions": [ ]
     },
     {
         "txt": "Écho (bis)",
         "lang": "fr",
         "priority": 0,
-        "requiredConditions": [{ "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ],
+        "requiredConditions": [{ "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ],
         "forgettingConditions": [ ]
     },
     {

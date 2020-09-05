@@ -24,7 +24,7 @@ else {
         "lang": "fr",
         "priority": 2,
         "requiredConditions": [],
-        "forgettingConditions": [{ "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 1}]
+        "forgettingConditions": [{ "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 1}]
     }
 ]
 <?php
