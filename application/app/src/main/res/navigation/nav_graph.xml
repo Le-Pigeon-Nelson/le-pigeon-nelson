@@ -20,9 +20,5 @@
         android:name="com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_listen_broadcast">
-
-        <action
-            android:id="@+id/action_ListenFragment_to_ListFragment"
-            app:destination="@id/FirstFragment" />
     </fragment>
 </navigation>

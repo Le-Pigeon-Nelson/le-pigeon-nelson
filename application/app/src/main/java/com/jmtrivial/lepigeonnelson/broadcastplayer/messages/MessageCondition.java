@@ -5,4 +5,6 @@ public interface MessageCondition {
 
     boolean satisfied(BMessage message);
 
+    boolean isTimeConstraint();
+
 }

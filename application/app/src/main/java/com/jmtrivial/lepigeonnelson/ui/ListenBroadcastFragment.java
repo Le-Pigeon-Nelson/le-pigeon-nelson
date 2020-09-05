@@ -34,8 +34,7 @@ public class ListenBroadcastFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 activity.stopBroadcast();
-                NavHostFragment.findNavController(ListenBroadcastFragment.this)
-                        .navigate(R.id.action_ListenFragment_to_ListFragment);
+                NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
             }
         });
     }

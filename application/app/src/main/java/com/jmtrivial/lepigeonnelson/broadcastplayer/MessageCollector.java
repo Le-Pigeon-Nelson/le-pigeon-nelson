@@ -1,5 +1,7 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
+import android.content.Context;
+import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -24,6 +26,7 @@ import java.util.Date;
 public class MessageCollector extends Handler {
     public static final int startCollect = 0;
     public static final int stopCollect = 1;
+    private final LocationService locationManager;
 
     private MessageQueue msgQueue;
 
@@ -37,8 +40,9 @@ public class MessageCollector extends Handler {
     private Runnable collectMessages;
 
 
-    public MessageCollector(MessageQueue msg) {
+    public MessageCollector(MessageQueue msg, Context context) {
 
+        locationManager = LocationService.getLocationManager(context);
         cFactory = new ConditionFactory();
         this.newMessages = new ArrayList<>();
         this.msgQueue = msg;
@@ -95,7 +99,7 @@ public class MessageCollector extends Handler {
 
         URL url = null;
         try {
-            url = new URL(server.getUrl());
+            url = new URL(server.getUrl() + getURLParameters());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return false;
@@ -122,6 +126,14 @@ public class MessageCollector extends Handler {
         }
 
         return true;
+    }
+
+    private String getURLParameters() {
+        Location location = locationManager.location;
+        if (location != null)
+            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude();
+        else
+            return "";
     }
 
     private void readMessagesArray(JsonReader reader) throws IOException {

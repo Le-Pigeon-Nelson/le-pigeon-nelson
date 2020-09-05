@@ -21,6 +21,12 @@ public class ConditionFactory {
         if (reference.equals("timeFromReception")) {
             return new TimeFromReceptionCondition(c, Integer.parseInt(parameter));
         }
+        else if (reference.matches("^distanceTo[(][ ]*[+-]?\\d*\\.?\\d*,[ ]*[+-]?\\d*\\.?\\d*[ ]*[)]$")) {
+            return new DistanceToCondition(reference, c, Float.parseFloat(parameter));
+        }
+        else {
+            Log.d("MessageCondition", "Unknown reference: " + reference);
+        }
         return null;
     }
 

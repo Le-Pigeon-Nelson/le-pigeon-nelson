@@ -31,4 +31,7 @@ public class Server {
     public long getPeriodMilliseconds() {
         return period * 1000;
     }
+    public int getPeriod() {
+        return period;
+    }
 }

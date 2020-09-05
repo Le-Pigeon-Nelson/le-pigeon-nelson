@@ -138,7 +138,13 @@ public class MessagePlayer extends Handler {
         }
     }
 
+
     public void registerQueue(MessageQueue messageQueue) {
         this.messageQueue = messageQueue;
+    }
+
+    public void reset() {
+        stopRendering();
+        tts.shutdown();
     }
 }

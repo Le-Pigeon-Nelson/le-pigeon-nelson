@@ -1,15 +1,22 @@
 package com.jmtrivial.lepigeonnelson;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -19,9 +26,78 @@ public class MainActivity extends AppCompatActivity {
 
     private BroadcastPlayer player;
 
+    private final int REQUEST_PERMISSION_COARSE_LOCATION = 1;
+    private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
+
+    // a function to request permissions
+    private void requestPermission(String permissionName, int permissionRequestCode) {
+        ActivityCompat.requestPermissions(this,
+                new String[]{permissionName}, permissionRequestCode);
+    }
+    // a function to show explanation when asking permission
+    private void showExplanation(String title,
+                                 String message,
+                                 final String permission,
+                                 final int permissionRequestCode) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        requestPermission(permission, permissionRequestCode);
+                    }
+                });
+        builder.create().show();
+    }
+    // show a small message depending on the permission result
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            String permissions[],
+            int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_FINE_LOCATION:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Accès localisation précise accordée.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Accès localisation précise refusée.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case REQUEST_PERMISSION_COARSE_LOCATION:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Accès localisation accordée.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Accès localisation refusée.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // first of all, check permissions for location
+        if (ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                showExplanation("Accès localisation requise", "Rationale",
+                        Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
+            } else {
+                requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
+            }        }
+        if (ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showExplanation("Accès localisation précise requise", "Rationale",
+                        Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_PERMISSION_FINE_LOCATION);
+            } else {
+                requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_PERMISSION_FINE_LOCATION);
+            }
+        }
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -76,6 +152,13 @@ public class MainActivity extends AppCompatActivity {
                 "UTF-8",
                 15));
 
+        // a server to find Museum in neighborhood
+        servers.add(new Server("Musées",
+                "Un serveur qui informe de la présence des musées dans le voisinage",
+                "https://lepigeonnelson.jmfavreau.info/museums.php",
+                "UTF-8",
+                60));
+
         // load servers stored in preferences
         // TODO: load servers stored in preferences
 
@@ -120,4 +203,11 @@ public class MainActivity extends AppCompatActivity {
     public void stopBroadcast() {
         player.stopBroadcast();
     }
+
+    @Override
+    protected void onDestroy() {
+        player.reset();
+        super.onDestroy();
+    }
+
 }

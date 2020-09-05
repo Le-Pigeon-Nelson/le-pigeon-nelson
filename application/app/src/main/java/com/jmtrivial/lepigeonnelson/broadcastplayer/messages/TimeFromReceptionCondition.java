@@ -21,4 +21,9 @@ public class TimeFromReceptionCondition implements MessageCondition {
         long timeFromReception = d.getTime() - message.getCollectedTime();
         return Maths.compare(timeFromReception, comparison, parameterMs);
     }
+
+    @Override
+    public boolean isTimeConstraint() {
+        return true;
+    }
 }

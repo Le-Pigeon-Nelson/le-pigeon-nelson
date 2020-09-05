@@ -5,7 +5,23 @@ import android.util.Log;
 public class Maths {
     public enum Comparison {smallerThan, greaterThan, smallerOrEqualTo, greaterOrEqualTo, unknown };
 
-
+    public static boolean compare(float a, Comparison comparison, float b) {
+        if (comparison == Comparison.smallerThan) {
+            return a < b;
+        }
+        else if (comparison == Comparison.greaterThan) {
+            return a > b;
+        }
+        else if (comparison == Comparison.smallerOrEqualTo) {
+            return a <= b;
+        }
+        else if (comparison == Comparison.greaterOrEqualTo) {
+            return a >= b;
+        }
+        else {
+            return false;
+        }
+    }
     public static boolean compare(long a, Comparison comparison, long b) {
         if (comparison == Comparison.smallerThan) {
             return a < b;
@@ -43,10 +59,10 @@ public class Maths {
         if (comparison == null) {
             return Comparison.unknown;
         }
-        else if (comparison.equals("smallerThan") || comparison.equals("<")) {
+        else if (comparison.equals("smallerThan") || comparison.equals("<") || comparison.equals("lessThan")) {
             return Comparison.smallerThan;
         }
-        else if(comparison.equals("smallerOrEqualTo") || comparison.equals("<=")) {
+        else if(comparison.equals("smallerOrEqualTo") || comparison.equals("<=") || comparison.equals("lessOrEqualTo")) {
             return Comparison.smallerOrEqualTo;
         }
         else if (comparison.equals("greaterThan") || comparison.equals(">")) {

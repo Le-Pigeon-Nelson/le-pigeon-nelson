@@ -62,7 +62,16 @@ public class BMessage implements Comparable<BMessage> {
         return true;
     }
 
-    public boolean isForgettable() {
+    public boolean hasTimeRelatedRequiredConstraint() {
+        for(MessageCondition condition: required) {
+            if (condition.isTimeConstraint())
+                return true;
+        }
+        return false;
+    }
+
+
+        public boolean isForgettable() {
         for(MessageCondition condition: forgettingConditions) {
             if (condition.satisfied(this))
                 return true;
@@ -115,5 +124,9 @@ public class BMessage implements Comparable<BMessage> {
 
     public int getPriority() {
         return priority;
+    }
+
+    public void addExpiration(int refreshDelay) {
+        forgettingConditions.add(new TimeFromReceptionCondition(Maths.Comparison.greaterThan, refreshDelay));
     }
 }

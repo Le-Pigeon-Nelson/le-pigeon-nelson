@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.LocationService;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
 
 import java.util.ArrayList;
@@ -44,9 +46,14 @@ public class ServerSelectionFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                activity.setActiveServer(serverListAdapter.getItem(position));
-                NavHostFragment.findNavController(ServerSelectionFragment.this)
-                        .navigate(R.id.action_ListFragment_to_ListenFragment);
+                if (LocationService.getLocationManager(getContext()).locationServiceAvailable) {
+                    activity.setActiveServer(serverListAdapter.getItem(position));
+                    NavHostFragment.findNavController(ServerSelectionFragment.this)
+                            .navigate(R.id.action_ListFragment_to_ListenFragment);
+                }
+                else {
+                    Toast.makeText(getActivity(), "Localisation non disponible.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

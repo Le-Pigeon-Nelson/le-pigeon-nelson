@@ -12,6 +12,8 @@ import java.util.Iterator;
 
 public class MessageQueue extends Handler {
 
+
+    private int serverPeriod;
     private int refreshDelay;
     private MessagePlayer messagePlayer;
 
@@ -22,18 +24,25 @@ public class MessageQueue extends Handler {
 
     private ArrayList<BMessage> queue;
 
-    public MessageQueue(final MessagePlayer messagePlayer, int refreshDelay) {
+
+    public MessageQueue(final MessagePlayer messagePlayer, int refreshDelayMs) {
         this.messagePlayer = messagePlayer;
         messagePlayer.registerQueue(this);
+        this.serverPeriod = 60;
 
         queue = new ArrayList<>();
-        this.refreshDelay = refreshDelay;
+        this.refreshDelay = refreshDelayMs;
 
     }
 
     public void setRefreshDelay(int refreshDelay) {
         this.refreshDelay = refreshDelay;
     }
+
+    public void setServerPeriod(int serverPeriod) {
+        this.serverPeriod = serverPeriod;
+    }
+
 
     @Override
     public final void handleMessage(Message msg) {
@@ -45,6 +54,13 @@ public class MessageQueue extends Handler {
         else if (msg.what == addNewMessages) {
             removeForgettableMessages();
             ArrayList<BMessage> newMessages = (ArrayList<BMessage>) msg.obj;
+
+            // add an expiration date to avoid too many messages in the queue while refreshing
+            // data from the server
+            for(BMessage message: newMessages) {
+                message.addExpiration(serverPeriod);
+            }
+
             queue.addAll(newMessages);
             Log.d("MessageQueue", "add " + newMessages.size() + " new message(s). Queue size: " + queue.size());
             playNextMessage();
@@ -67,6 +83,7 @@ public class MessageQueue extends Handler {
 
         if (queue.size() > 0) {
 
+            boolean existsTimeConstraint = false;
             boolean playing = false;
             BMessage currentMessage = messagePlayer.getCurrentMessage();
             Iterator<BMessage> iterator = queue.iterator();
@@ -77,7 +94,6 @@ public class MessageQueue extends Handler {
                     // play it only if it is a message with higher priority
                     if ((currentMessage == null) ||
                             (currentMessage.getPriority() < m.getPriority())) {
-                        Log.d("MessageQueue", "found a next message to play");
                         // ask player to play this message
                         Message msgThread = messagePlayer.obtainMessage();
                         msgThread.obj = m;
@@ -89,9 +105,14 @@ public class MessageQueue extends Handler {
                     }
                     break;
                 }
+                if (m.hasTimeRelatedRequiredConstraint()) {
+                    Log.d("Queue", "exists time constraint");
+                    existsTimeConstraint = true;
+                }
             }
-            if (!playing) {
-                // if the queue is not empty, but no message is playable, wait before
+            if (!playing && existsTimeConstraint) {
+                // if the queue is not empty, but no message is playable and controlled
+                // by a time constraint, wait before
                 // checking again
                 sendEmptyMessageAtTime(checkForPlayableMessage, refreshDelay);
             }

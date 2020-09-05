@@ -19,18 +19,20 @@ public class BroadcastPlayer extends HandlerThread {
         super("BroadcastPlayer");
         this.context = context;
         this.refreshDelay = refreshDelay;
+        LocationService.getLocationManager(context).register(this);
     }
 
     @Override
     protected void onLooperPrepared() {
         messagePlayer = new MessagePlayer(context);
         messageQueue = new MessageQueue(messagePlayer, refreshDelay);
-        messageCollector = new MessageCollector(messageQueue);
+        messageCollector = new MessageCollector(messageQueue, context);
     }
 
     public void playBroadcast() {
         if (messageCollector != null) {
             messageCollector.setServer(server);
+            messageQueue.setServerPeriod(server.getPeriod());
             Message msg = messageCollector.obtainMessage();
             msg.obj = server;
             msg.what = messageCollector.startCollect;
@@ -56,5 +58,14 @@ public class BroadcastPlayer extends HandlerThread {
 
     public Server getServer() {
         return this.server;
+    }
+
+    public void locationChanged() {
+        // if location has changed, try if a message can be played
+        messageQueue.sendEmptyMessage(messageQueue.checkForPlayableMessage);
+    }
+
+    public void reset() {
+        messagePlayer.reset();
     }
 }
