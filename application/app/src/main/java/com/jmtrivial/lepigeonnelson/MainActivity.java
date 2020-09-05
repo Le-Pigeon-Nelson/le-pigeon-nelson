@@ -95,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
             // TODO: implement preferences
             return true;
         }
+        else if (id == R.id.action_exit) {
+            finish();
+        }
 
         return super.onOptionsItemSelected(item);
     }
