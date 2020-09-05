@@ -62,13 +62,19 @@ public class MainActivity extends AppCompatActivity {
                 "UTF-8",
                 1));
 
-        // add a blabla / "bip" server
+        // a server to test forgetting constraints
         servers.add(new Server("5 messages ou moins",
                 "Un serveur envoie 5 messages mal triés, avec une durée de vie courte",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/5-messages.json",
                 "UTF-8",
                 15));
 
+        // a server to test playable constraints
+        servers.add(new Server("écho",
+                "Un serveur envoie des messages joués après quelques temps d'attente",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/echo.json",
+                "UTF-8",
+                5));
 
         // load servers stored in preferences
         // TODO: load servers stored in preferences

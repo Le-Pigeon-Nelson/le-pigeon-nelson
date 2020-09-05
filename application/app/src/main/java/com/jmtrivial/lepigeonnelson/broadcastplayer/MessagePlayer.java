@@ -25,6 +25,10 @@ public class MessagePlayer extends Handler {
     private HashMap<String, String> map;
     private MediaPlayer mPlayer;
 
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
     private boolean isPlaying;
 
     private UtteranceProgressListener mProgressListener = new UtteranceProgressListener() {

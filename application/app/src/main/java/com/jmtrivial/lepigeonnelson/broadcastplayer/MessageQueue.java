@@ -16,6 +16,7 @@ public class MessageQueue extends Handler {
     public static final int stopBroadcast = 0;
     public static final int addNewMessages = 1;
     public static final int nextMessage = 2;
+    public static final int checkForPlayableMessage = 3;
 
     private ArrayList<BMessage> queue;
 
@@ -23,7 +24,7 @@ public class MessageQueue extends Handler {
         this.messagePlayer = messagePlayer;
         messagePlayer.registerQueue(this);
 
-        queue = new ArrayList<BMessage>();
+        queue = new ArrayList<>();
 
     }
 
@@ -46,31 +47,47 @@ public class MessageQueue extends Handler {
             Log.d("MessageQueue", "next message?");
             playNextMessage();
         }
+        else if (msg.what == checkForPlayableMessage) {
+            Log.d("MessageQueue", "next message?");
+            if (!messagePlayer.isPlaying()) {
+                playNextMessage();
+            }
+        }
     }
 
     private void playNextMessage() {
         removeForgettableMessages();
         Collections.sort(queue);
 
-        BMessage currentMessage = messagePlayer.getCurrentMessage();
-        Iterator<BMessage> iterator = queue.iterator();
-        while (iterator.hasNext()) {
-            BMessage m = iterator.next();
-            // find the first playable message
-            if (m.isPlayable()) {
-                // play it only if it is a message with higher priority
-                if ((currentMessage == null) ||
+        if (queue.size() > 0) {
+
+            boolean playing = false;
+            BMessage currentMessage = messagePlayer.getCurrentMessage();
+            Iterator<BMessage> iterator = queue.iterator();
+            while (iterator.hasNext()) {
+                BMessage m = iterator.next();
+                // find the first playable message
+                if (m.isPlayable()) {
+                    // play it only if it is a message with higher priority
+                    if ((currentMessage == null) ||
                             (currentMessage.getPriority() < m.getPriority())) {
-                    Log.d("MessageQueue", "found a next message to play");
-                    // ask player to play this message
-                    Message msgThread = messagePlayer.obtainMessage();
-                    msgThread.obj = m;
-                    msgThread.what = messagePlayer.playMessage;
-                    messagePlayer.sendMessage(msgThread);
-                    // remove this message from the queue
-                    iterator.remove();
+                        Log.d("MessageQueue", "found a next message to play");
+                        // ask player to play this message
+                        Message msgThread = messagePlayer.obtainMessage();
+                        msgThread.obj = m;
+                        msgThread.what = messagePlayer.playMessage;
+                        messagePlayer.sendMessage(msgThread);
+                        playing = true;
+                        // remove this message from the queue
+                        iterator.remove();
+                    }
+                    break;
                 }
-                break;
+            }
+            if (!playing) {
+                // if the queue is not empty, but no message is playable, wait 1/10 second before
+                // checking again
+                sendEmptyMessageAtTime(checkForPlayableMessage, 100);
             }
         }
     }

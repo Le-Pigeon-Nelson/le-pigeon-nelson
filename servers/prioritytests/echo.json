@@ -1,0 +1,23 @@
+[
+    {
+        "txt": "Écho (ter)",
+        "lang": "fr",
+        "priority": 0,
+        "requiredConditions": [{ "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 2 } ],
+        "forgettingConditions": [ ]
+    },
+    {
+        "txt": "Écho (bis)",
+        "lang": "fr",
+        "priority": 0,
+        "requiredConditions": [{ "referenceVariable": "timeFromReception", "comparison": "greaterThan", "parameter": 1 } ],
+        "forgettingConditions": [ ]
+    },
+    {
+        "txt": "Écho",
+        "lang": "fr",
+        "priority": 0,
+        "requiredConditions": [ ],
+        "forgettingConditions": [ ]
+    }
+]
