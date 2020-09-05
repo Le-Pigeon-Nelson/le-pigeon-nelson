@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 "Un serveur envoie des messages joués après quelques temps d'attente",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/echo.json",
                 "UTF-8",
-                5));
+                15));
 
         // load servers stored in preferences
         // TODO: load servers stored in preferences
