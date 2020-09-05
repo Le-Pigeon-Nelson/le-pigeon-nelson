@@ -27,7 +27,7 @@ See [technical notes](technical-notes.md) if you're interested in technical deta
 ## Examples of use
 
 * Propose an audio-recorded tour of a neighborhood. The user is free to move around, and messages are triggered according to the constraints defined by the designers of the experience, who will have described this information on the server consulted.
-* Offer on-demand information on the services available in the area
+* Offer on-demand information on the services available in the area (e.g. [museums](https://github.com/jmtrivial/le-pigeon-nelson/blob/master/servers/museums.php))
 * Play selected music according to the location of the listener
 
 ## License
