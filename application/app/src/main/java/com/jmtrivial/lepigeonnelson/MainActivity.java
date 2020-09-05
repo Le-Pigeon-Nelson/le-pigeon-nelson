@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadServers() {
         servers = new ArrayList<>();
 
-        player = new BroadcastPlayer(this);
+        player = new BroadcastPlayer(this, 100);
 
         // add an "hello world" server
         servers.add(new Server("Hello world",

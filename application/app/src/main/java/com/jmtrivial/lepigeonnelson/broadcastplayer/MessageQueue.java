@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Iterator;
 
 public class MessageQueue extends Handler {
+
+    private int refreshDelay;
     private MessagePlayer messagePlayer;
 
     public static final int stopBroadcast = 0;
@@ -20,14 +22,18 @@ public class MessageQueue extends Handler {
 
     private ArrayList<BMessage> queue;
 
-    public MessageQueue(final MessagePlayer messagePlayer) {
+    public MessageQueue(final MessagePlayer messagePlayer, int refreshDelay) {
         this.messagePlayer = messagePlayer;
         messagePlayer.registerQueue(this);
 
         queue = new ArrayList<>();
+        this.refreshDelay = refreshDelay;
 
     }
 
+    public void setRefreshDelay(int refreshDelay) {
+        this.refreshDelay = refreshDelay;
+    }
 
     @Override
     public final void handleMessage(Message msg) {
@@ -85,9 +91,9 @@ public class MessageQueue extends Handler {
                 }
             }
             if (!playing) {
-                // if the queue is not empty, but no message is playable, wait 1/10 second before
+                // if the queue is not empty, but no message is playable, wait before
                 // checking again
-                sendEmptyMessageAtTime(checkForPlayableMessage, 100);
+                sendEmptyMessageAtTime(checkForPlayableMessage, refreshDelay);
             }
         }
     }

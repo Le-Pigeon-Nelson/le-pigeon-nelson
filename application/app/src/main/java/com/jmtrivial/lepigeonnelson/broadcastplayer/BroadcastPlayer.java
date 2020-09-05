@@ -6,6 +6,7 @@ import android.os.Message;
 
 public class BroadcastPlayer extends HandlerThread {
 
+    private int refreshDelay;
     private MessageCollector messageCollector;
     private MessagePlayer messagePlayer;
     private MessageQueue messageQueue;
@@ -14,16 +15,16 @@ public class BroadcastPlayer extends HandlerThread {
 
     private Context context;
 
-    public BroadcastPlayer(Context context) {
+    public BroadcastPlayer(Context context, int refreshDelay) {
         super("BroadcastPlayer");
         this.context = context;
-
+        this.refreshDelay = refreshDelay;
     }
 
     @Override
     protected void onLooperPrepared() {
         messagePlayer = new MessagePlayer(context);
-        messageQueue = new MessageQueue(messagePlayer);
+        messageQueue = new MessageQueue(messagePlayer, refreshDelay);
         messageCollector = new MessageCollector(messageQueue);
     }
 
@@ -48,6 +49,10 @@ public class BroadcastPlayer extends HandlerThread {
         this.server = server;
     }
 
+    public void setRefreshDelay(int delay) {
+        this.refreshDelay = delay;
+        messageQueue.setRefreshDelay(delay);
+    }
 
     public Server getServer() {
         return this.server;
