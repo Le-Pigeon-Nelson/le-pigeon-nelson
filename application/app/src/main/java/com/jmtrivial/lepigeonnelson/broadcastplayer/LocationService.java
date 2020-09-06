@@ -152,7 +152,7 @@ public class LocationService implements LocationListener {
     public void onLocationChanged(Location location) {
         Log.d("LocationManager", "Location changed");
         this.location = location;
-        if (broadcastPlayer != null)
+        if (broadcastPlayer != null && broadcastPlayer.isWorking())
             broadcastPlayer.locationChanged();
     }
 }

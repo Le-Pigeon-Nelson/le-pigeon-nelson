@@ -14,6 +14,7 @@ public class BroadcastPlayer extends HandlerThread {
     private Server server;
 
     private Context context;
+    private boolean working;
 
     public BroadcastPlayer(Context context, int refreshDelay) {
         super("BroadcastPlayer");
@@ -23,6 +24,7 @@ public class BroadcastPlayer extends HandlerThread {
         messagePlayer = null;
         messageCollector = null;
         messageQueue = null;
+        working = false;
     }
 
     @Override
@@ -40,6 +42,7 @@ public class BroadcastPlayer extends HandlerThread {
             msg.obj = server;
             msg.what = messageCollector.startCollect;
             messageCollector.sendMessage(msg);
+            working = true;
         }
     }
 
@@ -48,6 +51,7 @@ public class BroadcastPlayer extends HandlerThread {
             messageCollector.sendEmptyMessage(messageCollector.stopCollect);
             messageQueue.sendEmptyMessage(messageQueue.stopBroadcast);
         }
+        working = false;
     }
 
     public void setServer(Server server) {
@@ -66,8 +70,12 @@ public class BroadcastPlayer extends HandlerThread {
     }
 
     public void reset() {
-        if (messageQueue != null) {
+        if (messagePlayer != null) {
             messagePlayer.reset();
         }
+    }
+
+    public boolean isWorking() {
+        return working;
     }
 }
