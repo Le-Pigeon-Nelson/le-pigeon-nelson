@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         // a server to find Museum in neighborhood
         servers.add(new Server("Musées",
-                "Un serveur qui informe de la présence des musées dans le voisinage",
+                "Connaître les musées dans son voisinage",
                 "https://lepigeonnelson.jmfavreau.info/museums.php",
                 "UTF-8",
                 0));
