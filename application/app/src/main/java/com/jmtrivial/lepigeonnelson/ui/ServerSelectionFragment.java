@@ -73,6 +73,14 @@ public class ServerSelectionFragment extends Fragment {
 
             ((TextView) convertView.findViewById(R.id.serverName)).setText(getItem(position).getName());
             ((TextView) convertView.findViewById(R.id.serverDescription)).setText(getItem(position).getDescription());
+            if (getItem(position).getPeriod() != 0) {
+                convertView.findViewById(R.id.broadcastSingle).setVisibility(View.GONE);
+                convertView.findViewById(R.id.broadcastStreaming).setVisibility(View.VISIBLE);
+            }
+            else {
+                convertView.findViewById(R.id.broadcastSingle).setVisibility(View.VISIBLE);
+                convertView.findViewById(R.id.broadcastStreaming).setVisibility(View.GONE);
+            }
 
             return convertView;
         }
