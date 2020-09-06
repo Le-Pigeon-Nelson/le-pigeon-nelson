@@ -6,6 +6,7 @@ import android.util.Log;
 
 public class UIHandler extends Handler {
     public static final int END_OF_BROADCAST = 0;
+    public static final int SERVER_ERROR = 1;
 
     private BroadcastPlayer.BroadcastPlayerListener listener;
 
@@ -20,6 +21,10 @@ public class UIHandler extends Handler {
                 Log.d("BroadcastPlayer", "End of broadcast sent to UI");
                 listener.onEndOfBroadcast();
             }
+        }
+        else if (what == SERVER_ERROR) {
+            Log.d("BroadcastPlayer", "Error while reading server");
+            listener.onServerError();
         }
     }
 

@@ -115,6 +115,13 @@ public class MainActivity extends AppCompatActivity {
 
         player = new BroadcastPlayer(this, 100);
 
+        // a server to test playable constraints
+        servers.add(new Server("Défectueux 1",
+                "Un serveur injoignable",
+                "https://http://exemple.fr/",
+                "UTF-8",
+                15));
+
         // add an "hello world" server
         servers.add(new Server("Hello world",
                 "One \"hello world\" message every 30 seconds",

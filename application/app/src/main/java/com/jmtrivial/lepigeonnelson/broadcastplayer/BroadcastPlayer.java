@@ -2,12 +2,8 @@ package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
-
-import com.jmtrivial.lepigeonnelson.MainActivity;
 
 public class BroadcastPlayer extends HandlerThread {
 
@@ -43,7 +39,7 @@ public class BroadcastPlayer extends HandlerThread {
     protected void onLooperPrepared() {
         messagePlayer = new MessagePlayer(context);
         messageQueue = new MessageQueue(messagePlayer, refreshDelay, uiHandler);
-        messageCollector = new MessageCollector(messageQueue, context);
+        messageCollector = new MessageCollector(messageQueue, context, uiHandler);
     }
 
     public void playBroadcast() {
@@ -96,6 +92,8 @@ public class BroadcastPlayer extends HandlerThread {
     }
 
     public interface BroadcastPlayerListener {
-        public void onEndOfBroadcast();
+        void onEndOfBroadcast();
+
+        void onServerError();
     };
 }

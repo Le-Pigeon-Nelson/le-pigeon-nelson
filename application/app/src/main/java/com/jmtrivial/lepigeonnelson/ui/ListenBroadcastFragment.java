@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -52,6 +53,12 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
     @Override
     public void onEndOfBroadcast() {
         activity.stopBroadcast();
+        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
+    }
+
+    @Override
+    public void onServerError() {
+        Toast.makeText(activity, "Erreur d'accès au serveur.", Toast.LENGTH_SHORT).show();
         NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
     }
 }

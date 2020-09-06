@@ -41,8 +41,9 @@ public class MessageCollector extends Handler {
     private boolean running;
 
 
+    private UIHandler uiHandler;
 
-    public MessageCollector(MessageQueue msg, Context context) {
+    public MessageCollector(MessageQueue msg, Context context, UIHandler uiHandler) {
 
         locationManager = LocationService.getLocationManager(context);
         cFactory = new ConditionFactory();
@@ -51,7 +52,7 @@ public class MessageCollector extends Handler {
         running = false;
         serverID = 0;
 
-
+        this.uiHandler = uiHandler;
     }
 
     @Override
@@ -83,15 +84,14 @@ public class MessageCollector extends Handler {
                     msgQ.obj = newMessages;
                     msgQ.what = msgQueue.addNewMessages;
                     msgQueue.sendMessage(msgQ);
-                }
 
-                if (server.getPeriodMilliseconds() != 0) {
-                    // wait the desired period before collecting again, only if it's asked
-                    Date d2 = new Date();
-                    long time = releaseTime - d2.getTime();
-                    collectMessages(time);
+                    if (server.getPeriodMilliseconds() != 0) {
+                        // wait the desired period before collecting again, only if it's asked
+                        Date d2 = new Date();
+                        long time = releaseTime - d2.getTime();
+                        collectMessages(time);
+                    }
                 }
-
             }
         }
     }
@@ -115,6 +115,7 @@ public class MessageCollector extends Handler {
             url = new URL(server.getUrl() + getURLParameters());
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
             return false;
         }
 
@@ -132,6 +133,7 @@ public class MessageCollector extends Handler {
 
         } catch (IOException e) {
             e.printStackTrace();
+            uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
             return false;
         } finally {
             if (urlConnection != null)
