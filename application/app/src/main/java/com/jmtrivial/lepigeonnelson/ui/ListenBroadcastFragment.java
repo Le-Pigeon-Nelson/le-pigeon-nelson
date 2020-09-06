@@ -12,8 +12,9 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 
-public class ListenBroadcastFragment extends Fragment {
+public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer.BroadcastPlayerListener {
 
     private MainActivity activity;
 
@@ -29,6 +30,7 @@ public class ListenBroadcastFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         activity = (MainActivity) getActivity();
+        activity.getPlayer().setListener(this);
 
         view.findViewById(R.id.button_second).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,4 +49,9 @@ public class ListenBroadcastFragment extends Fragment {
     }
 
 
+    @Override
+    public void onEndOfBroadcast() {
+        activity.stopBroadcast();
+        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
+    }
 }

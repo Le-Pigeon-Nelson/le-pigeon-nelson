@@ -7,12 +7,14 @@ import android.os.Bundle;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
+import com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this,
                 new String[]{permissionName}, permissionRequestCode);
     }
+
     // a function to show explanation when asking permission
     private void showExplanation(String title,
                                  String message,
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 });
         builder.create().show();
     }
+
     // show a small message depending on the permission result
     @Override
     public void onRequestPermissionsResult(
@@ -80,15 +84,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // first of all, check permissions for location
-        if (ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 showExplanation("Accès localisation requise", "Rationale",
                         Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
             } else {
                 requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
-            }        }
-        if (ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 showExplanation("Accès localisation précise requise", "Rationale",
@@ -157,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 "Un serveur qui informe de la présence des musées dans le voisinage",
                 "https://lepigeonnelson.jmfavreau.info/museums.php",
                 "UTF-8",
-                60));
+                0));
 
         // load servers stored in preferences
         // TODO: load servers stored in preferences
@@ -183,8 +188,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             // TODO: implement preferences
             return true;
-        }
-        else if (id == R.id.action_exit) {
+        } else if (id == R.id.action_exit) {
             finish();
         }
 
@@ -210,4 +214,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    public BroadcastPlayer getPlayer() {
+        return player;
+    }
 }

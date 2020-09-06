@@ -8,8 +8,10 @@
  */
 require __DIR__ . "/vendor/autoload.php";
 
-use Geokit\Distance;
 use Geokit\LatLng;
+
+$radiusPlayable = 500; /* meters */
+$radiusSearch = 2; /* km */
 
 $math = new Geokit\Math();
 
@@ -52,6 +54,7 @@ function getLocation($row, $data) {
 
 
 function printMuseum($row, $data) {
+    global $radiusPlayable;
 
     $name = $row["tags"]["name"];
     $coordinate = getLocation($row, $data);
@@ -66,10 +69,11 @@ function printMuseum($row, $data) {
     print '{
         "txt": "' . $name . '",
         "lang": "fr",
-        "priority": 0,
-        "requiredConditions": [ {"reference": "distanceTo(' . $coordinate . ')", "comparison": "lessThan", "parameter": 500} ],
+        "priority": 1,
+        "requiredConditions": [ {"reference": "distanceTo(' . $coordinate . ')", "comparison": "lessThan", "parameter": ' . $radiusPlayable . '} ],
         "forgettingConditions": [ ]}';
     
+    return $coordinate;
 }
 
 
@@ -86,7 +90,7 @@ if (!isset($lat) || !isset($lng)) {
 
 // create a bounding box from the given position
 $position =  new Geokit\LatLng($lat, $lng);
-$box = $math->expand($position, '2km');
+$box = $math->expand($position, $radiusSearch . 'km');
 $box_str = "(" . $box->getSouthWest() . ",". $box->getNorthEast() . ")";
 
 
@@ -99,30 +103,37 @@ $result = json_decode($html, true); // "true" to get PHP array instead of an obj
 
 $data = $result['elements'];
 
-if (count($data) == 0) {
-    print '[{
-        "txt": "Il n\'y a aucun musée à un kilomètre à la ronde",
-        "lang": "fr",
-        "priority": 0,
-        "requiredConditions": [ ],
-        "forgettingConditions": [ ]}]';
-}
-else {
-    print '[';
+print "[";
+
+$minDist = new Geokit\Distance($radiusSearch, Geokit\Distance::UNIT_KILOMETERS);
+
+if (count($data) != 0) {
     $first = true;
     foreach($data as $key => $row) {
         if (isset($row["tags"]) && isset($row["tags"]["tourism"]) && $row["tags"]["tourism"] == "museum") {
-            if ($first) {
+            if ($first)
                 $first = false;
-            }
-            else {
+            else 
                 echo ", ";
-            }
-            printMuseum($row, $data);
+            $loc = printMuseum($row, $data);
+            $dist = $math->distanceHaversine($position, $loc);
+            if ($dist < $minDist)
+                $minDist = $dist;
         }
     }
-    print ']';
+
 }
+
+if ($minDist->meters() > $radiusPlayable) {
+    print ', {
+        "txt": "Il n\'y a aucun musée autour de vous.",
+        "lang": "fr",
+        "priority": 0,
+        "requiredConditions": [ ],
+        "forgettingConditions": [ ]}';
+}
+    
+print ']';
 
 ?>
 

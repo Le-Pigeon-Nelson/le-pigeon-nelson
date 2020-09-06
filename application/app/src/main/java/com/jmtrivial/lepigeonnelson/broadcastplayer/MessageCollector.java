@@ -85,10 +85,12 @@ public class MessageCollector extends Handler {
                     msgQueue.sendMessage(msgQ);
                 }
 
-                // wait the desired period before collecting again
-                Date d2 = new Date();
-                long time = releaseTime - d2.getTime();
-                collectMessages(time);
+                if (server.getPeriodMilliseconds() != 0) {
+                    // wait the desired period before collecting again, only if it's asked
+                    Date d2 = new Date();
+                    long time = releaseTime - d2.getTime();
+                    collectMessages(time);
+                }
 
             }
         }

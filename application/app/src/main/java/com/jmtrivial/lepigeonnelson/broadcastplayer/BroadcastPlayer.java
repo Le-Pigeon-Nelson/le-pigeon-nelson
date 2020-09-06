@@ -1,8 +1,13 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
+
+import com.jmtrivial.lepigeonnelson.MainActivity;
 
 public class BroadcastPlayer extends HandlerThread {
 
@@ -11,11 +16,15 @@ public class BroadcastPlayer extends HandlerThread {
     private MessagePlayer messagePlayer;
     private MessageQueue messageQueue;
 
+
+    private UIHandler uiHandler;
+
     private Server server;
 
     private Context context;
     private boolean working;
 
+    @SuppressLint("HandlerLeak")
     public BroadcastPlayer(Context context, int refreshDelay) {
         super("BroadcastPlayer");
         this.context = context;
@@ -25,12 +34,15 @@ public class BroadcastPlayer extends HandlerThread {
         messageCollector = null;
         messageQueue = null;
         working = false;
+
+        uiHandler = new UIHandler();
+
     }
 
     @Override
     protected void onLooperPrepared() {
         messagePlayer = new MessagePlayer(context);
-        messageQueue = new MessageQueue(messagePlayer, refreshDelay);
+        messageQueue = new MessageQueue(messagePlayer, refreshDelay, uiHandler);
         messageCollector = new MessageCollector(messageQueue, context);
     }
 
@@ -78,4 +90,12 @@ public class BroadcastPlayer extends HandlerThread {
     public boolean isWorking() {
         return working;
     }
+
+    public void setListener(BroadcastPlayerListener listener) {
+        uiHandler.setListener(listener);
+    }
+
+    public interface BroadcastPlayerListener {
+        public void onEndOfBroadcast();
+    };
 }

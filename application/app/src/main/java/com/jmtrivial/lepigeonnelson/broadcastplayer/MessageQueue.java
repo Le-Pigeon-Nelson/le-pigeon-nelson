@@ -17,6 +17,8 @@ public class MessageQueue extends Handler {
     private int refreshDelay;
     private MessagePlayer messagePlayer;
 
+    private UIHandler uiHandler;
+
     public static final int stopBroadcast = 0;
     public static final int addNewMessages = 1;
     public static final int nextMessage = 2;
@@ -25,18 +27,15 @@ public class MessageQueue extends Handler {
     private ArrayList<BMessage> queue;
 
 
-    public MessageQueue(final MessagePlayer messagePlayer, int refreshDelayMs) {
+    public MessageQueue(final MessagePlayer messagePlayer, int refreshDelayMs, UIHandler uiHandler) {
         this.messagePlayer = messagePlayer;
         messagePlayer.registerQueue(this);
         this.serverPeriod = 60;
+        this.uiHandler = uiHandler;
 
         queue = new ArrayList<>();
         this.refreshDelay = refreshDelayMs;
 
-    }
-
-    public void setRefreshDelay(int refreshDelay) {
-        this.refreshDelay = refreshDelay;
     }
 
     public void setServerPeriod(int serverPeriod) {
@@ -57,8 +56,10 @@ public class MessageQueue extends Handler {
 
             // add an expiration date to avoid too many messages in the queue while refreshing
             // data from the server
-            for(BMessage message: newMessages) {
-                message.addExpiration(serverPeriod);
+            if (serverPeriod != 0) {
+                for (BMessage message : newMessages) {
+                    message.addExpiration(serverPeriod);
+                }
             }
 
             queue.addAll(newMessages);
@@ -109,6 +110,11 @@ public class MessageQueue extends Handler {
                     Log.d("Queue", "exists time constraint");
                     existsTimeConstraint = true;
                 }
+            }
+            // if no message has been sent, and no other message will be obtained
+            // from the server (period = 0), end of broadcast
+            if (!playing && serverPeriod == 0) {
+                uiHandler.sendEmptyMessage(uiHandler.END_OF_BROADCAST);
             }
             if (!playing && existsTimeConstraint) {
                 // if the queue is not empty, but no message is playable and controlled
