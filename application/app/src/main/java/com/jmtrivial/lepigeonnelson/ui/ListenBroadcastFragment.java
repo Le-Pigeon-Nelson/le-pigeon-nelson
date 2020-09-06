@@ -61,4 +61,10 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
         Toast.makeText(activity, "Erreur d'accès au serveur.", Toast.LENGTH_SHORT).show();
         NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
     }
+
+    @Override
+    public void onServerContentError() {
+        Toast.makeText(activity, "Erreur dans le contenu du serveur.", Toast.LENGTH_SHORT).show();
+        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
+    }
 }

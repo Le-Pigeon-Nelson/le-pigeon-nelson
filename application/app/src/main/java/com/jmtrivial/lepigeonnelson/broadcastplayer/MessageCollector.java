@@ -122,22 +122,36 @@ public class MessageCollector extends Handler {
         HttpURLConnection urlConnection = null;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            JsonReader reader = new JsonReader(new InputStreamReader(in, server.getEncoding()));
-
-            try {
-                readMessagesArray(reader);
-            } finally {
-                reader.close();
-            }
 
         } catch (IOException e) {
             e.printStackTrace();
             uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
             return false;
+        }
+
+        JsonReader reader = null;
+        try {
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            reader = new JsonReader(new InputStreamReader(in, server.getEncoding()));
+
+            readMessagesArray(reader);
+
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+            uiHandler.sendEmptyMessage(uiHandler.SERVER_CONTENT_ERROR);
+            return false;
         } finally {
             if (urlConnection != null)
                 urlConnection.disconnect();
+        }
+
+        try {
+            if (reader != null)
+                reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
+            return false;
         }
 
         return true;
@@ -166,6 +180,8 @@ public class MessageCollector extends Handler {
                 i += 1;
                 newMessages.add(msg);
             }
+            else
+                throw new IOException();
         }
         reader.endArray();
 
@@ -217,6 +233,9 @@ public class MessageCollector extends Handler {
             if (c != null) {
                 result.add(c);
             }
+            else
+                throw new IOException();
+
         }
         reader.endArray();
         return result;

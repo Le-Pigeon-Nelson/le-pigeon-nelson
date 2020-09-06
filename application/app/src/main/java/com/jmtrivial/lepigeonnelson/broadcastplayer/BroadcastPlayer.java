@@ -95,5 +95,7 @@ public class BroadcastPlayer extends HandlerThread {
         void onEndOfBroadcast();
 
         void onServerError();
+
+        void onServerContentError();
     };
 }

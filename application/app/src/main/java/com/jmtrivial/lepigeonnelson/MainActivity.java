@@ -115,10 +115,24 @@ public class MainActivity extends AppCompatActivity {
 
         player = new BroadcastPlayer(this, 100);
 
-        // a server to test playable constraints
+        // a server to test robustness
         servers.add(new Server("Défectueux 1",
                 "Un serveur injoignable",
                 "https://http://exemple.fr/",
+                "UTF-8",
+                15));
+
+        // a server to test robustness
+        servers.add(new Server("Défectueux 2",
+                "Un json malformé",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/jsontests/broken.json",
+                "UTF-8",
+                15));
+
+        // a server to test robustness
+        servers.add(new Server("Défectueux 3",
+                "Un json avec des champs manquants",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/jsontests/missing-parts.json",
                 "UTF-8",
                 15));
 

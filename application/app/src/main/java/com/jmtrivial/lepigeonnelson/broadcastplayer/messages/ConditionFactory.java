@@ -19,6 +19,8 @@ public class ConditionFactory {
         }
 
         if (reference.equals("timeFromReception")) {
+            if (parameter == null)
+                return null;
             return new TimeFromReceptionCondition(c, Integer.parseInt(parameter));
         }
         else if (reference.matches("^distanceTo[(][ ]*[+-]?\\d*\\.?\\d*,[ ]*[+-]?\\d*\\.?\\d*[ ]*[)]$")) {
