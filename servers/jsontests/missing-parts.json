@@ -1,0 +1,29 @@
+[
+    {
+        "requiredConditions": [ ],
+        "forgettingConditions": [ ]
+    },
+    {
+        "priority": 0,
+        "requiredConditions": [ ],
+        "forgettingConditions": [ ]
+    },
+    {
+        "txt": "Message sans langue",
+        "priority": 0,
+        "requiredConditions": [ ],
+        "forgettingConditions": [ ]
+    },
+    {
+        "txt": "Message avec une condition incomplète",
+        "lang": "fr",
+        "requiredConditions": [ ],
+        "forgettingConditions": [  { "reference": "timeFromReception", "comparison": "greaterThan" } ]
+    },
+    {
+        "txt": "Message avec une condition incohérente",
+        "lang": "fr",
+        "requiredConditions": [ ],
+        "forgettingConditions": [  { "reference": "timeFromReception", "comparison": "greaterThan", "toto": "vrai" } ]
+    }
+]
