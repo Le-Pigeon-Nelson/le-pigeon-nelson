@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_ListFragment_to_ListenFragment"
             app:destination="@id/SecondFragment" />
+        <action
+            android:id="@+id/action_settings"
+            app:destination="@id/Settings" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -21,4 +24,7 @@
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_listen_broadcast">
     </fragment>
+    <fragment android:id="@+id/Settings"
+        android:name="com.jmtrivial.lepigeonnelson.ui.SettingsFragment" />
+
 </navigation>

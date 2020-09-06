@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -22,8 +23,7 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+            Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_listen_broadcast, container, false);
     }
@@ -36,7 +36,6 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
         view.findViewById(R.id.button_second).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.stopBroadcast();
                 NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
             }
         });
@@ -47,8 +46,15 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
         super.onResume();
         TextView text = getView().findViewById(R.id.textview_second);
         text.setText("Vous écoutez " + activity.getActiveServer().getName());
+        activity.setMainFragment(false);
+        activity.invalidateOptionsMenu();
     }
 
+    @Override
+    public void onStop() {
+        activity.stopBroadcast();
+        super.onStop();
+    }
 
     @Override
     public void onEndOfBroadcast() {

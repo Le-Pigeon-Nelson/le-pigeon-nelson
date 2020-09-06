@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 public class ServerSelectionFragment extends Fragment {
     private ServerListAdapter serverListAdapter;
+    private MainActivity activity;
 
     @Override
     public View onCreateView(
@@ -37,7 +38,7 @@ public class ServerSelectionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final MainActivity activity = (MainActivity) getActivity();
+        activity = (MainActivity) getActivity();
 
         serverListAdapter = new ServerListAdapter(view.getContext(), activity.servers);
 
@@ -58,12 +59,21 @@ public class ServerSelectionFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        serverListAdapter.notifyDataSetChanged();
+        super.onResume();
+        activity.setMainFragment(true);
+        activity.invalidateOptionsMenu();
+    }
+
     private class ServerListAdapter extends ArrayAdapter<Server> {
 
 
         public ServerListAdapter(@NonNull Context context, ArrayList<Server> servers) {
             super(context, 0, servers);
         }
+
 
         @Override
         public View getView(int position, View convertView, ViewGroup container) {

@@ -2,34 +2,45 @@ package com.jmtrivial.lepigeonnelson;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 import com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment;
+import com.jmtrivial.lepigeonnelson.ui.ServerSelectionFragment;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.preference.PreferenceManager;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    public ArrayList<Server> debugServers;
+    public ArrayList<Server> coreServers;
+    public ArrayList<Server> userDefinedServers;
     public ArrayList<Server> servers;
 
     private BroadcastPlayer player;
 
+    private boolean mainFragment;
     private final int REQUEST_PERMISSION_COARSE_LOCATION = 1;
     private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
+    private boolean showDebugServers;
+    private Toolbar toolbar;
 
     // a function to request permissions
     private void requestPermission(String permissionName, int permissionRequestCode) {
@@ -81,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mainFragment = true;
         super.onCreate(savedInstanceState);
 
         // first of all, check permissions for location
@@ -104,97 +116,138 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        loadPreferences();
 
         this.loadServers();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     private void loadServers() {
         servers = new ArrayList<>();
+        coreServers = new ArrayList<>();
+        debugServers = new ArrayList<>();
+        userDefinedServers = new ArrayList<>();
 
         player = new BroadcastPlayer(this, 100);
 
         // a server to test robustness
-        servers.add(new Server("Défectueux 1",
+        debugServers.add(new Server("Défectueux 1",
                 "Un serveur injoignable",
                 "https://http://exemple.fr/",
                 "UTF-8",
                 15));
 
         // a server to test robustness
-        servers.add(new Server("Défectueux 2",
+        debugServers.add(new Server("Défectueux 2",
                 "Un json malformé",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/jsontests/broken.json",
                 "UTF-8",
                 15));
 
         // a server to test robustness
-        servers.add(new Server("Défectueux 3",
+        debugServers.add(new Server("Défectueux 3",
                 "Un json avec des champs manquants",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/jsontests/missing-parts.json",
                 "UTF-8",
                 15));
 
         // add an "hello world" server
-        servers.add(new Server("Hello world",
+        debugServers.add(new Server("Hello world",
                 "One \"hello world\" message every 30 seconds",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/message.json",
                 "UTF-8",
                 30));
 
         // add an "bonjour le monde" (fr) server
-        servers.add(new Server("Bonjour le monde",
+        debugServers.add(new Server("Bonjour le monde",
                 "Un message \"bonjour le monde\" toutes les 30 secondes",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/message-fr.json",
                 "UTF-8",
                 30));
 
         // add an "bonjour le monde" (fr) server
-        servers.add(new Server("Bonjour le monde (audio)",
+        debugServers.add(new Server("Bonjour le monde (audio)",
                 "Un message \"bonjour le monde\" dit par un humain, toutes les 30 secondes",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/audiomessage-fr.json",
                 "UTF-8",
                 30));
 
         // add a blabla / "bip" server
-        servers.add(new Server("Blabla bip",
+        debugServers.add(new Server("Blabla bip",
                 "Un serveur qui raconte du blabla toutes les 15 secondes, mais qui est coupé par un bip",
                 "https://lepigeonnelson.jmfavreau.info/blabla-bip.php",
                 "UTF-8",
                 1));
 
         // a server to test forgetting constraints
-        servers.add(new Server("5 messages ou moins",
+        debugServers.add(new Server("5 messages ou moins",
                 "Un serveur envoie 5 messages mal triés, avec une durée de vie courte",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/5-messages.json",
                 "UTF-8",
                 15));
 
         // a server to test playable constraints
-        servers.add(new Server("écho",
+        debugServers.add(new Server("écho",
                 "Un serveur envoie des messages joués après quelques temps d'attente",
                 "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/echo.json",
                 "UTF-8",
                 15));
 
         // a server to find Museum in neighborhood
-        servers.add(new Server("Musées",
+        coreServers.add(new Server("Musées",
                 "Connaître les musées dans son voisinage",
                 "https://lepigeonnelson.jmfavreau.info/museums.php",
                 "UTF-8",
                 0));
 
-        // load servers stored in preferences
         // TODO: load servers stored in preferences
 
+        buildServerList();
+
         player.start();
+    }
+
+    private void loadPreferences() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        showDebugServers = preferences.getBoolean("debug_servers", false);
+
+    }
+
+    private void buildServerList() {
+        servers.clear();
+
+        if (showDebugServers) {
+            servers.addAll(debugServers);
+        }
+        servers.addAll(coreServers);
+        servers.addAll(userDefinedServers);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem itemSettings = menu.findItem(R.id.action_settings);
+        itemSettings.setVisible(mainFragment);
+
+        if (mainFragment)
+            toolbar.setNavigationIcon(R.drawable.ic_baseline_power_off_24);
+        else
+            toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+
+
         return true;
     }
 
@@ -207,10 +260,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            // TODO: implement preferences
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.action_settings);
             return true;
-        } else if (id == R.id.action_exit) {
-            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -237,5 +288,14 @@ public class MainActivity extends AppCompatActivity {
 
     public BroadcastPlayer getPlayer() {
         return player;
+    }
+
+    public void enableDebugServers(boolean showDebugServers) {
+        this.showDebugServers = showDebugServers;
+        buildServerList();
+    }
+
+    public void setMainFragment(boolean b) {
+        mainFragment = b;
     }
 }
