@@ -26,6 +26,8 @@ import java.util.Date;
 public class MessageCollector extends Handler {
     public static final int startCollect = 0;
     public static final int stopCollect = 1;
+    public static final int processCollect = 2;
+
     private final LocationService locationManager;
 
     private MessageQueue msgQueue;
@@ -35,9 +37,9 @@ public class MessageCollector extends Handler {
     private ArrayList<BMessage> newMessages;
 
     private Server server;
+    private int serverID;
     private boolean running;
 
-    private Runnable collectMessages;
 
 
     public MessageCollector(MessageQueue msg, Context context) {
@@ -47,37 +49,9 @@ public class MessageCollector extends Handler {
         this.newMessages = new ArrayList<>();
         this.msgQueue = msg;
         running = false;
+        serverID = 0;
 
-        collectMessages = new Runnable() {
-            @Override
-            public void run() {
-                if (running) {
-                    Date d = new Date();
-                    long releaseTime = d.getTime() + server.getPeriodMilliseconds();
-                    Log.d("MessageCollector", "get data from server");
 
-                    // collect messages from the server
-                    if (collect()) {
-                        // send them to the message queue
-                        Message msg = msgQueue.obtainMessage();
-                        msg.obj = newMessages;
-                        msg.what = msgQueue.addNewMessages;
-                        msgQueue.sendMessage(msg);
-                    }
-
-                    // wait the desired period before collecting again
-                    Date d2 = new Date();
-                    long time = releaseTime - d2.getTime();
-                    if (time > 0) {
-                        postDelayed(collectMessages, time);
-                    }
-                    else {
-                        post(collectMessages);
-                    }
-
-                }
-            }
-        };
     }
 
     @Override
@@ -89,9 +63,46 @@ public class MessageCollector extends Handler {
         else if (msg.what == startCollect) {
             Log.d("MessageCollector", "start collect");
             this.server = (Server) msg.obj;
+            serverID += 1;
             running = true;
 
-            post(collectMessages);
+            collectMessages(0);
+        }
+        else if (msg.what == processCollect) {
+            Integer id = (Integer) msg.obj;
+            // only run this process if it corresponds to the current server
+            if (running && id == serverID) {
+                Date d = new Date();
+                long releaseTime = d.getTime() + server.getPeriodMilliseconds();
+                Log.d("MessageCollector", "get data from server");
+
+                // collect messages from the server
+                if (collect()) {
+                    // send them to the message queue
+                    Message msgQ = msgQueue.obtainMessage();
+                    msgQ.obj = newMessages;
+                    msgQ.what = msgQueue.addNewMessages;
+                    msgQueue.sendMessage(msgQ);
+                }
+
+                // wait the desired period before collecting again
+                Date d2 = new Date();
+                long time = releaseTime - d2.getTime();
+                collectMessages(time);
+
+            }
+        }
+    }
+
+    private void collectMessages(long d) {
+        Message msg = obtainMessage();
+        msg.obj = serverID;
+        msg.what = processCollect;
+        if (d <= 0) {
+            sendMessage(msg);
+        }
+        else {
+            sendMessageDelayed(msg, d);
         }
     }
 
