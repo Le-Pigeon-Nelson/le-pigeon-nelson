@@ -1,9 +1,9 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 public class BroadcastPlayer extends HandlerThread {
 
@@ -20,8 +20,7 @@ public class BroadcastPlayer extends HandlerThread {
     private Context context;
     private boolean working;
 
-    @SuppressLint("HandlerLeak")
-    public BroadcastPlayer(Context context, int refreshDelay) {
+    public BroadcastPlayer(Context context, int refreshDelay, UIHandler uiHandler) {
         super("BroadcastPlayer");
         this.context = context;
         this.refreshDelay = refreshDelay;
@@ -31,8 +30,7 @@ public class BroadcastPlayer extends HandlerThread {
         messageQueue = null;
         working = false;
 
-        uiHandler = new UIHandler();
-
+        this.uiHandler = uiHandler;
     }
 
     @Override
@@ -97,5 +95,7 @@ public class BroadcastPlayer extends HandlerThread {
         void onServerError();
 
         void onServerContentError();
+
+        void onServerGPSError();
     };
 }

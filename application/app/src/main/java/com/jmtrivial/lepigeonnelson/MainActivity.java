@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.UIHandler;
 import com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment;
 import com.jmtrivial.lepigeonnelson.ui.ServerSelectionFragment;
 
@@ -37,10 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastPlayer player;
 
     private boolean mainFragment;
-    private final int REQUEST_PERMISSION_COARSE_LOCATION = 1;
-    private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
+    private final int REQUEST_PERMISSION_FINE_LOCATION = 1;
     private boolean showDebugServers;
     private Toolbar toolbar;
+    private UIHandler uiHandler;
 
     // a function to request permissions
     private void requestPermission(String permissionName, int permissionRequestCode) {
@@ -79,14 +80,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Accès localisation précise refusée.", Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case REQUEST_PERMISSION_COARSE_LOCATION:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Accès localisation accordée.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Accès localisation refusée.", Toast.LENGTH_SHORT).show();
-                }
-                break;
         }
     }
 
@@ -96,15 +89,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // first of all, check permissions for location
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                showExplanation("Accès localisation requise", "Rationale",
-                        Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
-            } else {
-                requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
-            }
-        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -121,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        uiHandler = new UIHandler();
+
 
         loadPreferences();
 
@@ -139,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         debugServers = new ArrayList<>();
         userDefinedServers = new ArrayList<>();
 
-        player = new BroadcastPlayer(this, 100);
+        player = new BroadcastPlayer(this, 100, uiHandler);
 
         // a server to test robustness
         debugServers.add(new Server("Défectueux 1",
@@ -280,6 +267,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void setActiveServer(Server activeServer) {
         player.setServer(activeServer);
+    }
+
+    public void playBroadcast() {
         player.playBroadcast();
     }
 

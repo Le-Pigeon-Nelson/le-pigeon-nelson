@@ -79,6 +79,10 @@ public class MessageQueue extends Handler {
     }
 
     private void playNextMessage() {
+        if (serverPeriod == 0 && queue.size() == 0) {
+            uiHandler.sendEmptyMessage(uiHandler.END_OF_BROADCAST);
+        }
+
         removeForgettableMessages();
         Collections.sort(queue);
 

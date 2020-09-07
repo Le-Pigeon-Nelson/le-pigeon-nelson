@@ -24,14 +24,14 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        activity = (MainActivity) getActivity();
+        activity.getPlayer().setListener(this);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_listen_broadcast, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        activity = (MainActivity) getActivity();
-        activity.getPlayer().setListener(this);
 
         view.findViewById(R.id.button_second).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +48,7 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
         text.setText("Vous écoutez " + activity.getActiveServer().getName());
         activity.setMainFragment(false);
         activity.invalidateOptionsMenu();
+        activity.playBroadcast();
     }
 
     @Override
@@ -71,6 +72,12 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
     @Override
     public void onServerContentError() {
         Toast.makeText(activity, "Erreur dans le contenu du serveur.", Toast.LENGTH_SHORT).show();
+        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
+    }
+
+    @Override
+    public void onServerGPSError() {
+        Toast.makeText(activity, "Pas de connexion GPS.", Toast.LENGTH_SHORT).show();
         NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
     }
 }

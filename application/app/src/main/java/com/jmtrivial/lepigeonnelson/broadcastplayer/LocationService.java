@@ -1,6 +1,5 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,26 +9,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public class LocationService implements LocationListener {
 
     //The minimum distance to change updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10 meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 
     //The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1; //1000 * 60 * 1; // 1 minute
-
-    private final static boolean forceNetwork = false;
+    private static final long MIN_TIME_BW_UPDATES = 1000;
 
     private static LocationService instance = null;
     private final Context context;
 
     private LocationManager locationManager;
     public Location location;
-    private boolean isGPSEnabled;
-    private boolean isNetworkEnabled;
     public boolean locationServiceAvailable;
 
     private BroadcastPlayer broadcastPlayer;
@@ -57,9 +51,7 @@ public class LocationService implements LocationListener {
      * Local constructor
      */
     private LocationService(Context context) {
-        this.isGPSEnabled = false;
-        this.isNetworkEnabled = false;
-        if (forceNetwork) isGPSEnabled = false;
+        this.locationServiceAvailable = false;
         this.context = context;
         broadcastPlayer = null;
 
@@ -76,9 +68,8 @@ public class LocationService implements LocationListener {
         try {
             this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-            // Get GPS and network status
-            this.isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            this.isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            // Get GPS status
+            this.locationServiceAvailable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             updateLocationService();
         } catch (Exception ex) {
@@ -87,6 +78,7 @@ public class LocationService implements LocationListener {
     }
 
     private void updateLocationService() {
+        locationManager.removeUpdates(this);
 
         if (Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -95,32 +87,18 @@ public class LocationService implements LocationListener {
             return;
         }
 
-        if (!isNetworkEnabled && !isGPSEnabled) {
-            // cannot get location
-            this.locationServiceAvailable = false;
+        if (locationServiceAvailable) {
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    MIN_TIME_BW_UPDATES,
+                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+            if (locationManager != null) {
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
         }
         else {
-            this.locationServiceAvailable = true;
-
-            if (isGPSEnabled)  {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                        MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                if (locationManager != null) {
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                }
-            }
-
-            if (isNetworkEnabled) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                        MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                if (locationManager != null) {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                }
-            }
+            Log.w("LocationService", "GPS is not available");
         }
     }
 
@@ -132,19 +110,13 @@ public class LocationService implements LocationListener {
 
     @Override
     public void onProviderEnabled(String provider) {
-        if (provider.equals(LocationManager.GPS_PROVIDER))
-            this.isGPSEnabled = true;
-        if (provider.equals(LocationManager.NETWORK_PROVIDER))
-            this.isNetworkEnabled = true;
+        locationServiceAvailable = true;
         updateLocationService();
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        if (provider.equals(LocationManager.GPS_PROVIDER))
-            this.isGPSEnabled = false;
-        if (provider.equals(LocationManager.NETWORK_PROVIDER))
-            this.isNetworkEnabled = false;
+        locationServiceAvailable = false;
         updateLocationService();
     }
 

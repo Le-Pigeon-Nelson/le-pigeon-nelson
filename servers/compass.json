@@ -1,83 +1,83 @@
 [
     {
-        "txt": "Le nord est à midi",
+        "txt": "Le Nord est à midi",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(0)", "comparison": "lessOrEqualTo", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "Le nord est à 11 heures",
+        "txt": "Le Nord est à 11 heures",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(30)", "comparison": "lessThan", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "L'est est à 1 heure",
+        "txt": "L'Est est à 1 heure",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(60)", "comparison": "lessThan", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "L'est est à midi",
+        "txt": "L'Est est à midi",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(90)", "comparison": "lessOrEqualTo", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "L'est est à 11 heures",
+        "txt": "L'Est est à 11 heures",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(120)", "comparison": "lessThan", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "Le sud est à 1 heure",
+        "txt": "Le Sud est à 1 heure",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(150)", "comparison": "lessThan", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "Le sud est à midi",
+        "txt": "Le Sud est à midi",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(180)", "comparison": "lessOrEqualTo", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "Le sud est à 11 heures",
+        "txt": "Le Sud est à 11 heures",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(210)", "comparison": "lessThan", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "L'ouest est à 1 heure",
+        "txt": "L'Ouest est à 1 heure",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(240)", "comparison": "lessThan", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "L'ouest est à midi",
+        "txt": "L'Ouest est à midi",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(270)", "comparison": "lessOrEqualTo", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "L'ouest est à 11 heures",
+        "txt": "L'Ouest est à 11 heures",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(300)", "comparison": "lessThan", "parameter": 15 } ],
         "forgettingConditions": [ ]
     },
     {
-        "txt": "Le nord est à 1 heure",
+        "txt": "Le Nord est à 1 heure",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ { "reference": "angularDeviation(330)", "comparison": "lessThan", "parameter": 15 } ],

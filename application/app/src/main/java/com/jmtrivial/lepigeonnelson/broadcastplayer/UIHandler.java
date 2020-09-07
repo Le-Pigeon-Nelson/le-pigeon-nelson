@@ -8,6 +8,7 @@ public class UIHandler extends Handler {
     public static final int END_OF_BROADCAST = 0;
     public static final int SERVER_ERROR = 1;
     public static final int SERVER_CONTENT_ERROR = 2;
+    public static final int NO_GPS = 3;
 
     private BroadcastPlayer.BroadcastPlayerListener listener;
 
@@ -30,6 +31,10 @@ public class UIHandler extends Handler {
         else if (what == SERVER_CONTENT_ERROR) {
             Log.d("BroadcastPlayer", "Error while reading server (content error)");
             listener.onServerContentError();
+        }
+        else if (what == NO_GPS) {
+            Log.d("BroadcastPlayer", "Cannot get GPS coordinate");
+            listener.onServerGPSError();
         }
     }
 

@@ -118,6 +118,10 @@ public class MessageCollector extends Handler {
             uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
             return false;
         }
+        catch (Exception e) {
+            uiHandler.sendEmptyMessage(uiHandler.NO_GPS);
+            return false;
+        }
 
         HttpURLConnection urlConnection = null;
         try {
@@ -157,12 +161,13 @@ public class MessageCollector extends Handler {
         return true;
     }
 
-    private String getURLParameters() {
+    private String getURLParameters() throws Exception {
         Location location = locationManager.location;
         if (location != null)
             return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude() + "&bearing=" + location.getBearing();
-        else
-            return "";
+        else {
+            throw new Exception();
+        }
     }
 
     private void readMessagesArray(JsonReader reader) throws IOException {

@@ -1,6 +1,7 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.LocationService;
 
@@ -31,9 +32,15 @@ public class AngularDeviationCondition implements MessageCondition {
             return false;
         else {
             Location l = locationService.location;
-            float b = l.getBearing();
-            float angleBetweenBearings = Math.abs(normalizeDegree(b - refBearing));
-            return Maths.compare(angleBetweenBearings, comparison, angle);
+            if (l == null) {
+                return false;
+            }
+            else {
+                float b = l.getBearing();
+                Log.d("AngularDeviationCondition", "angle: " + b);
+                float angleBetweenBearings = Math.abs(normalizeDegree(b - refBearing));
+                return Maths.compare(angleBetweenBearings, comparison, angle);
+            }
         }
     }
 
