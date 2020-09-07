@@ -211,6 +211,13 @@ public class MainActivity extends AppCompatActivity {
                 "UTF-8",
                 0));
 
+        // a server to find Museum in neighborhood
+        coreServers.add(new Server("Rose des vents",
+                "Connaître la direction vers laquelle on s'oriente",
+                "https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/compass.json",
+                "UTF-8",
+                0));
+
         // TODO: load servers stored in preferences
 
         buildServerList();

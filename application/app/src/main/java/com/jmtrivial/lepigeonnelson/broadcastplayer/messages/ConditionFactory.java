@@ -26,6 +26,9 @@ public class ConditionFactory {
         else if (reference.matches("^distanceTo[(][ ]*[+-]?\\d*\\.?\\d*,[ ]*[+-]?\\d*\\.?\\d*[ ]*[)]$")) {
             return new DistanceToCondition(reference, c, Float.parseFloat(parameter));
         }
+        else if  (reference.matches("^angularDeviation[(][ ]*[+-]?\\d*\\.?\\d*[ ]*[)]$")) {
+            return new AngularDeviationCondition(reference, c, Float.parseFloat(parameter));
+        }
         else {
             Log.d("MessageCondition", "Unknown reference: " + reference);
         }

@@ -160,7 +160,7 @@ public class MessageCollector extends Handler {
     private String getURLParameters() {
         Location location = locationManager.location;
         if (location != null)
-            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude();
+            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude() + "&bearing=" + location.getBearing();
         else
             return "";
     }
