@@ -14,10 +14,10 @@ import androidx.core.content.ContextCompat;
 public class LocationService implements LocationListener {
 
     //The minimum distance to change updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
 
     //The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000;
+    private static final long MIN_TIME_BW_UPDATES = 100;
 
     private static LocationService instance = null;
     private final Context context;
