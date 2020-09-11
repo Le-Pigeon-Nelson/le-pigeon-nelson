@@ -1,12 +1,13 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.JsonReader;
 import android.util.Log;
+import android.view.animation.AccelerateInterpolator;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.BMessage;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.ConditionFactory;
@@ -28,7 +29,7 @@ public class MessageCollector extends Handler {
     public static final int stopCollect = 1;
     public static final int processCollect = 2;
 
-    private final LocationService locationManager;
+    private final SensorsService sensorManager;
 
     private MessageQueue msgQueue;
 
@@ -43,9 +44,9 @@ public class MessageCollector extends Handler {
 
     private UIHandler uiHandler;
 
-    public MessageCollector(MessageQueue msg, Context context, UIHandler uiHandler) {
+    public MessageCollector(MessageQueue msg, Activity activity, UIHandler uiHandler) {
 
-        locationManager = LocationService.getLocationManager(context);
+        sensorManager = SensorsService.getSensorsService(activity);
         cFactory = new ConditionFactory();
         this.newMessages = new ArrayList<>();
         this.msgQueue = msg;
@@ -162,9 +163,10 @@ public class MessageCollector extends Handler {
     }
 
     private String getURLParameters() throws Exception {
-        Location location = locationManager.location;
+        Location location = sensorManager.getLocation();
+        float azimuth = sensorManager.getAzimuth();
         if (location != null)
-            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude() + "&bearing=" + location.getBearing();
+            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude() + "&azimuth=" + azimuth;
         else {
             throw new Exception();
         }

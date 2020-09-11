@@ -1,12 +1,13 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 
 public class BroadcastPlayer extends HandlerThread {
 
+    private final Activity activity;
     private int refreshDelay;
     private MessageCollector messageCollector;
     private MessagePlayer messagePlayer;
@@ -20,15 +21,18 @@ public class BroadcastPlayer extends HandlerThread {
     private Context context;
     private boolean working;
 
-    public BroadcastPlayer(Context context, int refreshDelay, UIHandler uiHandler) {
+    public BroadcastPlayer(Activity activity, int refreshDelay, UIHandler uiHandler) {
         super("BroadcastPlayer");
-        this.context = context;
+        this.activity = activity;
+        this.context = activity.getApplicationContext();
         this.refreshDelay = refreshDelay;
-        LocationService.getLocationManager(context).register(this);
+        SensorsService.getSensorsService(activity).register(this);
         messagePlayer = null;
         messageCollector = null;
         messageQueue = null;
         working = false;
+
+
 
         this.uiHandler = uiHandler;
     }
@@ -37,7 +41,7 @@ public class BroadcastPlayer extends HandlerThread {
     protected void onLooperPrepared() {
         messagePlayer = new MessagePlayer(context);
         messageQueue = new MessageQueue(messagePlayer, refreshDelay, uiHandler);
-        messageCollector = new MessageCollector(messageQueue, context, uiHandler);
+        messageCollector = new MessageCollector(messageQueue, activity, uiHandler);
     }
 
     public void playBroadcast() {

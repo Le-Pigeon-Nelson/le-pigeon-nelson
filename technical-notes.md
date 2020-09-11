@@ -6,10 +6,17 @@ The application will be developed using Java for Android, and a demo server will
 
 The application needs to identify information on the user's movement: [location and speed](https://developer.android.com/reference/android/location/LocationProvider) (see for example [this article](https://openclassrooms.com/fr/courses/2023346-creez-des-applications-pour-android/2028397-la-localisation-et-les-cartes)), [compas](https://github.com/iutinvg/compass) (see a [description of geolocation an compass](https://www.mobileprocessing.org/geolocation.html)).
 
-To improve the original measures that are not very robust, we can combine sensors, GPS and network:
+To improve the original measures that are not very robust, we can combine sensors, GPS and network.
+
+About GPS and bearing:
+
+* use sensors and filters to improve Location: [mad-location-manager](https://github.com/maddevsio/mad-location-manager)
+* a fork that claims to be more precise: [GPS-IMU-android](https://github.com/iamjaspreetsingh/GPS-IMU-android)
+
+About sensor fusion to improve the orientation (compass, ~ bearing):
 
 * [FSensor](https://github.com/KalebKE/FSensor)
-* [mad-location-manager](https://github.com/maddevsio/mad-location-manager)
+
 
 ## REST client
 

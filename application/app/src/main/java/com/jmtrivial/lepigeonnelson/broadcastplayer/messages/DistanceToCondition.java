@@ -1,16 +1,15 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 
 import android.location.Location;
-import android.util.Log;
 
-import com.jmtrivial.lepigeonnelson.broadcastplayer.LocationService;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DistanceToCondition implements MessageCondition {
 
-    private LocationService locationService;
+    private SensorsService locationService;
     private Location refLocation;
     private float distance;
     private Maths.Comparison comparison;
@@ -28,7 +27,7 @@ public class DistanceToCondition implements MessageCondition {
         }
         this.comparison = c;
         this.distance = parameter;
-        this.locationService = LocationService.getLocationManager();
+        this.locationService = SensorsService.getSensorsService();
     }
 
     @Override
@@ -36,7 +35,7 @@ public class DistanceToCondition implements MessageCondition {
         if (refLocation == null)
             return false;
         else {
-            Location l = locationService.location;
+            Location l = locationService.getLocation();
             float d = l.distanceTo(refLocation);
             return Maths.compare(d, comparison, distance);
         }

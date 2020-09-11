@@ -3,19 +3,19 @@ package com.jmtrivial.lepigeonnelson.broadcastplayer.messages;
 import android.location.Location;
 import android.util.Log;
 
-import com.jmtrivial.lepigeonnelson.broadcastplayer.LocationService;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AngularDeviationCondition implements MessageCondition {
-    private LocationService locationService;
+public class AzimuthDeviationCondition implements MessageCondition {
+    private SensorsService locationService;
     private Float refBearing;
     private float angle;
     private Maths.Comparison comparison;
 
-    public AngularDeviationCondition(String reference, Maths.Comparison c, float parameter) {
-        Pattern p = Pattern.compile("^angularDeviation[(][ ]*([+-]?\\d*\\.?\\d*)[ ]*[)]$");
+    public AzimuthDeviationCondition(String reference, Maths.Comparison c, float parameter) {
+        Pattern p = Pattern.compile("^azimuthDeviation[(][ ]*([+-]?\\d*\\.?\\d*)[ ]*[)]$");
         Matcher m = p.matcher(reference);
         refBearing = null;
         if (m.find()) {
@@ -23,7 +23,7 @@ public class AngularDeviationCondition implements MessageCondition {
         }
         this.comparison = c;
         this.angle = parameter;
-        this.locationService = LocationService.getLocationManager();
+        this.locationService = SensorsService.getSensorsService();
     }
 
     @Override
@@ -31,16 +31,10 @@ public class AngularDeviationCondition implements MessageCondition {
         if (refBearing == null)
             return false;
         else {
-            Location l = locationService.location;
-            if (l == null) {
-                return false;
-            }
-            else {
-                float b = l.getBearing();
-                Log.d("AngularDeviationCondition", "angle: " + b);
-                float angleBetweenBearings = Math.abs(normalizeDegree(b - refBearing));
-                return Maths.compare(angleBetweenBearings, comparison, angle);
-            }
+            float azimuth = locationService.getAzimuth();
+            Log.d("azimuthDeviation", "angle: " + azimuth);
+            float angleBetweenAzimuths = Math.abs(normalizeDegree(azimuth - refBearing));
+            return Maths.compare(angleBetweenAzimuths, comparison, angle);
         }
     }
 

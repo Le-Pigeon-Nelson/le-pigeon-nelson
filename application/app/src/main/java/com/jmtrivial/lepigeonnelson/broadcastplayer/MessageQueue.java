@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import static com.jmtrivial.lepigeonnelson.broadcastplayer.MessagePlayer.stopMessage;
+
 public class MessageQueue extends Handler {
 
 
@@ -48,7 +50,7 @@ public class MessageQueue extends Handler {
         if (msg.what == stopBroadcast) {
             Log.d("MessageQueue", "stop broadcast");
             clearQueue();
-            messagePlayer.sendEmptyMessage(messagePlayer.stopMessage);
+            messagePlayer.sendEmptyMessage(stopMessage);
         }
         else if (msg.what == addNewMessages) {
             removeForgettableMessages();
@@ -80,7 +82,7 @@ public class MessageQueue extends Handler {
 
     private void playNextMessage() {
         if (serverPeriod == 0 && queue.size() == 0) {
-            uiHandler.sendEmptyMessage(uiHandler.END_OF_BROADCAST);
+            uiHandler.sendEmptyMessage(UIHandler.END_OF_BROADCAST);
         }
 
         removeForgettableMessages();
@@ -102,7 +104,7 @@ public class MessageQueue extends Handler {
                         // ask player to play this message
                         Message msgThread = messagePlayer.obtainMessage();
                         msgThread.obj = m;
-                        msgThread.what = messagePlayer.playMessage;
+                        msgThread.what = MessagePlayer.playMessage;
                         messagePlayer.sendMessage(msgThread);
                         playing = true;
                         // remove this message from the queue
@@ -118,7 +120,7 @@ public class MessageQueue extends Handler {
             // if no message has been sent, and no other message will be obtained
             // from the server (period = 0), end of broadcast
             if (!playing && serverPeriod == 0) {
-                uiHandler.sendEmptyMessage(uiHandler.END_OF_BROADCAST);
+                uiHandler.sendEmptyMessage(UIHandler.END_OF_BROADCAST);
             }
             if (!playing && existsTimeConstraint) {
                 // if the queue is not empty, but no message is playable and controlled

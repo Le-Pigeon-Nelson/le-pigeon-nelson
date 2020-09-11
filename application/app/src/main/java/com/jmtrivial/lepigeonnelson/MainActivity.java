@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastPlayer player;
 
     private boolean mainFragment;
-    private final int REQUEST_PERMISSION_FINE_LOCATION = 1;
+    private final int REQUEST_PERMISSION_COARSE_LOCATION = 1;
+    private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
     private boolean showDebugServers;
     private Toolbar toolbar;
     private UIHandler uiHandler;
@@ -80,6 +81,14 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Accès localisation précise refusée.", Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case REQUEST_PERMISSION_COARSE_LOCATION:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Accès localisation accordée.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Accès localisation refusée.", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
@@ -89,7 +98,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // first of all, check permissions for location
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                showExplanation("Accès localisation requise", "Rationale",
+                        Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
+            } else {
+                requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
+            }
+        }        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 showExplanation("Accès localisation précise requise", "Rationale",

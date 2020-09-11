@@ -1,7 +1,9 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
 import android.content.Context;
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -9,11 +11,16 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.BMessage;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
+
+import kotlin.Suppress;
+
 import static android.media.AudioManager.STREAM_MUSIC;
 
 public class MessagePlayer extends Handler {
@@ -36,6 +43,7 @@ public class MessagePlayer extends Handler {
         public void onStart(String utteranceId) {
         } // Do nothing
 
+        @SuppressWarnings("deprecation")
         @Override
         public void onError(String utteranceId) {
         } // Do nothing.
@@ -72,6 +80,7 @@ public class MessagePlayer extends Handler {
     private BMessage currentMessage;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public MessagePlayer(Context context) {
 
         this.messageQueue = null;
@@ -91,7 +100,10 @@ public class MessagePlayer extends Handler {
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "LePigeonNelson");
 
         mPlayer = new MediaPlayer();
-        mPlayer.setAudioStreamType(STREAM_MUSIC);
+        mPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build());
         mPlayer.setOnCompletionListener(onCompletionListener);
     }
 
@@ -108,11 +120,16 @@ public class MessagePlayer extends Handler {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void renderMessage() {
         if (currentMessage.isText()) {
             Log.d("MessagePlayer", "sending message \"" + currentMessage.getTxt() + "\' to TTS");
             tts.setLanguage(new Locale(currentMessage.getLang()));
-            tts.speak(currentMessage.getTxt(), TextToSpeech.QUEUE_FLUSH, map);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                tts.speak(currentMessage.getTxt(), TextToSpeech.QUEUE_FLUSH, map);
+            } else {
+                tts.speak(currentMessage.getTxt(), TextToSpeech.QUEUE_FLUSH, null, null);
+            }
             isPlaying = true;
         }
         else if (currentMessage.isAudio()) {
