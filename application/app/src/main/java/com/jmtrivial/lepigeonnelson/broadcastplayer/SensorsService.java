@@ -14,7 +14,11 @@ import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
 
+import com.kircherelectronics.fsensor.filter.averaging.MeanFilter;
+import com.kircherelectronics.fsensor.observer.SensorSubject;
+import com.kircherelectronics.fsensor.sensor.gyroscope.KalmanGyroscopeSensor;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LocationSettingsRequest;
@@ -33,12 +37,30 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     private final Context context;
     private final Activity activity;
     private static final int REQUEST_CHECK_SETTINGS = 100;
+    private final KalmanGyroscopeSensor sensor;
+    private final MeanFilter meanFilter;
+
+    private float[] fusedOrientation = new float[3];
+
 
     private Location location;
 
     private BroadcastPlayer broadcastPlayer;
     private LostApiClient lostApiClient;
     private boolean locationServiceAvailable;
+
+    private SensorSubject.SensorObserver sensorObserver = new SensorSubject.SensorObserver() {
+        @Override
+        public void onSensorChanged(float[] values) {
+            Log.d("sensorChanged", "orientation " + values[0]);
+            updateValues(values);
+        }
+    };
+
+    private void updateValues(float[] values) {
+        fusedOrientation = values;
+        fusedOrientation = meanFilter.filter(fusedOrientation);
+    }
 
     /**
      * Singleton implementation
@@ -69,6 +91,13 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         this.context = activity.getApplicationContext();
         this.activity = activity;
         broadcastPlayer = null;
+        this.sensor = new KalmanGyroscopeSensor(context);
+        this.sensor.register(sensorObserver);
+        this.sensor.start();
+        this.meanFilter = new MeanFilter();
+        // meanFilter.setTimeConstant(...);
+
+
 
         initLocationService();
         Log.d("LocationService", "LocationService created");
@@ -176,10 +205,12 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     }
 
     public float getAzimuth() {
-        return location.getBearing();
+        return (float) (Math.toDegrees(fusedOrientation[0]) + 360) % 360;
     }
 
     public boolean isLocationServiceAvailable() {
         return locationServiceAvailable;
     }
+
+
 }

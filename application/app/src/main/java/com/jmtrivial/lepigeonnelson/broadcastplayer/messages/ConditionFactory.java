@@ -27,7 +27,7 @@ public class ConditionFactory {
             return new DistanceToCondition(reference, c, Float.parseFloat(parameter));
         }
         else if  (reference.matches("^azimuthDeviation[(][ ]*[+-]?\\d*\\.?\\d*[ ]*[)]$")) {
-            Log.d("Condition factory", "AngularDeviationCondition");
+            Log.d("Condition factory", "azimuthDeviation");
             return new AzimuthDeviationCondition(reference, c, Float.parseFloat(parameter));
         }
         else {
