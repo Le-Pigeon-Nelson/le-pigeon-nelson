@@ -1,6 +1,7 @@
 package com.jmtrivial.lepigeonnelson.ui;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +30,7 @@ public class ServerSelectionFragment extends Fragment {
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+            Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_server_selection, container, false);
     }
@@ -47,14 +47,9 @@ public class ServerSelectionFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (SensorsService.getSensorsService(getActivity()).isLocationServiceAvailable()) {
-                    activity.setActiveServer(serverListAdapter.getItem(position));
-                    NavHostFragment.findNavController(ServerSelectionFragment.this)
-                            .navigate(R.id.action_ListFragment_to_ListenFragment);
-                }
-                else {
-                    Toast.makeText(getActivity(), "Localisation non disponible.", Toast.LENGTH_SHORT).show();
-                }
+                activity.setActiveServer(serverListAdapter.getItem(position));
+                NavHostFragment.findNavController(ServerSelectionFragment.this)
+                        .navigate(R.id.action_ListFragment_to_ListenFragment);
             }
         });
     }
@@ -65,6 +60,7 @@ public class ServerSelectionFragment extends Fragment {
         super.onResume();
         activity.setMainFragment(true);
         activity.invalidateOptionsMenu();
+
     }
 
     private class ServerListAdapter extends ArrayAdapter<Server> {

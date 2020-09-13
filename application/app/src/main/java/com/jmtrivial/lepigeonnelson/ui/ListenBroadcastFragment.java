@@ -80,4 +80,5 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
         Toast.makeText(activity, "Pas de connexion GPS.", Toast.LENGTH_SHORT).show();
         NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
     }
+
 }

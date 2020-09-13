@@ -3,6 +3,7 @@ package com.jmtrivial.lepigeonnelson.broadcastplayer;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -36,7 +37,7 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     private static SensorsService instance = null;
     private final Context context;
     private final Activity activity;
-    private static final int REQUEST_CHECK_SETTINGS = 100;
+    public static final int REQUEST_CHECK_SETTINGS = 100;
     private final KalmanGyroscopeSensor sensor;
     private final MeanFilter meanFilter;
 
@@ -47,15 +48,20 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
 
     private BroadcastPlayer broadcastPlayer;
     private LostApiClient lostApiClient;
-    private boolean locationServiceAvailable;
 
     private SensorSubject.SensorObserver sensorObserver = new SensorSubject.SensorObserver() {
         @Override
         public void onSensorChanged(float[] values) {
-            Log.d("sensorChanged", "orientation " + values[0]);
             updateValues(values);
         }
     };
+    private LocationSettingsRequest request;
+
+    public boolean isLocationAvailable() {
+        return locationAvailable;
+    }
+
+    private boolean locationAvailable;
 
     private void updateValues(float[] values) {
         fusedOrientation = values;
@@ -97,7 +103,9 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         this.meanFilter = new MeanFilter();
         // meanFilter.setTimeConstant(...);
 
+        locationAvailable = false;
 
+        request = null;
 
         initLocationService();
         Log.d("LocationService", "LocationService created");
@@ -111,50 +119,13 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         lostApiClient = new LostApiClient.Builder(context).addConnectionCallbacks(this).build();
         lostApiClient.connect();
 
-        ArrayList<LocationRequest> requests = new ArrayList<>();
-        LocationRequest highAccuracy = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        requests.add(highAccuracy);
-
-        boolean needBle = false;
-        LocationSettingsRequest request = new LocationSettingsRequest.Builder()
-                .addAllLocationRequests(requests)
-                .setNeedBle(needBle)
-                .build();
-
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(lostApiClient, request);
-
-        LocationSettingsResult locationSettingsResult = result.await();
-        LocationSettingsStates states = locationSettingsResult.getLocationSettingsStates();
-        Status status = locationSettingsResult.getStatus();
-        switch (status.getStatusCode()) {
-            case Status.SUCCESS:
-                // All location settings are satisfied. The client can make location requests here.
-                break;
-            case Status.RESOLUTION_REQUIRED:
-                // Location requirements are not satisfied. Redirect user to system settings for resolution.
-                try {
-                    status.startResolutionForResult(activity, REQUEST_CHECK_SETTINGS);
-                } catch (IntentSender.SendIntentException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case Status.INTERNAL_ERROR:
-            case Status.INTERRUPTED:
-            case Status.TIMEOUT:
-            case Status.CANCELLED:
-                // Location settings are not satisfied and cannot be resolved.
-                break;
-            default:
-                break;
-        }
-
     }
+
 
 
     @Override
     public void onConnected() {
+        Log.d("onConnected", "ouiiiiiii");
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -170,34 +141,26 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         Location loc = LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
         if (loc != null) {
             location = loc;
-            locationServiceAvailable = true;
         }
-        else
-            locationServiceAvailable = false;
 
-        LocationRequest request = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_LOW_POWER)
-                .setInterval(5000)
-                .setSmallestDisplacement(10);
+        ArrayList<LocationRequest> requests = new ArrayList<>();
+        LocationRequest highAccuracy = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(500).setSmallestDisplacement(10);
+        requests.add(highAccuracy);
 
-        com.mapzen.android.lost.api.LocationListener listener = new com.mapzen.android.lost.api.LocationListener() {
-            @Override
-            public void onLocationChanged(Location loc) {
-                // Do stuff
-                Log.d("LocationManager", "Location changed");
-                location = loc;
-                if (broadcastPlayer != null && broadcastPlayer.isWorking())
-                    broadcastPlayer.locationChanged();
-            }
-        };
+        boolean needBle = false;
+        request = new LocationSettingsRequest.Builder()
+                .addAllLocationRequests(requests)
+                .setNeedBle(needBle)
+                .build();
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient, request, listener);
+        checkSensorsSettings();
 
     }
 
     @Override
     public void onConnectionSuspended() {
-        locationServiceAvailable = false;
+        // do nothing
     }
 
     public Location getLocation() {
@@ -208,9 +171,43 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         return (float) (Math.toDegrees(fusedOrientation[0]) + 360) % 360;
     }
 
-    public boolean isLocationServiceAvailable() {
-        return locationServiceAvailable;
+
+    public void checkSensorsSettings() {
+        if (request != null) {
+            PendingResult<LocationSettingsResult> result =
+                    LocationServices.SettingsApi.checkLocationSettings(lostApiClient, request);
+
+            LocationSettingsResult locationSettingsResult = result.await();
+            LocationSettingsStates states = locationSettingsResult.getLocationSettingsStates();
+            Status status = locationSettingsResult.getStatus();
+            switch (status.getStatusCode()) {
+                case Status.SUCCESS:
+                    Log.d("SensorsService", "success");
+                    locationAvailable = true;
+                    // All location settings are satisfied. The client can make location requests here.
+                    break;
+                case Status.RESOLUTION_REQUIRED:
+                    Log.d("SensorsService", "resolution required");
+                    // Location requirements are not satisfied. Redirect user to system settings for resolution.
+                    try {
+                        status.startResolutionForResult(activity, REQUEST_CHECK_SETTINGS);
+                    } catch (IntentSender.SendIntentException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case Status.INTERNAL_ERROR:
+                case Status.INTERRUPTED:
+                case Status.TIMEOUT:
+                case Status.CANCELLED:
+                    Log.d("SensorsService", "error during initialization");
+
+                    // Location settings are not satisfied and cannot be resolved.
+                    locationAvailable = false;
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
-
-
 }

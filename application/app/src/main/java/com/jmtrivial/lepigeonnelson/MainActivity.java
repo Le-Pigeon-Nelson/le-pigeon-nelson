@@ -2,10 +2,13 @@ package com.jmtrivial.lepigeonnelson;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
+import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.UIHandler;
@@ -129,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         loadPreferences();
 
         this.loadServers();
+
     }
 
     @Override
@@ -311,5 +315,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void setMainFragment(boolean b) {
         mainFragment = b;
+    }
+
+    @Override  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case SensorsService.REQUEST_CHECK_SETTINGS:
+                player.checkSensorsSettings();
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -93,6 +93,13 @@ public class BroadcastPlayer extends HandlerThread {
         uiHandler.setListener(listener);
     }
 
+    public void checkSensorsSettings() {
+        SensorsService service = SensorsService.getSensorsService(activity);
+        if (service != null) {
+            service.checkSensorsSettings();
+        }
+    }
+
     public interface BroadcastPlayerListener {
         void onEndOfBroadcast();
 
