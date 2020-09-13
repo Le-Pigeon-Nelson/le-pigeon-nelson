@@ -1,6 +1,7 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +41,10 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     public static final int REQUEST_CHECK_SETTINGS = 100;
     private final KalmanGyroscopeSensor sensor;
     private final MeanFilter meanFilter;
+    private LocationRequest request;
+
+    private final int refreshDelayGPSms = 500;
+    private final int smallestDisplacementGPS = 10;
 
     private float[] fusedOrientation = new float[3];
 
@@ -55,7 +60,6 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
             updateValues(values);
         }
     };
-    private LocationSettingsRequest request;
 
     public boolean isLocationAvailable() {
         return locationAvailable;
@@ -70,7 +74,6 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
 
     /**
      * Singleton implementation
-     * @return
      */
     public static SensorsService getSensorsService(Activity activity) {
         if (instance == null) {
@@ -101,66 +104,30 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         this.sensor.register(sensorObserver);
         this.sensor.start();
         this.meanFilter = new MeanFilter();
-        // meanFilter.setTimeConstant(...);
+        // do we need meanFilter.setTimeConstant(...); ?
 
         locationAvailable = false;
 
         request = null;
 
-        initLocationService();
+        lostApiClient = new LostApiClient.Builder(context).addConnectionCallbacks(this).build();
+        lostApiClient.connect();
+
         Log.d("LocationService", "LocationService created");
     }
 
 
-    /**
-     * Sets up location service after permissions is granted
-     */
-    private void initLocationService() {
-        lostApiClient = new LostApiClient.Builder(context).addConnectionCallbacks(this).build();
-        lostApiClient.connect();
-
-    }
-
-
-
     @Override
     public void onConnected() {
-        Log.d("onConnected", "ouiiiiiii");
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-
-        Location loc = LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
-        if (loc != null) {
-            location = loc;
-        }
-
-        ArrayList<LocationRequest> requests = new ArrayList<>();
-        LocationRequest highAccuracy = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setInterval(500).setSmallestDisplacement(10);
-        requests.add(highAccuracy);
-
-        boolean needBle = false;
-        request = new LocationSettingsRequest.Builder()
-                .addAllLocationRequests(requests)
-                .setNeedBle(needBle)
-                .build();
-
+        Log.d("SensorsService", "connected");
+        request = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).
+                setInterval(refreshDelayGPSms).setSmallestDisplacement(smallestDisplacementGPS);
         checkSensorsSettings();
-
     }
 
     @Override
     public void onConnectionSuspended() {
-        // do nothing
+        location = null;
     }
 
     public Location getLocation() {
@@ -172,10 +139,19 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     }
 
 
+    @SuppressLint("MissingPermission")
     public void checkSensorsSettings() {
         if (request != null) {
+            ArrayList<LocationRequest> requests = new ArrayList<>();
+            requests.add(request);
+            boolean needBle = false;
+            LocationSettingsRequest sRequest = new LocationSettingsRequest.Builder()
+                    .addAllLocationRequests(requests)
+                    .setNeedBle(needBle)
+                    .build();
+
             PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(lostApiClient, request);
+                    LocationServices.SettingsApi.checkLocationSettings(lostApiClient, sRequest);
 
             LocationSettingsResult locationSettingsResult = result.await();
             LocationSettingsStates states = locationSettingsResult.getLocationSettingsStates();
@@ -184,7 +160,25 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                 case Status.SUCCESS:
                     Log.d("SensorsService", "success");
                     locationAvailable = true;
+                    Location loc = LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
+                    if (loc != null) {
+                        location = loc;
+                    }
+
                     // All location settings are satisfied. The client can make location requests here.
+                    com.mapzen.android.lost.api.LocationListener listener =
+                            new com.mapzen.android.lost.api.LocationListener() {
+                        @Override
+                        public void onLocationChanged(Location loc) {
+                            // Do stuff
+                            Log.d("LocationManager", "Location changed");
+                            location = loc;
+                            if (broadcastPlayer != null && broadcastPlayer.isWorking())
+                                broadcastPlayer.locationChanged();
+                        }
+                    };
+                    LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient,
+                            request, listener);
                     break;
                 case Status.RESOLUTION_REQUIRED:
                     Log.d("SensorsService", "resolution required");
