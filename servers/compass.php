@@ -1,29 +1,18 @@
 <?php
 
 
-function degreeToClock($azimuth) {
-    return $azimuth / 360 * 12;
-}
+include 'pigeon-nelson.php';
 
-function fmod_alt($x, $y) {
-    if (!$y) { return NAN; }
-    $r = fmod($x, $y);
-    if ($r < 0)
-        return $r += $y;
-    else
-        return $r;
-}
-
-$azimuth = $_GET["azimuth"];
+$server = new PigeonNelsonServer($_GET);
 
 
-// one parameters is required
-if (!isset($azimuth)) {
+// azimuth is required
+if (!$server->hasRequestedAzimuth()) {
     echo "[]";
     return;
 }
 
-$azimuthClock = degreeToClock($azimuth);
+$azimuthClock = $server->getRequestedAzimuthAsClock();
 
 
 $names = [ 0 => "Le Nord", 3 => "L'Est", 6 => "Le Sud", 9 => "L'Ouest", 12 => "Le Nord" ];
@@ -31,7 +20,7 @@ $names = [ 0 => "Le Nord", 3 => "L'Est", 6 => "Le Sud", 9 => "L'Ouest", 12 => "L
 $message = "";
 
 for($refHour = 0; $refHour <= 12; $refHour += 3) {
-    $diff = fmod_alt(abs($azimuthClock - $refHour), 12);
+    $diff = PNUtil::clockDistance($azimuthClock, $refHour); 
     
     if ($diff <= 1.5) {
         if ($diff <= 0.5) {
@@ -54,13 +43,9 @@ if ($message == "") {
     return;
 }
 else {
-    echo '[{ 
-        "txt": "'. $message . '",
-        "lang": "fr",
-        "priority": 0,
-        "requiredConditions": [ ],
-        "forgettingConditions": [ ]
-    }]';
+    $message = PigeonNelsonMessage::makeTxtMessage($message, "fr");
+    $message->setPriority(0);
+    print "[" . $message->toString() . "]";
     
 }
 
