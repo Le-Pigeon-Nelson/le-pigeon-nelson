@@ -3,7 +3,7 @@
 
 
 $radiusPlayable = 500; /* meters */
-$radiusSearch = 2; /* km */
+$radiusSearch = 2000; /* meters */
 
 
 include 'pigeon-nelson.php';
@@ -53,7 +53,7 @@ $position = $server->getRequestedPosition();
 
 print "[";
 
-$minDist = PNUtil::geoDistanceKm($radiusPlayable);
+$minDist = PNUtil::geoDistanceMeters($radiusPlayable);
 
 if ($server->hasEntries()) {
     $first = true;

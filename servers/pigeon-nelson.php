@@ -43,8 +43,8 @@ abstract class PNUtil {
         return PNUtil::fmod_alt(abs($h1 - $h2), 12);
     }
     
-    public static function geoDistanceKm($distance) {
-        return new Geokit\Distance($distance, Geokit\Distance::UNIT_KILOMETERS);
+    public static function geoDistanceMeters($distance) {
+        return new Geokit\Distance($distance, Geokit\Distance::UNIT_METERS);
     }
     
     public static function distance($position1, $position2) {
@@ -225,7 +225,7 @@ class PigeonNelsonServer {
     
     private function getBBoxStringFromRequestedPosition($radius) {
         $position =  $this->getRequestedPosition();
-        $box = PNUtil::$math->expand($position, $radius . 'km');
+        $box = PNUtil::$math->expand($position, $radius . 'm');
         return $box->getSouthWest() . ",". $box->getNorthEast();
     }
     
