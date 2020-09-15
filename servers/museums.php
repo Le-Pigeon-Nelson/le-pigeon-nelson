@@ -15,49 +15,24 @@ $radiusSearch = 2; /* km */
 
 $math = new Geokit\Math();
 
-function osm2geokit($node) {
-    return new Geokit\LatLng($node["lat"], $node["lon"]);
-}
-
-function findNode($idNode, $data) {
-    foreach($data as $key => $row) {
-        if ($row["id"] == $idNode) {
-            return $row;
-        }
+function osm2geokit($element) {
+    if ($element["type"] == "node") {
+        return new Geokit\LatLng($element["lat"], $element["lon"]);
     }
-    return null;
-}
-
-function buildPolygon($nodes, $data) {
-    $lns = [];
-    
-    foreach($nodes as $key => $idNode) {
-        $point = osm2geokit(findNode($idNode, $data));
-        if ($point != null)
-            array_push($lns, $point);
-    }
-    return new Geokit\Polygon($lns);
-}
-
-function getLocation($row, $data) {
-    if ($row["type"] == "node") {
-        return osm2geokit($row);
-    }
-    else {
-        $polygon = buildPolygon($row["nodes"], $data);
-        $bounds = $polygon->toBounds();
-        
-        return $bounds->getCenter();
+    else 
+    if ($element["center"] != null) {
+        return new Geokit\LatLng($element["center"]["lat"], $element["center"]["lon"]);
     }
 }
 
 
 
-function printMuseum($row, $data) {
+
+function printMuseum($row) {
     global $radiusPlayable;
 
     $name = $row["tags"]["name"];
-    $coordinate = getLocation($row, $data);
+    $coordinate = osm2geokit($row);
     
     if (!isset($name)) {
         $name = "Vous êtes proche d'un musée dont on ne connaît pas le nom.";
@@ -94,7 +69,7 @@ $box = $math->expand($position, $radiusSearch . 'km');
 $box_str = "(" . $box->getSouthWest() . ",". $box->getNorthEast() . ")";
 
 
-$overpass = 'http://overpass-api.de/api/interpreter?data=[out:json][timeout:25];(node[%22tourism%22=%22museum%22]'.$box_str.';way[%22tourism%22=%22museum%22]'.$box_str.';);out%20body;%3E;out%20skel%20qt;';
+$overpass = 'http://overpass-api.de/api/interpreter?data=[out:json][timeout:25];(node[%22tourism%22=%22museum%22]'.$box_str.';way[%22tourism%22=%22museum%22]'.$box_str.';);out%20center;';
 
 // collecting results in JSON format
 $html = file_get_contents($overpass);
@@ -115,7 +90,7 @@ if (count($data) != 0) {
                 $first = false;
             else 
                 echo ", ";
-            $loc = printMuseum($row, $data);
+            $loc = printMuseum($row);
             $dist = $math->distanceHaversine($position, $loc);
             if ($dist < $minDist)
                 $minDist = $dist;
