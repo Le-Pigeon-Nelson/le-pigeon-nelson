@@ -177,34 +177,70 @@ class PigeonNelsonMessage {
 }
 
 class PigeonNelsonServer {
-    public $requestedLatitude;
-    public $requestedLongitude;
-    public $requestedAzimuth;
+    private $latitudeRequest;
+    private $longitudeRequest;
+    private $azimuthRequest;
+    private $requestedSelfDescription;
+    private $name;
+    private $description;
+    private $encoding;
+    private $defaultPeriodBetweenUpdates;
     
     public function __construct($get) {
+        $this->requestedSelfDescription = array_key_exists("self-description", $get);
+            
         if (array_key_exists("lat", $get))
-            $this->requestedLatitude = $get["lat"];
+            $this->latitudeRequest = $get["lat"];
         else
-            $this->requestedLatitude = null;
+            $this->latitudeRequest = null;
+            
         if (array_key_exists("lng", $get))
-            $this->requestedLongitude = $get["lng"];
+            $this->longitudeRequest = $get["lng"];
         else
-            $this->requestedLongitude = null;
+            $this->longitudeRequest = null;
+            
         if (array_key_exists("azimuth", $get))
-            $this->requestedAzimuth = $get["azimuth"];
+            $this->azimuthRequest = $get["azimuth"];
         else
-            $this->requestedAzimuth = null;
+            $this->azimuthRequest = null;
         $this->data = [];
+        
+        $name = null;
+        $description = null;
+        $encoding = null;
+        $defaultPeriodBetweenUpdates = null;
     }
     
+    
+    public function setName($name) {
+        $this->name = $name;
+    }
+    public function setDescription($description) {
+        $this->description = $description;
+    }
+    public function setEncoding($encoding) {
+        $this->encoding = $encoding;
+    }
+    public function setDefaultPeriodBetweenUpdates($defaultPeriodBetweenUpdates) {
+        $this->defaultPeriodBetweenUpdates = $defaultPeriodBetweenUpdates;
+    }
+
+    
+    public function isRequestedSelfDescription() {
+        return $this->requestedSelfDescription;
+    }
+    
+    public function getSelfDescription() {
+        return "[]";
+    }
     
 
-    public function hasRequestedAzimuth() {
-        return $this->requestedAzimuth != null;
+    public function hasAzimuthRequest() {
+        return $this->azimuthRequest != null;
     }
     
-    public function hasRequestCoordinates() {
-        return $this->requestedLatitude != null && $this->requestedLongitude != null;
+    public function hasCoordinatesRequest() {
+        return $this->latitudeRequest != null && $this->longitudeRequest != null;
     }
     
     private static function replaceBoxInRequest($request, $box_str) {
@@ -214,17 +250,17 @@ class PigeonNelsonServer {
         return $result;
     }
     
-    public function getRequestedPosition() {
-        return new Geokit\LatLng($this->requestedLatitude, $this->requestedLongitude);
+    public function getPositionRequest() {
+        return new Geokit\LatLng($this->latitudeRequest, $this->longitudeRequest);
     }
     
-    public function getRequestedAzimuthAsClock() {
-        return PNUtil::degreeToClock($this->requestedAzimuth);
+    public function getAzimuthRequestAsClock() {
+        return PNUtil::degreeToClock($this->azimuthRequest);
     }
     
     
-    private function getBBoxStringFromRequestedPosition($radius) {
-        $position =  $this->getRequestedPosition();
+    private function getBBoxStringFromPositionRequest($radius) {
+        $position =  $this->getPositionRequest();
         $box = PNUtil::$math->expand($position, $radius . 'm');
         return $box->getSouthWest() . ",". $box->getNorthEast();
     }
@@ -232,7 +268,7 @@ class PigeonNelsonServer {
     public function getOSMData($request, $radius) {
         // create a bounding box from the given position
         
-        $box_str = $this->getBBoxStringFromRequestedPosition($radius);
+        $box_str = $this->getBBoxStringFromPositionRequest($radius);
         
         // build request
         $overpass = 'http://overpass-api.de/api/interpreter?data=' . PigeonNelsonServer::replaceBoxInRequest($request, $box_str);

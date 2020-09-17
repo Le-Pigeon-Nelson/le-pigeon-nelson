@@ -6,13 +6,25 @@ include 'pigeon-nelson.php';
 $server = new PigeonNelsonServer($_GET);
 
 
+$server->setName("Rose des vents");
+$server->setDescription("Connaître la direction vers laquelle vous pointez");
+$server->setEncoding("UTF-8");
+$server->setDefaultPeriodBetweenUpdates(0);
+
+
+if ($server->isRequestedSelfDescription()) {
+    print $server->getSelfDescription();
+    return;
+}
+
+
 // azimuth is required
-if (!$server->hasRequestedAzimuth()) {
+if (!$server->hasAzimuthRequest()) {
     echo "[]";
     return;
 }
 
-$azimuthClock = $server->getRequestedAzimuthAsClock();
+$azimuthClock = $server->getAzimuthRequestAsClock();
 
 
 $names = [ 0 => "Le Nord", 3 => "L'Est", 6 => "Le Sud", 9 => "L'Ouest", 12 => "Le Nord" ];
