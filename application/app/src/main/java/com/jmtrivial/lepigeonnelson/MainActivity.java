@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
 
     private BroadcastPlayer player;
 
+    public boolean isMainFragment() {
+        return mainFragment;
+    }
+
     private boolean mainFragment;
     private final int REQUEST_PERMISSION_COARSE_LOCATION = 1;
     private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
@@ -299,7 +303,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (!mainFragment) {
+            // back to the main fragment
+            onBackPressed();
+        }
+        stopBroadcast();
+    }
+
+    @Override
     protected void onDestroy() {
+        player.stopBroadcast();
         player.reset();
         super.onDestroy();
     }

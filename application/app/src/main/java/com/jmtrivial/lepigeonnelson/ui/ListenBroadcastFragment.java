@@ -59,8 +59,15 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
 
     @Override
     public void onEndOfBroadcast() {
-        activity.stopBroadcast();
-        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
+        if (!activity.isMainFragment()) {
+            try {
+                NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
+                activity.stopBroadcast();
+            }
+            catch (Exception e) {
+                // ignore it: the fragment has been deleted before
+            }
+        }
     }
 
     @Override

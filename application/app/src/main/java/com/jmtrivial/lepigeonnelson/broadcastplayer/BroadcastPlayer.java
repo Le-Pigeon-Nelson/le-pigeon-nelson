@@ -2,8 +2,11 @@ package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.HandlerThread;
 import android.os.Message;
+
+import androidx.annotation.RequiresApi;
 
 public class BroadcastPlayer extends HandlerThread {
 
@@ -37,6 +40,7 @@ public class BroadcastPlayer extends HandlerThread {
         this.uiHandler = uiHandler;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onLooperPrepared() {
         messagePlayer = new MessagePlayer(context);
