@@ -83,7 +83,7 @@ if ($server->hasEntries()) {
 
 }
 
-if ($minDist->meters() > $radiusPlayable) {
+if ($minDist->meters() >= $radiusPlayable) {
     $message = PigeonNelsonMessage::makeTxtMessage("Il n'y a aucun musée autour de vous.", "fr");
     $message->setPriority(0);
     print $message->toString();
