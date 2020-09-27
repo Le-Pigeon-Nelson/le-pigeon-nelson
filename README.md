@@ -7,10 +7,11 @@ The aim of *le pigeon Nelson* is to provide a sound broadcasting tool according 
 <div>
 <a href="./images/Screenshot1.png"><img src="./images/Screenshot1.png" width="150px" alt="A list of servers to be played" align="left" margin="1em"></a>
 <a href="./images/Screenshot2.png"><img src="./images/Screenshot2.png" width="150px" alt="A playing server" align="left" margin="1em"></a>
-<a href="./images/Screenshot3.png"><img src="./images/Screenshot3.png" width="100px" alt="Add a new server (simple)" align="left" margin="1em"></a>
-<a href="./images/Screenshot4.png"><img src="./images/Screenshot4.png" width="100px" alt="Add a new server (with details)" align="left" margin="1em"></a>
-<a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="100px" alt="Add a new server (with refresh delay)" align="left" margin="1em"></a>
+<a href="./images/Screenshot3.png"><img src="./images/Screenshot3.png" width="150px" alt="Add a new server (simple)" align="left" margin="1em"></a>
+<a href="./images/Screenshot4.png"><img src="./images/Screenshot4.png" width="150px" alt="Add a new server (with details)" align="left" margin="1em"></a>
+<a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="150px" alt="Add a new server (with refresh delay)" align="left" margin="1em"></a>
 
+<div style="clear: both"></div>
 </div>
 
 ## How it works
