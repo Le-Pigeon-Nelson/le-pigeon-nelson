@@ -36,7 +36,7 @@ See [technical notes](technical-notes.md) if you're interested in technical deta
 <a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="150px" alt="Add a new server (with refresh delay)" align="left" margin="1em"></a>
 
 <br />
-
+  
 
 ## License
 
