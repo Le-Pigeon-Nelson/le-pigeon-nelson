@@ -19,7 +19,7 @@ public class BroadcastPlayer extends HandlerThread {
 
     private UIHandler uiHandler;
 
-    private Server server;
+    private ServerDescription currentServer;
 
     private Context context;
     private boolean working;
@@ -50,10 +50,10 @@ public class BroadcastPlayer extends HandlerThread {
 
     public void playBroadcast() {
         if (messageCollector != null) {
-            messageCollector.setServer(server);
-            messageQueue.setServerPeriod(server.getPeriod());
+            messageCollector.setCurrentServer(currentServer);
+            messageQueue.setServerPeriod(currentServer.getPeriod());
             Message msg = messageCollector.obtainMessage();
-            msg.obj = server;
+            msg.obj = currentServer;
             msg.what = messageCollector.startCollect;
             messageCollector.sendMessage(msg);
             working = true;
@@ -68,12 +68,12 @@ public class BroadcastPlayer extends HandlerThread {
         working = false;
     }
 
-    public void setServer(Server server) {
-        this.server = server;
+    public void setCurrentServer(ServerDescription currentServer) {
+        this.currentServer = currentServer;
     }
 
-    public Server getServer() {
-        return this.server;
+    public ServerDescription getCurrentServer() {
+        return this.currentServer;
     }
 
     public void locationChanged() {
@@ -104,6 +104,15 @@ public class BroadcastPlayer extends HandlerThread {
         }
     }
 
+    public void collectServerDescription(ServerDescription serverDescription) {
+        if (serverDescription.isSelfDescribed() && messageCollector != null) {
+            Message msg = messageCollector.obtainMessage();
+            msg.obj = serverDescription;
+            msg.what = messageCollector.getDescription;
+            messageCollector.sendMessage(msg);
+        }
+    }
+
     public interface BroadcastPlayerListener {
         void onEndOfBroadcast();
 
@@ -112,5 +121,9 @@ public class BroadcastPlayer extends HandlerThread {
         void onServerContentError();
 
         void onServerGPSError();
+
+        void onServerDescriptionUpdate(ServerDescription description);
+
+        void onServerListUpdated();
     };
 }

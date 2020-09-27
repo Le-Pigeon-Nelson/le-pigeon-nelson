@@ -8,7 +8,17 @@
     <string name="listen">Écouter</string>
     <string name="stop_listening">Fin de l\'écoute</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="action_back">Retour</string>
+    <string name="add">Ajouter</string>
+    <string name="settings_fragment">Préférences</string>
+    <string name="edit_server_fragment">Édition du serveur</string>
+    <string name="no_GPS_connection">Pas de connexion GPS.</string>
+    <string name="server_content_error">Erreur dans le contenu du serveur.</string>
+    <string name="server_access_error">Erreur d\'accès au serveur.</string>
+    <string name="server_url">Adresse du serveur</string>
+    <string name="force_server_properties">Forcer les propriétés du serveur</string>
+    <string name="server_name">Nom du serveur</string>
+    <string name="server_description">server_description</string>
+    <string name="server_encoding">Encodage</string>
+    <string name="refresh_messages">Récupérer régulièrement de nouveaux messages</string>
 </resources>

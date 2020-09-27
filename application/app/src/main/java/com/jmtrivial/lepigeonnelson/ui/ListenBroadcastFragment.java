@@ -16,7 +16,7 @@ import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 
-public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer.BroadcastPlayerListener {
+public class ListenBroadcastFragment extends Fragment {
 
     private MainActivity activity;
 
@@ -25,7 +25,6 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         activity = (MainActivity) getActivity();
-        activity.getPlayer().setListener(this);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_listen_broadcast, container, false);
     }
@@ -46,8 +45,7 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
         super.onResume();
         TextView text = getView().findViewById(R.id.textview_second);
         text.setText("Vous écoutez " + activity.getActiveServer().getName());
-        activity.setMainFragment(false);
-        activity.invalidateOptionsMenu();
+        activity.setActiveFragment(MainActivity.LISTEN_BROADCAST_FRAGMENT, this);
         activity.playBroadcast();
     }
 
@@ -57,35 +55,7 @@ public class ListenBroadcastFragment extends Fragment implements BroadcastPlayer
         super.onStop();
     }
 
-    @Override
-    public void onEndOfBroadcast() {
-        if (!activity.isMainFragment()) {
-            try {
-                NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
-                activity.stopBroadcast();
-            }
-            catch (Exception e) {
-                // ignore it: the fragment has been deleted before
-            }
-        }
-    }
 
-    @Override
-    public void onServerError() {
-        Toast.makeText(activity, "Erreur d'accès au serveur.", Toast.LENGTH_SHORT).show();
-        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
-    }
 
-    @Override
-    public void onServerContentError() {
-        Toast.makeText(activity, "Erreur dans le contenu du serveur.", Toast.LENGTH_SHORT).show();
-        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
-    }
-
-    @Override
-    public void onServerGPSError() {
-        Toast.makeText(activity, "Pas de connexion GPS.", Toast.LENGTH_SHORT).show();
-        NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
-    }
 
 }

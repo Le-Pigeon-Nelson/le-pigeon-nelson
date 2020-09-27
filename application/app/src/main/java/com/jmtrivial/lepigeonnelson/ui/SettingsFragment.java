@@ -45,8 +45,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setMainFragment(false);
-        activity.invalidateOptionsMenu();
+        activity.setActiveFragment(MainActivity.SETTINGS_FRAGMENT, this);
     }
 
 

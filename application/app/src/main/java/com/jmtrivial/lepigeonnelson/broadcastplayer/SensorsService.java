@@ -139,7 +139,6 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     }
 
 
-    @SuppressLint("MissingPermission")
     public void checkSensorsSettings() {
         if (request != null) {
             ArrayList<LocationRequest> requests = new ArrayList<>();
@@ -160,6 +159,12 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                 case Status.SUCCESS:
                     Log.d("SensorsService", "success");
                     locationAvailable = true;
+                    if (ActivityCompat.checkSelfPermission(context,
+                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(context,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
                     Location loc = LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
                     if (loc != null) {
                         location = loc;

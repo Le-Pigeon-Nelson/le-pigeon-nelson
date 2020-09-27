@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools = "http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/server_url"
+            />
+        <EditText
+            android:id="@+id/server_address"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="text"
+            tools:ignore="Autofill" />
+        <CheckBox
+            android:id="@+id/force_server_properties"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/force_server_properties"
+            android:checked="false" />
+        <LinearLayout
+            android:id="@+id/option_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/server_name" />
+            <EditText
+                android:id="@+id/server_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/server_description" />
+            <EditText
+                android:id="@+id/server_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/server_encoding" />
+            <EditText
+                android:id="@+id/server_encoding"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="UTF-8"
+                android:inputType="text" />
+
+            <CheckBox
+                android:id="@+id/refresh_messages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/refresh_messages"
+                android:checked="false" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/period_frame">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Durée en secondes entre deux interrogations du serveur" />
+                <NumberPicker
+                    android:id="@+id/default_period"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+        <Button
+            android:id="@+id/save_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enregistrer le serveur" />
+        <Button
+            android:id="@+id/delete_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Supprimer le serveur" />
+
+    </LinearLayout>
+</ScrollView>

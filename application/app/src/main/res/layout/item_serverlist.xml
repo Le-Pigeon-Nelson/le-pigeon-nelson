@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+        <!-- TODO: add an icon to illustrate that this entry cannot be modified (core) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

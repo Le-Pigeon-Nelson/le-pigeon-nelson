@@ -1,13 +1,11 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
 import android.app.Activity;
-import android.content.Context;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
 import android.util.JsonReader;
 import android.util.Log;
-import android.view.animation.AccelerateInterpolator;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.BMessage;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.messages.ConditionFactory;
@@ -28,6 +26,7 @@ public class MessageCollector extends Handler {
     public static final int startCollect = 0;
     public static final int stopCollect = 1;
     public static final int processCollect = 2;
+    public static final int getDescription = 3;
 
     private final SensorsService sensorManager;
 
@@ -37,7 +36,7 @@ public class MessageCollector extends Handler {
 
     private ArrayList<BMessage> newMessages;
 
-    private Server server;
+    private ServerDescription currentServer;
     private int serverID;
     private boolean running;
 
@@ -58,13 +57,18 @@ public class MessageCollector extends Handler {
 
     @Override
     public final void handleMessage(Message msg) {
-        if (msg.what == stopCollect) {
+        if (msg.what == getDescription) {
+            ServerDescription description = (ServerDescription) msg.obj;
+            collect(description, true);
+        }
+        else if (msg.what == stopCollect) {
             Log.d("MessageCollector", "stop collect");
             running = false;
         }
+
         else if (msg.what == startCollect) {
             Log.d("MessageCollector", "start collect");
-            this.server = (Server) msg.obj;
+            this.currentServer = (ServerDescription) msg.obj;
             serverID += 1;
             running = true;
 
@@ -75,18 +79,18 @@ public class MessageCollector extends Handler {
             // only run this process if it corresponds to the current server
             if (running && id == serverID) {
                 Date d = new Date();
-                long releaseTime = d.getTime() + server.getPeriodMilliseconds();
+                long releaseTime = d.getTime() + currentServer.getPeriodMilliseconds();
                 Log.d("MessageCollector", "get data from server");
 
                 // collect messages from the server
-                if (collect()) {
+                if (collect(currentServer, false)) {
                     // send them to the message queue
                     Message msgQ = msgQueue.obtainMessage();
                     msgQ.obj = newMessages;
                     msgQ.what = msgQueue.addNewMessages;
                     msgQueue.sendMessage(msgQ);
 
-                    if (server.getPeriodMilliseconds() != 0) {
+                    if (currentServer.getPeriodMilliseconds() != 0) {
                         // wait the desired period before collecting again, only if it's asked
                         Date d2 = new Date();
                         long time = releaseTime - d2.getTime();
@@ -109,11 +113,14 @@ public class MessageCollector extends Handler {
         }
     }
 
-    private boolean collect() {
+    private boolean collect(ServerDescription serverDescription, boolean description) {
 
         URL url = null;
         try {
-            url = new URL(server.getUrl() + getURLParameters());
+            if (description)
+                url = new URL(serverDescription.getUrl() + "?self-description");
+            else
+                url = new URL(serverDescription.getUrl() + getURLParameters());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
@@ -137,9 +144,14 @@ public class MessageCollector extends Handler {
         JsonReader reader = null;
         try {
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            reader = new JsonReader(new InputStreamReader(in, server.getEncoding()));
+            reader = new JsonReader(new InputStreamReader(in, serverDescription.getEncoding()));
 
-            readMessagesArray(reader);
+            if (description) {
+                readDescription(reader, serverDescription);
+            }
+            else {
+                readMessagesArray(reader);
+            }
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
@@ -160,6 +172,48 @@ public class MessageCollector extends Handler {
         }
 
         return true;
+    }
+
+    private void readDescription(JsonReader reader, ServerDescription serverDescription) throws IOException {
+        String name = null;
+        String description = null;
+        String encoding = null;
+        Integer defaultPeriod = null;
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String jname = reader.nextName();
+            if (jname.equals("name")) {
+                name = reader.nextString();
+            }
+            else if (jname.equals("description")) {
+                description = reader.nextString();
+            }
+            else if (jname.equals("encoding")) {
+                encoding = reader.nextString();
+            }
+            else if (jname.equals("defaultPeriod")) {
+                defaultPeriod = reader.nextInt();
+            }
+            else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+
+        if (name != null && description != null && encoding != null && defaultPeriod != null) {
+            ServerDescription newDescription = new ServerDescription(serverDescription.getUrl());
+            newDescription.setName(name).setDescription(description)
+                    .setEncoding(encoding).setPeriod(defaultPeriod)
+                    .setIsEditable(true).setIsSelfDescribed(true);
+
+            Message msg = uiHandler.obtainMessage();
+            msg.obj = newDescription;
+            msg.what = uiHandler.NEW_SERVER_DESCRIPTION;
+            uiHandler.sendMessage(msg);
+        }
+
+
+
     }
 
     private String getURLParameters() throws Exception {
@@ -276,7 +330,9 @@ public class MessageCollector extends Handler {
     }
 
 
-    public void setServer(Server server) {
-        this.server = server;
+    public void setCurrentServer(ServerDescription currentServer) {
+        this.currentServer = currentServer;
     }
+
+
 }

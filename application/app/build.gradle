@@ -36,5 +36,10 @@ dependencies {
     implementation "androidx.preference:preference-ktx:${rootProject.preferenceVersion}"
     implementation "com.mapzen.android:lost:3.0.2"
     implementation 'com.github.KalebKE:FSensor:v2.0'
+
+    def room_version = "2.2.5"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
 }
 

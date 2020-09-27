@@ -1,8 +1,8 @@
 package com.jmtrivial.lepigeonnelson.ui;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +10,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
-import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
-import com.jmtrivial.lepigeonnelson.broadcastplayer.Server;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
 
 import java.util.ArrayList;
 
-public class ServerSelectionFragment extends Fragment {
+public class ServerSelectionFragment extends Fragment implements ServerDescription.ServerDescriptionListener {
     private ServerListAdapter serverListAdapter;
     private MainActivity activity;
 
@@ -42,7 +41,11 @@ public class ServerSelectionFragment extends Fragment {
 
         serverListAdapter = new ServerListAdapter(view.getContext(), activity.servers);
 
-        final ListView list = view.findViewById(R.id.list_view);
+        for (ServerDescription server: activity.servers) {
+            server.setListener(this);
+        }
+
+        ListView list = view.findViewById(R.id.list_view);
         list.setAdapter(serverListAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -52,21 +55,56 @@ public class ServerSelectionFragment extends Fragment {
                         .navigate(R.id.action_ListFragment_to_ListenFragment);
             }
         });
+        list.setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        ServerDescription server = serverListAdapter.getItem(position);
+                        if (server.isEditable()) {
+                            activity.setEditServer(server);
+                            NavHostFragment.findNavController(ServerSelectionFragment.this)
+                                    .navigate(R.id.action_edit);
+                        }
+                        return true;
+                    }
+                }
+        );
+
+        FloatingActionButton addButton = view.findViewById(R.id.add_button);
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activity.setEditNewServer();
+                NavHostFragment.findNavController(ServerSelectionFragment.this)
+                        .navigate(R.id.action_edit);
+            }
+        });
+
     }
 
     @Override
     public void onResume() {
         serverListAdapter.notifyDataSetChanged();
         super.onResume();
-        activity.setMainFragment(true);
-        activity.invalidateOptionsMenu();
+        activity.setActiveFragment(MainActivity.SERVER_SELECTION_FRAGMENT, this);
 
     }
 
-    private class ServerListAdapter extends ArrayAdapter<Server> {
+    @Override
+    public void onUpdatedDescription(ServerDescription description) {
+        activity.saveServerDescription(description);
+        serverListAdapter.notifyDataSetChanged();
+    }
+
+    public void notifyDataSetChanged() {
+        serverListAdapter.notifyDataSetChanged();
+    }
+
+    private class ServerListAdapter extends ArrayAdapter<ServerDescription> {
 
 
-        public ServerListAdapter(@NonNull Context context, ArrayList<Server> servers) {
+        public ServerListAdapter(@NonNull Context context, ArrayList<ServerDescription> servers) {
             super(context, 0, servers);
         }
 
