@@ -5,8 +5,12 @@
 The aim of *le pigeon Nelson* is to provide a sound broadcasting tool according to your location and movement.
 
 <div>
-<img src="./images/Screenshot1.png" width="200px" alt="First screenshot: a list of servers to be played" align="left" margin="1em">
-<img src="./images/Screenshot2.png" width="200px" alt="Second screenshot: a playing server" align="left" margin="1em">
+<a href="./images/Screenshot1.png"><img src="./images/Screenshot1.png" width="150px" alt="A list of servers to be played" align="left" margin="1em"></a>
+<a href="./images/Screenshot2.png"><img src="./images/Screenshot2.png" width="150px" alt="A playing server" align="left" margin="1em"></a>
+<a href="./images/Screenshot3.png"><img src="./images/Screenshot3.png" width="100px" alt="Add a new server (simple)" align="left" margin="1em"></a>
+<a href="./images/Screenshot4.png"><img src="./images/Screenshot4.png" width="100px" alt="Add a new server (with details)" align="left" margin="1em"></a>
+<a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="100px" alt="Add a new server (with refresh delay)" align="left" margin="1em"></a>
+
 </div>
 
 ## How it works
@@ -20,7 +24,8 @@ The server then returns a set of broadcastable messages, each of them provided w
 This message can be the url of an audio file to be played, or a text that will be said by the application's voice synthesis. 
 The application can be set so that the messages can be cut, superimposed, or wait for other messages to be played before being broadcast. Messages can also contain these broadcast constraints.
 
-A second mode of operation allows the user to request, at the frequency he wishes, a message associated with his location.
+Servers can be self described, containing their own information (name, description, refresh frequency, etc.).
+
 
 See [technical notes](technical-notes.md) if you're interested in technical details.
 
