@@ -27,16 +27,6 @@ See [technical notes](technical-notes.md) if you're interested in technical deta
 * Offer on-demand information on the services available in the area (e.g. [museums](https://github.com/jmtrivial/le-pigeon-nelson/blob/master/servers/museums.php))
 * Play selected music according to the location of the listener
 
-## Screenshots
-
-<a href="./images/Screenshot1.png"><img src="./images/Screenshot1.png" width="150px" alt="A list of servers to be played" align="left" margin="1em"></a>
-<a href="./images/Screenshot2.png"><img src="./images/Screenshot2.png" width="150px" alt="A playing server" align="left" margin="1em"></a>
-<a href="./images/Screenshot3.png"><img src="./images/Screenshot3.png" width="150px" alt="Add a new server (simple)" align="left" margin="1em"></a>
-<a href="./images/Screenshot4.png"><img src="./images/Screenshot4.png" width="150px" alt="Add a new server (with details)" align="left" margin="1em"></a>
-<a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="150px" alt="Add a new server (with refresh delay)" align="left" margin="1em"></a>
-
-<br />
-  
 
 ## License
 
@@ -49,3 +39,13 @@ The initial idea has been discussed on August 2020 between Samuel Braikeh and Je
 ## About the name of the project
 
 Imagine for a moment a pigeon singing *On the rrrrrroad again* (Willie Nelson). That's it.
+
+## Screenshots
+
+<a href="./images/Screenshot1.png"><img src="./images/Screenshot1.png" width="150px" alt="A list of servers to be played" align="left" margin="1em"></a>
+<a href="./images/Screenshot2.png"><img src="./images/Screenshot2.png" width="150px" alt="A playing server" align="left" margin="1em"></a>
+
+
+<a href="./images/Screenshot3.png"><img src="./images/Screenshot3.png" width="150px" alt="Add a new server (simple)" align="left" margin="1em"></a>
+<a href="./images/Screenshot4.png"><img src="./images/Screenshot4.png" width="150px" alt="Add a new server (with details)" align="left" margin="1em"></a>
+<a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="150px" alt="Add a new server (with refresh delay)" align="left" margin="1em"></a>
