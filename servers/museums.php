@@ -11,7 +11,7 @@ include 'pigeon-nelson.php';
 
 
 
-function printMuseum($row) {
+function addMuseum($row, $server) {
     global $radiusPlayable;
 
     $name = $row["tags"]["name"];
@@ -27,7 +27,7 @@ function printMuseum($row) {
     $message = PigeonNelsonMessage::makeTxtMessage($name, "fr");
     $message->addRequiredCondition(PigeonNelsonCondition::ConditionDistanceTo($coordinate, Comparison::lessThan, $radiusPlayable));
     
-    print $message->toString();
+    $server->addMessage($message);
     
     return $coordinate;
 }
@@ -62,19 +62,13 @@ $position = $server->getPositionRequest();
 
 
 
-print "[";
 
 $minDist = PNUtil::geoDistanceMeters($radiusPlayable);
 
-$first = true;
 if ($server->hasEntries()) {
     foreach($server->getEntries() as $key => $row) {
         if (isset($row["tags"]) && isset($row["tags"]["tourism"]) && $row["tags"]["tourism"] == "museum") {
-            if ($first)
-                $first = false;
-            else 
-                echo ", ";
-            $loc = printMuseum($row);
+            $loc = addMuseum($row, $server);
             $dist = PNUtil::distance($position, $loc);
             if ($dist < $minDist)
                 $minDist = $dist;
@@ -84,15 +78,12 @@ if ($server->hasEntries()) {
 }
 
 if ($minDist->meters() >= $radiusPlayable) {
-    if (!$first) {
-        echo ", ";
-    }
     $message = PigeonNelsonMessage::makeTxtMessage("Il n'y a aucun musée autour de vous.", "fr");
     $message->setPriority(0);
-    print $message->toString();
+    $server->addMessage($message);
 }
     
-print ']';
+$server->printMessages();
 
 ?>
 

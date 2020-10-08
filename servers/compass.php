@@ -50,16 +50,13 @@ for($refHour = 0; $refHour <= 12; $refHour += 3) {
     }
 }
 
-if ($message == "") {
-    echo "[]";
-    return;
-}
-else {
+if ($message != "") {
     $message = PigeonNelsonMessage::makeTxtMessage($message, "fr");
     $message->setPriority(0);
-    print "[" . $message->toString() . "]";
-    
+    $server->addMessage($message);    
 }
+
+$server->printMessages();
 
 ?>
 

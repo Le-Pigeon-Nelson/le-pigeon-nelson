@@ -185,8 +185,10 @@ class PigeonNelsonServer {
     private $description;
     private $encoding;
     private $defaultPeriodBetweenUpdates;
+    private $messages;
     
     public function __construct($get) {
+        $this->messages = [];
         $this->requestedSelfDescription = array_key_exists("self-description", $get);
             
         if (array_key_exists("lat", $get))
@@ -289,6 +291,26 @@ class PigeonNelsonServer {
     
     public function getEntries() {
         return $this->data;
+    }
+    
+    public function addMessage($message) {
+        array_push($this->messages, $message);
+    }
+    
+    public function printMessages() {
+        print "[";
+        
+        $first = true;
+        foreach($this->messages as $message) {
+            if ($first)
+                $first = false;
+            else
+                print ", ";
+            print $message->toString();
+        }
+        
+        
+        print "]";
     }
     
 
