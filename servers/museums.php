@@ -66,8 +66,8 @@ print "[";
 
 $minDist = PNUtil::geoDistanceMeters($radiusPlayable);
 
+$first = true;
 if ($server->hasEntries()) {
-    $first = true;
     foreach($server->getEntries() as $key => $row) {
         if (isset($row["tags"]) && isset($row["tags"]["tourism"]) && $row["tags"]["tourism"] == "museum") {
             if ($first)
@@ -84,6 +84,9 @@ if ($server->hasEntries()) {
 }
 
 if ($minDist->meters() >= $radiusPlayable) {
+    if (!$first) {
+        echo ", ";
+    }
     $message = PigeonNelsonMessage::makeTxtMessage("Il n'y a aucun musée autour de vous.", "fr");
     $message->setPriority(0);
     print $message->toString();
