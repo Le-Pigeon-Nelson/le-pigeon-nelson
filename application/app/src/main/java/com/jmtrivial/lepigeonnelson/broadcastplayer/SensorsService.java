@@ -185,6 +185,8 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                             // Do stuff
                             Log.d("LocationManager", "Location changed");
                             location = loc;
+                            // TODO: store here last position and timestamp to estimate speed vector ?
+                            // TODO: do this storage every second (or more)
                             if (broadcastPlayer != null && broadcastPlayer.isWorking())
                                 broadcastPlayer.locationChanged();
                         }
