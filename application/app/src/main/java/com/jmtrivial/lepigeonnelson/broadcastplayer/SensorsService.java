@@ -138,6 +138,13 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         return (float) (Math.toDegrees(fusedOrientation[0]) + 360) % 360;
     }
 
+    public float getPitch() {
+        return (float) Math.toDegrees(fusedOrientation[1]);
+    }
+
+    public float getRoll() {
+        return (float) Math.toDegrees(fusedOrientation[2]);
+    }
 
     public void checkSensorsSettings() {
         if (request != null) {

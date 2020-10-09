@@ -30,6 +30,14 @@ public class ConditionFactory {
             Log.d("Condition factory", "azimuthDeviation");
             return new AzimuthDeviationCondition(reference, c, Float.parseFloat(parameter));
         }
+        else if  (reference.matches("^pitchDeviation[(][ ]*[+-]?\\d*\\.?\\d*[ ]*[)]$")) {
+            Log.d("Condition factory", "pitchDeviation");
+            return new PitchDeviationCondition(reference, c, Float.parseFloat(parameter));
+        }
+        else if  (reference.matches("^rollDeviation[(][ ]*[+-]?\\d*\\.?\\d*[ ]*[)]$")) {
+            Log.d("Condition factory", "rollDeviation");
+            return new RollDeviationCondition(reference, c, Float.parseFloat(parameter));
+        }
         else {
             Log.d("MessageCondition", "Unknown reference: " + reference);
         }

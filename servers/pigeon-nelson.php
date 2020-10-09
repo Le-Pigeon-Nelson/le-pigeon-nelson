@@ -26,8 +26,8 @@ abstract class PNUtil {
     }
 
 
-    public static function degreeToClock($azimuth) {
-        return $azimuth / 360 * 12;
+    public static function degreeToClock($angle) {
+        return $angle / 360 * 12;
     }
 
     private static function fmod_alt($x, $y) {
@@ -180,6 +180,8 @@ class PigeonNelsonServer {
     private $latitudeRequest;
     private $longitudeRequest;
     private $azimuthRequest;
+    private $pitchRequest;
+    private $rollRequest;
     private $requestedSelfDescription;
     private $name;
     private $description;
@@ -205,6 +207,17 @@ class PigeonNelsonServer {
             $this->azimuthRequest = $get["azimuth"];
         else
             $this->azimuthRequest = null;
+
+        if (array_key_exists("pitch", $get))
+            $this->pitchRequest = $get["pitch"];
+        else
+            $this->pitchRequest = null;
+
+        if (array_key_exists("roll", $get))
+            $this->rollRequest = $get["roll"];
+        else
+            $this->rollRequest = null;
+
         $this->data = [];
         
         $name = null;
@@ -240,7 +253,15 @@ class PigeonNelsonServer {
     public function hasAzimuthRequest() {
         return $this->azimuthRequest != null;
     }
-    
+
+    public function hasPitchRequest() {
+        return $this->pitchRequest != null;
+    }
+
+    public function hasRollRequest() {
+        return $this->rollRequest != null;
+    }
+
     public function hasCoordinatesRequest() {
         return $this->latitudeRequest != null && $this->longitudeRequest != null;
     }
@@ -259,7 +280,14 @@ class PigeonNelsonServer {
     public function getAzimuthRequestAsClock() {
         return PNUtil::degreeToClock($this->azimuthRequest);
     }
-    
+  
+    public function getPitchRequestAsClock() {
+        return PNUtil::degreeToClock($this->pitchRequest);
+    }
+
+    public function getRollRequestAsClock() {
+        return PNUtil::degreeToClock($this->rollRequest);
+    }
     
     private function getBBoxStringFromPositionRequest($radius) {
         $position =  $this->getPositionRequest();
@@ -291,6 +319,11 @@ class PigeonNelsonServer {
     
     public function getEntries() {
         return $this->data;
+    }
+    
+    
+    public function clearMessages() {
+        $this->messages = [];
     }
     
     public function addMessage($message) {

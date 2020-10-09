@@ -219,8 +219,13 @@ public class MessageCollector extends Handler {
     private String getURLParameters() throws Exception {
         Location location = sensorManager.getLocation();
         float azimuth = sensorManager.getAzimuth();
+        float pitch = sensorManager.getPitch();
+        float roll = sensorManager.getRoll();
         if (location != null)
-            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude() + "&azimuth=" + azimuth;
+            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude() +
+                    "&azimuth=" + azimuth +
+                    "&pitch=" + pitch +
+                    "&roll=" + roll;
         else {
             throw new Exception();
         }
