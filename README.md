@@ -20,7 +20,7 @@ The application can be set so that the messages can be cut, superimposed, or wai
 Servers can be self described, containing their own information (name, description, refresh frequency, etc.).
 
 
-See [technical notes](technical-notes.md) if you're interested in technical details.
+See [technical notes](technical-notes.md)  and [protocol details](protocol-details.md) if you're interested in technical details.
 
 ## Examples of use
 
