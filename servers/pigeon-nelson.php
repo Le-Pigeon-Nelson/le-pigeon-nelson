@@ -96,6 +96,11 @@ class PigeonNelsonCondition {
         return new PigeonNelsonCondition("distanceTo(" . $coordinates. ")", $comparison, $parameter);
     }
     
+    public static function ConditionTimeFromReception($comparison, $parameter) {
+        return new PigeonNelsonCondition("timeFromReception", $comparison, $parameter);
+    }
+    
+    
     public function toString() {
         return '{"reference": "' . $this->reference . '", "comparison": "'. Comparison::toString($this->comparison) . '", "parameter": "' . $this->parameter .'" }';
     }
@@ -140,6 +145,17 @@ class PigeonNelsonMessage {
     public function addForgettingCondition($condition) {
         array_push($this->forgettingConditions, $condition);
     }
+    public function addForgettingConditionTimeFromReception($duration) {
+        $this->addForgettingCondition(PigeonNelsonCondition::ConditionTimeFromReception(Comparison::greaterThan, $duration));
+    }
+    
+    public function hasForgettingConditionTFR() {
+        foreach($this->forgettingConditions as $condition) {
+            if ($condition->reference == "timeFromReception")
+                return true;
+        }
+        return false;
+    }
     
     public function toString() {
         $result = '{';
@@ -164,10 +180,11 @@ class PigeonNelsonMessage {
         }
         $result .= '], ';
         $result .= '"forgettingConditions": [';
+        $first = true;
         foreach($this->forgettingConditions as $condition) {
             if ($first) $first = false;
             else $result .= ", ";
-            $result .= $condition.toString();
+            $result .= $condition->toString();
         }
         $result .= ']}';
         
@@ -327,6 +344,8 @@ class PigeonNelsonServer {
     }
     
     public function addMessage($message) {
+        if (!$message->hasForgettingConditionTFR() && isset($this->defaultPeriodBetweenUpdates) && $this->defaultPeriodBetweenUpdates > 0)
+            $message->addForgettingConditionTimeFromReception($this->defaultPeriodBetweenUpdates);
         array_push($this->messages, $message);
     }
     

@@ -220,7 +220,7 @@ public class MessageCollector extends Handler {
 
 
     }
-    
+
 
     private String getURLParameters() throws Exception {
         Location location = sensorManager.getLocation();

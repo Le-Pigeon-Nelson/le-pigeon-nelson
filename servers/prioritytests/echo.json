@@ -4,20 +4,20 @@
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [{ "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 6 } ],
-        "forgettingConditions": [ ]
+        "forgettingConditions": [ { "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 15 } ]
     },
     {
         "txt": "Écho (bis)",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [{ "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 3 } ],
-        "forgettingConditions": [ ]
+        "forgettingConditions": [ { "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 15 } ]
     },
     {
         "txt": "Écho",
         "lang": "fr",
         "priority": 0,
         "requiredConditions": [ ],
-        "forgettingConditions": [ ]
+        "forgettingConditions": [ { "reference": "timeFromReception", "comparison": "greaterThan", "parameter": 15 } ]
     }
 ]
