@@ -4,6 +4,7 @@
 
 The aim of *le pigeon Nelson* is to provide a sound broadcasting tool according to your location and movement.
 
+See [a french description](https://compas.limos.fr/le-pigeon-nelson/) in Compas website.
 
 ## How it works
 
@@ -34,7 +35,7 @@ This project is [provided under GPL v3](./LICENSE).
 
 ## Authors
 
-The initial idea has been discussed on August 2020 between Samuel Braikeh and Jean-Marie Favreau
+The initial idea has been discussed on August 2020 between Samuel Braikeh and Jean-Marie Favreau.
 
 ## About the name of the project
 
