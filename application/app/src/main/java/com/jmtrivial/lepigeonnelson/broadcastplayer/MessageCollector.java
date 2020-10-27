@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -39,6 +40,7 @@ public class MessageCollector extends Handler {
     private ServerDescription currentServer;
     private int serverID;
     private boolean running;
+    private String deviceID;
 
 
     private UIHandler uiHandler;
@@ -53,6 +55,9 @@ public class MessageCollector extends Handler {
         serverID = 0;
 
         this.uiHandler = uiHandler;
+
+        this.deviceID = Settings.Secure.getString(activity.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
     }
 
     @Override
@@ -216,16 +221,34 @@ public class MessageCollector extends Handler {
 
     }
 
+    private static String addParameter(String beginURL, String key, String value) {
+        String url = beginURL;
+        if (beginURL.equals("")) {
+            url += "?";
+        }
+        else
+            url += "&";
+
+        return url + key + "=" + value;
+    }
+
     private String getURLParameters() throws Exception {
         Location location = sensorManager.getLocation();
         float azimuth = sensorManager.getAzimuth();
         float pitch = sensorManager.getPitch();
         float roll = sensorManager.getRoll();
-        if (location != null)
-            return "?lat=" + location.getLatitude() + "&lng=" + location.getLongitude() +
-                    "&azimuth=" + azimuth +
-                    "&pitch=" + pitch +
-                    "&roll=" + roll;
+        if (location != null) {
+            URLParamBuilder params = new URLParamBuilder();
+            params.addParameter("lat", location.getLatitude());
+            params.addParameter("lng", location.getLongitude());
+            params.addParameter("azimuth", azimuth);
+            params.addParameter("pitch", pitch);
+            params.addParameter("roll", roll);
+
+            params.addParameter("uid", deviceID);
+            
+            return params.toString();
+        }
         else {
             throw new Exception();
         }
