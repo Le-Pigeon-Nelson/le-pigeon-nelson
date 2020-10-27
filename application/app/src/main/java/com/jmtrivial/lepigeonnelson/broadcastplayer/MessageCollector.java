@@ -220,17 +220,7 @@ public class MessageCollector extends Handler {
 
 
     }
-
-    private static String addParameter(String beginURL, String key, String value) {
-        String url = beginURL;
-        if (beginURL.equals("")) {
-            url += "?";
-        }
-        else
-            url += "&";
-
-        return url + key + "=" + value;
-    }
+    
 
     private String getURLParameters() throws Exception {
         Location location = sensorManager.getLocation();
@@ -246,7 +236,7 @@ public class MessageCollector extends Handler {
             params.addParameter("roll", roll);
 
             params.addParameter("uid", deviceID);
-            
+
             return params.toString();
         }
         else {
