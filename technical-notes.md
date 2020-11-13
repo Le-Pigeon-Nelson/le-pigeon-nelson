@@ -12,7 +12,7 @@ The application needs to identify information on the user's movements. To improv
 * [Lost from Mapzen](https://github.com/lostzen/lost), a drop-in replacement for Google Play services location APIs for Android
 
 
-## REST communication betwwen client and server
+## REST communication between client and server
 
 The application regularly queries a server to obtain messages to broadcast, using a REST API. See [protocol details](protocol-details.md) for a detailed description.
 
