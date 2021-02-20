@@ -77,7 +77,7 @@ public class ServerDescription {
         this.hasDescription = true;
         Log.d("ServerDescription", "update");
 
-        if (listener != null && editable)
+        if (listener != null)
             listener.onUpdatedDescription(this);
     }
 

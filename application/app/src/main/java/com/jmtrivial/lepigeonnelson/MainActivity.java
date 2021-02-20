@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Accès localisation précise accordée.", Toast.LENGTH_SHORT).show();
-                } else {
+               } else {
                     Toast.makeText(this, "Accès localisation précise refusée.", Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -135,7 +135,8 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
             } else {
                 requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
             }
-        }        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 showExplanation("Accès localisation précise requise", "Rationale",
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+        editedServerIsNew = false;
         uiHandler = new UIHandler();
 
 
@@ -410,7 +412,8 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
     public void saveServerDescription(ServerDescription description) {
         Log.d("PigeonNelson", "Save server description " + description.getUrl());
         // save in room this server description
-        db.add(description);
+        if (description.isEditable())
+            db.add(description);
 
     }
 
@@ -469,24 +472,31 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
     public void updateEditedServer(ServerDescription description) {
         // if this description is a new one, add it to the list
+        boolean save = false;
         if (editedServerIsNew) {
             userDefinedServers.add(description);
+            save = true;
         }
         else {
-            // update the edited server
-            editedServer.update(description);
+            if (editedServer == null) {
+                // update the edited server
+                editedServer.update(description);
+                save = true;
+            }
         }
+        if (save) {
 
-        saveServerDescription(description);
+            saveServerDescription(description);
 
-        if (description.isSelfDescribed()) {
-            Log.d("PigeonNelson", "self descripted server, ask for its description");
-            player.collectServerDescription(description);
+            if (description.isSelfDescribed()) {
+                Log.d("PigeonNelson", "self descripted server, ask for its description");
+                player.collectServerDescription(description);
+            }
+
+            Log.d("PigeonNelson", "build server list");
+            // update view
+            buildServerList();
         }
-
-        Log.d("PigeonNelson", "build server list");
-        // update view
-        buildServerList();
 
         editedServer = null;
 
