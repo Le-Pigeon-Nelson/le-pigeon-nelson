@@ -1,5 +1,12 @@
 [
     {
+        "name":"Bonjour le monde",
+        "description":"Un message \"bonjour le monde\" toutes les 30 secondes",
+        "encoding":"UTF-8",
+        "defaultPeriod": 30
+    
+    },
+    {
         "txt": "Bonjour le monde!",
         "lang": "fr",
         "priority": 1,

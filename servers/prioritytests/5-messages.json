@@ -1,5 +1,11 @@
 [
     {
+        "name":"5 messages ou moins",
+        "description":"Un serveur envoie 5 messages mal triés, avec une durée de vie courte",
+        "encoding":"UTF-8",
+        "defaultPeriod": 15
+    
+    },    {
         "txt": "Cinquième message",
         "lang": "fr",
         "priority": 0,

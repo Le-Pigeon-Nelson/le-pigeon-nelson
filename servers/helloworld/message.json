@@ -1,5 +1,12 @@
 [
     {
+        "name":"Hello world",
+        "description":"One \"hello world\" message every 30 seconds",
+        "encoding":"UTF-8",
+        "defaultPeriod": 30
+    
+    },
+    {
         "txt": "Hello world!",
         "lang": "en",
         "priority": 1,

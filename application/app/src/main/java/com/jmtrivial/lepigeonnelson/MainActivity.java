@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
         player = new BroadcastPlayer(this, 100, uiHandler);
         player.setListener(this);
+        player.start();
 
 
         createDebugServers();
@@ -221,25 +222,26 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
         buildServerList();
 
-        player.start();
 
         // refresh descriptions from server
         for(ServerDescription server: this.servers) {
-            if (server.isSelfDescribed())
+            if (server.isSelfDescribed()) {
+                Log.d("DefaultServers", "load self description for " + server.getUrl());
                 player.collectServerDescription(server);
+            }
+            else
+                Log.d("DefaultServers", "not self described " + server.getUrl());
         }
+
+
     }
 
     private void createCoreServers() {
         // a server to find Museum in neighborhood
-        ServerDescription server1 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/museums.php");
-        server1.setName("Musées").setDescription("Connaître les musées dans son voisinage")
-                .setPeriod(0).setEncoding("UTF-8").setIsEditable(false);
+        ServerDescription server1 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/protocol2/museums.php");
 
         // a server for orientation
-        ServerDescription server2 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/compass.php");
-        server2.setName("Rose des vents").setDescription("Connaître la direction vers laquelle on s'oriente")
-                .setPeriod(0).setEncoding("UTF-8").setIsEditable(false);
+        ServerDescription server2 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/protocol2/compass.php");
 
         coreServers.add(server1);
         coreServers.add(server2);
@@ -255,32 +257,26 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         debugServers.add(server1);
 
         // a server to test robustness
-        ServerDescription server2 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/jsontests/broken.json");
+        ServerDescription server2 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/jsontests/broken.json");
         server2.setName("Défectueux 2").setDescription("Un json malformé").
                 setEncoding("UTF-8").setPeriod(15).setIsEditable(false);
         debugServers.add(server2);
 
         // a server to test robustness
-        ServerDescription server3 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/jsontests/missing-parts.json");
+        ServerDescription server3 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/jsontests/missing-parts.json");
         server3.setName("Défectueux 3").setDescription("Un json avec des champs manquants")
                 .setEncoding("UTF-8").setPeriod(15).setIsEditable(false);
         debugServers.add(server3);
 
-        ServerDescription server4 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/message.json");
-        server4.setName("Hello world").setDescription("One \"hello world\" message every 30 seconds")
-                .setEncoding("UTF-8").setPeriod(30).setIsEditable(false);
+        ServerDescription server4 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/helloworld/message.json");
         debugServers.add(server4);
 
         // add an "bonjour le monde" (fr) server
-        ServerDescription server5 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/message-fr.json");
-        server5.setName("Bonjour le monde").setDescription("Un message \"bonjour le monde\" toutes les 30 secondes")
-                .setEncoding("UTF-8").setPeriod(30).setIsEditable(false);
+        ServerDescription server5 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/helloworld/message-fr.json");
         debugServers.add(server5);
 
         // add an "bonjour le monde" (fr) server
-        ServerDescription server6 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/helloworld/audiomessage-fr.json");
-        server6.setName("Bonjour le monde (audio)").setDescription("Un message \"bonjour le monde\" dit par un humain, toutes les 30 secondes")
-                .setEncoding("UTF-8").setPeriod(30).setIsEditable(false);
+        ServerDescription server6 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/protocol-v2/helloworld/audiomessage-fr.json");
         debugServers.add(server6);
 
         // add a blabla / "bip" server
@@ -290,15 +286,11 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         debugServers.add(server7);
 
         // a server to test forgetting constraints
-        ServerDescription server8 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/5-messages.json");
-        server8.setName("5 messages ou moins").setDescription("Un serveur envoie 5 messages mal triés, avec une durée de vie courte")
-                .setEncoding("UTF-8").setPeriod(15).setIsEditable(false);
+        ServerDescription server8 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/prioritytests/5-messages.json");
         debugServers.add(server8);
 
         // a server to test playable constraints
-        ServerDescription server9 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/master/servers/prioritytests/echo.json");
-        server9.setName("écho").setDescription("Un serveur envoie des messages joués après quelques temps d'attente")
-                .setEncoding("UTF-8").setPeriod(15).setIsEditable(false);
+        ServerDescription server9 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/prioritytests/echo.json");
         debugServers.add(server9);
 
     }
@@ -446,8 +438,9 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
     @Override
     public void onServerDescriptionUpdate(ServerDescription description) {
+        Log.d("DefaultServers", "new description for " + description.getUrl());
         for (ServerDescription server : servers) {
-            if (server.isEditable() && description.getUrl().equals(server.getUrl())) {
+            if (description.getUrl().equals(server.getUrl())) {
                 server.update(description);
                 break;
             }

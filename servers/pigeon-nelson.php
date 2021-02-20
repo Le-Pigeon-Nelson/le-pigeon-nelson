@@ -263,7 +263,7 @@ class PigeonNelsonServer {
     }
     
     public function getSelfDescription() {
-        return '{ "name": "' . $this->name . '", "description": "'. $this->description . '", "encoding": "'. $this->encoding .'", "defaultPeriod": '. $this->defaultPeriodBetweenUpdates . ' }';
+        return '[{ "name": "' . $this->name . '", "description": "'. $this->description . '", "encoding": "'. $this->encoding .'", "defaultPeriod": '. $this->defaultPeriodBetweenUpdates . ' }]';
     }
     
 

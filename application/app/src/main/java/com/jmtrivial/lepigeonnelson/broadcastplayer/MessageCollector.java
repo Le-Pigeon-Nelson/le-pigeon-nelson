@@ -120,7 +120,7 @@ public class MessageCollector extends Handler {
 
     private boolean collect(ServerDescription serverDescription, boolean description) {
 
-        URL url = null;
+        URL url;
         try {
             if (description)
                 url = new URL(serverDescription.getUrl() + "?self-description");
@@ -136,7 +136,7 @@ public class MessageCollector extends Handler {
             return false;
         }
 
-        HttpURLConnection urlConnection = null;
+        HttpURLConnection urlConnection;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -146,17 +146,12 @@ public class MessageCollector extends Handler {
             return false;
         }
 
-        JsonReader reader = null;
+        JsonReader reader;
         try {
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             reader = new JsonReader(new InputStreamReader(in, serverDescription.getEncoding()));
-
-            if (description) {
-                readDescription(reader, serverDescription);
-            }
-            else {
-                readMessagesArray(reader);
-            }
+            Log.d("DefaultServers", "read arrays");
+            readArray(reader, description, serverDescription);
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
@@ -177,48 +172,6 @@ public class MessageCollector extends Handler {
         }
 
         return true;
-    }
-
-    private void readDescription(JsonReader reader, ServerDescription serverDescription) throws IOException {
-        String name = null;
-        String description = null;
-        String encoding = null;
-        Integer defaultPeriod = null;
-        reader.beginObject();
-        while (reader.hasNext()) {
-            String jname = reader.nextName();
-            if (jname.equals("name")) {
-                name = reader.nextString();
-            }
-            else if (jname.equals("description")) {
-                description = reader.nextString();
-            }
-            else if (jname.equals("encoding")) {
-                encoding = reader.nextString();
-            }
-            else if (jname.equals("defaultPeriod")) {
-                defaultPeriod = reader.nextInt();
-            }
-            else {
-                reader.skipValue();
-            }
-        }
-        reader.endObject();
-
-        if (name != null && description != null && encoding != null && defaultPeriod != null) {
-            ServerDescription newDescription = new ServerDescription(serverDescription.getUrl());
-            newDescription.setName(name).setDescription(description)
-                    .setEncoding(encoding).setPeriod(defaultPeriod)
-                    .setIsEditable(true).setIsSelfDescribed(true);
-
-            Message msg = uiHandler.obtainMessage();
-            msg.obj = newDescription;
-            msg.what = uiHandler.NEW_SERVER_DESCRIPTION;
-            uiHandler.sendMessage(msg);
-        }
-
-
-
     }
 
 
@@ -244,7 +197,9 @@ public class MessageCollector extends Handler {
         }
     }
 
-    private void readMessagesArray(JsonReader reader) throws IOException {
+    private void readArray(JsonReader reader,
+                           boolean description,
+                           ServerDescription serverDescription) throws IOException {
         newMessages.clear();
         Date d = new Date();
         long ctime = d.getTime();
@@ -252,12 +207,25 @@ public class MessageCollector extends Handler {
 
         reader.beginArray();
         while (reader.hasNext()) {
-            BMessage msg = readMessage(reader);
-            if (msg != null) {
-                msg.setCollectedTimestamp(ctime);
-                msg.setLocalID(i);
-                i += 1;
-                newMessages.add(msg);
+            Entry entry = readEntry(reader);
+            if (entry.isMessage() && !description) {
+                BMessage msg = entry.getMessage();
+                if (msg != null) {
+                    msg.setCollectedTimestamp(ctime);
+                    msg.setLocalID(i);
+                    i += 1;
+                    newMessages.add(msg);
+                } else
+                    throw new IOException();
+            }
+            else if (entry.isDescription() && description) {
+                ServerDescription newDescription = entry.getDescription(serverDescription);
+
+
+                Message msg = uiHandler.obtainMessage();
+                msg.obj = newDescription;
+                msg.what = uiHandler.NEW_SERVER_DESCRIPTION;
+                uiHandler.sendMessage(msg);
             }
             else
                 throw new IOException();
@@ -266,33 +234,49 @@ public class MessageCollector extends Handler {
 
     }
 
-    private BMessage readMessage(JsonReader reader) throws IOException {
+    private Entry readEntry(JsonReader reader) throws IOException {
         String txt = null;
         int priority = 10;
         String lang = null;
         String audioURL = null;
+        String name = null;
+        String description = null;
+        String encoding = null;
+        Integer defaultPeriod = null;
 
         ArrayList<MessageCondition> required = new ArrayList<>();
         ArrayList<MessageCondition> forgettingConditions = new ArrayList<>();
         reader.beginObject();
         while (reader.hasNext()) {
-            String name = reader.nextName();
-            if (name.equals("txt")) {
+            String jname = reader.nextName();
+            if (jname.equals("name")) {
+                name = reader.nextString();
+            }
+            else if (jname.equals("description")) {
+                description = reader.nextString();
+            }
+            else if (jname.equals("encoding")) {
+                encoding = reader.nextString();
+            }
+            else if (jname.equals("defaultPeriod")) {
+                defaultPeriod = reader.nextInt();
+            }
+            else if (jname.equals("txt")) {
                 txt = reader.nextString();
             }
-            else if (name.equals("lang")) {
+            else if (jname.equals("lang")) {
                 lang = reader.nextString();
             }
-            else if (name.equals("priority")) {
+            else if (jname.equals("priority")) {
                 priority = reader.nextInt();
             }
-            else if (name.equals("audioURL")) {
+            else if (jname.equals("audioURL")) {
                 audioURL = reader.nextString();
             }
-            else if (name.equals("requiredConditions")) {
+            else if (jname.equals("requiredConditions")) {
                 required = readConditions(reader);
             }
-            else if (name.equals("forgettingConditions")) {
+            else if (jname.equals("forgettingConditions")) {
                 forgettingConditions = readConditions(reader);
             }
             else {
@@ -300,7 +284,8 @@ public class MessageCollector extends Handler {
             }
         }
         reader.endObject();
-        return new BMessage(txt, lang, audioURL, priority, required, forgettingConditions);
+        return new Entry(txt, lang, audioURL, priority, required, forgettingConditions,
+                name, description, encoding, defaultPeriod);
 
     }
 
@@ -352,5 +337,59 @@ public class MessageCollector extends Handler {
         this.currentServer = currentServer;
     }
 
+
+    private class Entry {
+
+
+        private final String txt;
+        private final String lang;
+        private final String audioURL;
+        private final int priority;
+        private final ArrayList<MessageCondition> required;
+        private final ArrayList<MessageCondition> forgottingConditions;
+        private final String name;
+        private final String description;
+        private final String encoding;
+        private final Integer defaultPeriod;
+
+        public Entry(String txt, String lang, String audioURL, int priority,
+                     ArrayList<MessageCondition> required, ArrayList<MessageCondition> forgettingConditions,
+                     String name, String description, String encoding, Integer defaultPeriod) {
+            this.txt = txt;
+            this.lang = lang;
+            this.audioURL = audioURL;
+            this.priority = priority;
+            this.required = required;
+            this.forgottingConditions = forgettingConditions;
+
+            this.name = name;
+            this.description = description;
+            this.encoding = encoding;
+            this.defaultPeriod = defaultPeriod;
+
+        }
+
+
+        public boolean isMessage() {
+            return (txt != null && lang != null) || audioURL != null;
+        }
+
+        public boolean isDescription() {
+            return name != null && description != null && encoding != null && defaultPeriod != null;
+        }
+
+        public ServerDescription getDescription(ServerDescription serverDescription) {
+            ServerDescription newDescription = new ServerDescription(serverDescription.getUrl());
+            newDescription.setName(name).setDescription(description)
+                .setEncoding(encoding).setPeriod(defaultPeriod)
+                .setIsEditable(true).setIsSelfDescribed(true);
+            return newDescription;
+        }
+
+        public BMessage getMessage() {
+            return new BMessage(txt, lang, audioURL, priority, required, forgottingConditions);
+        }
+
+    }
 
 }

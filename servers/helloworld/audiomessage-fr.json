@@ -1,4 +1,13 @@
 [
+
+    {
+        "name":"Bonjour le monde (audio)",
+        "description":"Un message \"bonjour le monde\" dit par un humain, toutes les 30 secondes",
+        "encoding":"UTF-8",
+        "defaultPeriod": 30
+    
+    },
+
     {
         "audioURL": "https://github.com/jmtrivial/le-pigeon-nelson/raw/master/servers/helloworld/audio/bonjour-le-monde.mp3",
         "priority": 1,

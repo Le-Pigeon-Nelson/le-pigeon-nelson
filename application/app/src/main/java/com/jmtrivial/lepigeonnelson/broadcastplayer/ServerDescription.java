@@ -22,8 +22,8 @@ public class ServerDescription {
     public ServerDescription(String url) {
         this.selfDescribed = true;
         this.url = url;
-        this.name = "";
-        this.description = "";
+        this.name = "...";
+        this.description = "...";
 
         // set default values
         this.period = 0;

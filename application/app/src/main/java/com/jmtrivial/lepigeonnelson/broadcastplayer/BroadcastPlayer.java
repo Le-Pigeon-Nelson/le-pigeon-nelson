@@ -3,8 +3,10 @@ package com.jmtrivial.lepigeonnelson.broadcastplayer;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -104,12 +106,27 @@ public class BroadcastPlayer extends HandlerThread {
         }
     }
 
-    public void collectServerDescription(ServerDescription serverDescription) {
-        if (serverDescription.isSelfDescribed() && messageCollector != null) {
-            Message msg = messageCollector.obtainMessage();
-            msg.obj = serverDescription;
-            msg.what = messageCollector.getDescription;
-            messageCollector.sendMessage(msg);
+    public void collectServerDescription(final ServerDescription serverDescription) {
+        if (serverDescription.isSelfDescribed()) {
+            if (messageCollector != null) {
+                Message msg = messageCollector.obtainMessage();
+                msg.obj = serverDescription;
+                msg.what = messageCollector.getDescription;
+                messageCollector.sendMessage(msg);
+            }
+            else  {
+                // delay
+                Log.d("BroadcastPlayer", "collector not ready, wait 1 second");
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        collectServerDescription(serverDescription);
+                    }
+
+                }, 1000); //
+            }
         }
     }
 

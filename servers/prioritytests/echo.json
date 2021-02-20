@@ -1,5 +1,12 @@
 [
     {
+        "name":"écho",
+        "description":"Un serveur envoie des messages joués après quelques temps d'attente",
+        "encoding":"UTF-8",
+        "defaultPeriod": 15
+    
+    },
+    {
         "txt": "Écho (ter)",
         "lang": "fr",
         "priority": 0,

@@ -9,12 +9,14 @@ The first request from the application to the server is dedicated to the server 
 The resulting document is a json with the following content:
 
 ```json
-{ 
-    "name": "...", 
-    "description": "...",
-    "encoding": "...",
-    "defaultPeriod": "..." 
-}
+[ 
+    { 
+        "name": "...", 
+        "description": "...",
+        "encoding": "...",
+        "defaultPeriod": "..." 
+    }
+]
 
 ```
 
