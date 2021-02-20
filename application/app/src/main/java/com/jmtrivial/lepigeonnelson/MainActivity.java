@@ -223,15 +223,7 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         buildServerList();
 
 
-        // refresh descriptions from server
-        for(ServerDescription server: this.servers) {
-            if (server.isSelfDescribed()) {
-                Log.d("DefaultServers", "load self description for " + server.getUrl());
-                player.collectServerDescription(server);
-            }
-            else
-                Log.d("DefaultServers", "not self described " + server.getUrl());
-        }
+
 
 
     }
@@ -239,9 +231,11 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
     private void createCoreServers() {
         // a server to find Museum in neighborhood
         ServerDescription server1 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/protocol2/museums.php");
+        server1.setIsEditable(false);
 
         // a server for orientation
         ServerDescription server2 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/protocol2/compass.php");
+        server2.setIsEditable(false);
 
         coreServers.add(server1);
         coreServers.add(server2);
@@ -269,14 +263,17 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         debugServers.add(server3);
 
         ServerDescription server4 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/helloworld/message.json");
+        server4.setIsEditable(false);
         debugServers.add(server4);
 
         // add an "bonjour le monde" (fr) server
         ServerDescription server5 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/helloworld/message-fr.json");
+        server5.setIsEditable(false);
         debugServers.add(server5);
 
         // add an "bonjour le monde" (fr) server
-        ServerDescription server6 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/protocol-v2/helloworld/audiomessage-fr.json");
+        ServerDescription server6 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/helloworld/audiomessage-fr.json");
+        server6.setIsEditable(false);
         debugServers.add(server6);
 
         // add a blabla / "bip" server
@@ -287,10 +284,12 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
         // a server to test forgetting constraints
         ServerDescription server8 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/prioritytests/5-messages.json");
+        server8.setIsEditable(false);
         debugServers.add(server8);
 
         // a server to test playable constraints
         ServerDescription server9 = new ServerDescription("https://raw.githubusercontent.com/jmtrivial/le-pigeon-nelson/protocol-v2/servers/prioritytests/echo.json");
+        server9.setIsEditable(false);
         debugServers.add(server9);
 
     }
@@ -310,6 +309,15 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         servers.addAll(coreServers);
         servers.addAll(userDefinedServers);
 
+        // refresh descriptions from server
+        for(ServerDescription server: this.servers) {
+            if (server.isSelfDescribed() && server.missingDescription()) {
+                Log.d("DefaultServers", "load self description for " + server.getUrl());
+                player.collectServerDescription(server);
+            }
+            else
+                Log.d("DefaultServers", "not self described " + server.getUrl());
+        }
     }
 
     @Override
@@ -421,19 +429,22 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
     @Override
     public void onServerError() {
         Toast.makeText(this, R.string.server_access_error, Toast.LENGTH_SHORT).show();
-        onBackPressed();
+        if (!isMainFragment())
+            onBackPressed();
     }
 
     @Override
     public void onServerContentError() {
         Toast.makeText(this, R.string.server_content_error, Toast.LENGTH_SHORT).show();
-        onBackPressed();
+        if (!isMainFragment())
+            onBackPressed();
     }
 
     @Override
     public void onServerGPSError() {
         Toast.makeText(this, R.string.no_GPS_connection, Toast.LENGTH_SHORT).show();
-        onBackPressed();
+        if (!isMainFragment())
+            onBackPressed();
     }
 
     @Override

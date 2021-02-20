@@ -15,12 +15,14 @@ public class ServerDescription {
     private Integer period;
 
     private boolean selfDescribed;
+    private boolean hasDescription;
     private ServerDescriptionListener listener;
     private boolean editable;
 
 
     public ServerDescription(String url) {
         this.selfDescribed = true;
+        this.hasDescription = false;
         this.url = url;
         this.name = "...";
         this.description = "...";
@@ -72,9 +74,10 @@ public class ServerDescription {
         this.description = sd.description;
         this.encoding = sd.encoding;
         this.period = sd.period;
+        this.hasDescription = true;
         Log.d("ServerDescription", "update");
 
-        if (listener != null)
+        if (listener != null && editable)
             listener.onUpdatedDescription(this);
     }
 
@@ -89,11 +92,13 @@ public class ServerDescription {
 
     public ServerDescription setEncoding(String encoding) {
         this.encoding = encoding;
+        this.hasDescription =true;
         return this;
     }
 
     public ServerDescription setName(String name) {
         this.name = name;
+        this.hasDescription =true;
         return this;
     }
 
@@ -104,12 +109,17 @@ public class ServerDescription {
 
     public ServerDescription setDescription(String description) {
         this.description = description;
+        this.hasDescription =true;
         return this;
     }
 
     public ServerDescription setIsEditable(boolean b) {
         this.editable = b;
         return this;
+    }
+
+    public boolean missingDescription() {
+        return !hasDescription;
     }
 
 

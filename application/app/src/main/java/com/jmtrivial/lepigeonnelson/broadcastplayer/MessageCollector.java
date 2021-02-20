@@ -227,8 +227,6 @@ public class MessageCollector extends Handler {
                 msg.what = uiHandler.NEW_SERVER_DESCRIPTION;
                 uiHandler.sendMessage(msg);
             }
-            else
-                throw new IOException();
         }
         reader.endArray();
 
