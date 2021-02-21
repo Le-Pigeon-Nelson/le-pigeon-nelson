@@ -106,7 +106,11 @@ public class MessageCollector extends Handler {
         }
     }
 
-    private void collectMessages(long d) {
+    void collectMessages(long d) {
+        // remove previously delayed collect messages
+        removeMessages(processCollect);
+
+        // send new message
         Message msg = obtainMessage();
         msg.obj = serverID;
         msg.what = processCollect;
@@ -241,12 +245,15 @@ public class MessageCollector extends Handler {
         String description = null;
         String encoding = null;
         Integer defaultPeriod = null;
+        Integer period = null;
 
         ArrayList<MessageCondition> required = new ArrayList<>();
         ArrayList<MessageCondition> forgettingConditions = new ArrayList<>();
+
         reader.beginObject();
         while (reader.hasNext()) {
             String jname = reader.nextName();
+            // read elements of a description entry
             if (jname.equals("name")) {
                 name = reader.nextString();
             }
@@ -259,6 +266,8 @@ public class MessageCollector extends Handler {
             else if (jname.equals("defaultPeriod")) {
                 defaultPeriod = reader.nextInt();
             }
+
+            // read elements of a message entry
             else if (jname.equals("txt")) {
                 txt = reader.nextString();
             }
@@ -277,12 +286,15 @@ public class MessageCollector extends Handler {
             else if (jname.equals("forgettingConditions")) {
                 forgettingConditions = readConditions(reader);
             }
+            else if (jname.equals("period")) {
+                period = reader.nextInt();
+            }
             else {
                 reader.skipValue();
             }
         }
         reader.endObject();
-        return new Entry(txt, lang, audioURL, priority, required, forgettingConditions,
+        return new Entry(txt, lang, audioURL, priority, period, required, forgettingConditions,
                 name, description, encoding, defaultPeriod);
 
     }
@@ -339,24 +351,29 @@ public class MessageCollector extends Handler {
     private class Entry {
 
 
+        // message fields
         private final String txt;
         private final String lang;
         private final String audioURL;
-        private final int priority;
+        private final Integer priority;
+        private final Integer period;
         private final ArrayList<MessageCondition> required;
         private final ArrayList<MessageCondition> forgottingConditions;
+
+        // description fields
         private final String name;
         private final String description;
         private final String encoding;
         private final Integer defaultPeriod;
 
-        public Entry(String txt, String lang, String audioURL, int priority,
+        public Entry(String txt, String lang, String audioURL, Integer priority, Integer period,
                      ArrayList<MessageCondition> required, ArrayList<MessageCondition> forgettingConditions,
                      String name, String description, String encoding, Integer defaultPeriod) {
             this.txt = txt;
             this.lang = lang;
             this.audioURL = audioURL;
             this.priority = priority;
+            this.period = period;
             this.required = required;
             this.forgottingConditions = forgettingConditions;
 
@@ -385,7 +402,7 @@ public class MessageCollector extends Handler {
         }
 
         public BMessage getMessage() {
-            return new BMessage(txt, lang, audioURL, priority, required, forgottingConditions);
+            return new BMessage(txt, lang, audioURL, priority, period == null ? BMessage.DEFAULT_PERIOD : period, required, forgottingConditions);
         }
 
     }

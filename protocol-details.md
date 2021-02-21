@@ -40,6 +40,7 @@ The resulting document is a json with a list of messages described as following:
         "txt": "...",
         "lang": "...",
         "priority": ...,
+        "period": ...,
         "requiredConditions": [
             {
                 "reference": "...", 
@@ -77,7 +78,7 @@ The resulting document is a json with a list of messages described as following:
 ]
 ```
 
-Each message is described by its content (`audioURL` for an audio file, or `txt` and `lang` if a synthetized voice message), a priority (used in the message queue), and two series of constraints: one used as guards for broadcasting, and the other used as condition to forget the message.
+Each message is described by its content (`audioURL` for an audio file, or `txt` and `lang` if a synthetized voice message), a `priority` (used in the message queue), a specific `period` (before next server request) and two series of constraints: one used as guards for broadcasting, and the other used as condition to forget the message.
 
 Each condition is described by 3 parameters:
 

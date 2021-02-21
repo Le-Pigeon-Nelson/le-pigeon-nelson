@@ -10,6 +10,7 @@ public class BMessage implements Comparable<BMessage> {
     private int priority;
     private String lang;
     private String audioURL;
+    private int period;
 
     private ArrayList<MessageCondition> required;
     private ArrayList<MessageCondition> forgettingConditions;
@@ -18,12 +19,15 @@ public class BMessage implements Comparable<BMessage> {
         return collectedTime;
     }
 
+    public static final int DEFAULT_PERIOD = -1;
+
     private long collectedTime;
     private int localID;
 
     public BMessage(String txt, String lang,
                     String audioURL,
                     int priority,
+                    int period,
                     ArrayList<MessageCondition> required,
                     ArrayList<MessageCondition> forgettingConditions) {
         this.txt = txt;
@@ -34,6 +38,7 @@ public class BMessage implements Comparable<BMessage> {
         this.audioURL = audioURL;
         this.priority = priority;
         this.required = required;
+        this.period = period;
         this.forgettingConditions = forgettingConditions;
 
         this.collectedTime = 0;
@@ -52,6 +57,7 @@ public class BMessage implements Comparable<BMessage> {
     public String getAudioURL() {
         return audioURL;
     }
+    public int getPeriod() { return period; }
 
 
     public boolean isPlayable() {
@@ -128,5 +134,9 @@ public class BMessage implements Comparable<BMessage> {
 
     public void addExpiration(int refreshDelay) {
         forgettingConditions.add(new TimeFromReceptionCondition(Maths.Comparison.greaterThan, refreshDelay));
+    }
+
+    public long getPeriodMs() {
+        return getPeriod() * 1000;
     }
 }

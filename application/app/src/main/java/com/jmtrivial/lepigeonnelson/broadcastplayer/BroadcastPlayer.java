@@ -48,6 +48,7 @@ public class BroadcastPlayer extends HandlerThread {
         messagePlayer = new MessagePlayer(context);
         messageQueue = new MessageQueue(messagePlayer, refreshDelay, uiHandler);
         messageCollector = new MessageCollector(messageQueue, activity, uiHandler);
+        messageQueue.setCollector(messageCollector);
     }
 
     public void playBroadcast() {

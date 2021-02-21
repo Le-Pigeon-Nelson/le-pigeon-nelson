@@ -27,6 +27,7 @@ public class MessageQueue extends Handler {
     public static final int checkForPlayableMessage = 3;
 
     private ArrayList<BMessage> queue;
+    private MessageCollector messageCollector;
 
 
     public MessageQueue(final MessagePlayer messagePlayer, int refreshDelayMs, UIHandler uiHandler) {
@@ -38,6 +39,7 @@ public class MessageQueue extends Handler {
         queue = new ArrayList<>();
         this.refreshDelay = refreshDelayMs;
 
+        messageCollector = null;
     }
 
     public void setServerPeriod(int serverPeriod) {
@@ -107,8 +109,16 @@ public class MessageQueue extends Handler {
                         msgThread.what = MessagePlayer.playMessage;
                         messagePlayer.sendMessage(msgThread);
                         playing = true;
+
+                        // if required, ask for a new server collect
+                        if (m.getPeriod() != BMessage.DEFAULT_PERIOD) {
+                            Log.d("MessageQueue", "Specific period: " + m.getPeriod());
+                            messageCollector.collectMessages(m.getPeriodMs());
+                        }
+
                         // remove this message from the queue
                         iterator.remove();
+
                     }
                     break;
                 }
@@ -145,4 +155,7 @@ public class MessageQueue extends Handler {
         queue.clear();
     }
 
+    public void setCollector(MessageCollector messageCollector) {
+        this.messageCollector = messageCollector;
+    }
 }

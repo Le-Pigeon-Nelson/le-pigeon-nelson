@@ -294,6 +294,10 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         server9.setIsEditable(false);
         debugServers.add(server9);
 
+        // a server to test changing periods
+        ServerDescription server10 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/protocol2/random-period.php");
+        server10.setIsEditable(false);
+        debugServers.add(server10);
     }
 
     private void loadPreferences() {
