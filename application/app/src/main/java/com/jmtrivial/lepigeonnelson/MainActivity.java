@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         debugServers.add(server6);
 
         // add a blabla / "bip" server
-        ServerDescription server7 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/blabla-bip.php");
+        ServerDescription server7 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/protocol2/blabla-bip.php");
         server7.setName("Blabla bip").setDescription("Un serveur qui raconte du blabla toutes les 15 secondes, mais qui est coupé par un bip")
                 .setEncoding("UTF-8").setPeriod(1).setIsEditable(false);
         debugServers.add(server7);
