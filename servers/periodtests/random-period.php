@@ -7,7 +7,7 @@
     
     },
 <?php 
-$period = rand(2, 10);
+$period = rand(1, 10);
 
 ?>
 
@@ -15,7 +15,7 @@ $period = rand(2, 10);
         "txt": "Prochain message dans <?php echo $period; ?> secondes.",
         "lang": "fr",
         "priority": 1,
-        "period": <?php echo $period; ?>,
+        "period": <?php echo ($period + 3); ?>,
         "requiredConditions": [],
         "forgettingConditions": []
     }
