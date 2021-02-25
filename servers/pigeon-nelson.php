@@ -196,6 +196,7 @@ class PigeonNelsonMessage {
 class PigeonNelsonServer {
     private $latitudeRequest;
     private $longitudeRequest;
+    private $locAccuracyResquest;
     private $azimuthRequest;
     private $pitchRequest;
     private $rollRequest;
@@ -219,6 +220,11 @@ class PigeonNelsonServer {
             $this->longitudeRequest = $get["lng"];
         else
             $this->longitudeRequest = null;
+            
+        if (array_key_exists("loc_accuracy", $get))
+            $this->locAccuracyResquest = $get["loc_accuracy"];
+        else
+            $this->latitudeRequest = null;
             
         if (array_key_exists("azimuth", $get))
             $this->azimuthRequest = $get["azimuth"];

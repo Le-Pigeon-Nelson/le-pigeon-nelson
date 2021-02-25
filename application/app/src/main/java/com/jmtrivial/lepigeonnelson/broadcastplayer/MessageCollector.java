@@ -188,6 +188,7 @@ public class MessageCollector extends Handler {
             URLParamBuilder params = new URLParamBuilder();
             params.addParameter("lat", location.getLatitude());
             params.addParameter("lng", location.getLongitude());
+            params.addParameter("loc_accuracy", location.getAccuracy());
             params.addParameter("azimuth", azimuth);
             params.addParameter("pitch", pitch);
             params.addParameter("roll", roll);
