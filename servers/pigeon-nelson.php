@@ -194,12 +194,7 @@ class PigeonNelsonMessage {
 }
 
 class PigeonNelsonServer {
-    private $latitudeRequest;
-    private $longitudeRequest;
-    private $locAccuracyResquest;
-    private $azimuthRequest;
-    private $pitchRequest;
-    private $rollRequest;
+    private $getParams;
     private $requestedSelfDescription;
     private $name;
     private $description;
@@ -210,36 +205,13 @@ class PigeonNelsonServer {
     public function __construct($get) {
         $this->messages = [];
         $this->requestedSelfDescription = array_key_exists("self-description", $get);
-            
-        if (array_key_exists("lat", $get))
-            $this->latitudeRequest = $get["lat"];
-        else
-            $this->latitudeRequest = null;
-            
-        if (array_key_exists("lng", $get))
-            $this->longitudeRequest = $get["lng"];
-        else
-            $this->longitudeRequest = null;
-            
-        if (array_key_exists("loc_accuracy", $get))
-            $this->locAccuracyResquest = $get["loc_accuracy"];
-        else
-            $this->latitudeRequest = null;
-            
-        if (array_key_exists("azimuth", $get))
-            $this->azimuthRequest = $get["azimuth"];
-        else
-            $this->azimuthRequest = null;
-
-        if (array_key_exists("pitch", $get))
-            $this->pitchRequest = $get["pitch"];
-        else
-            $this->pitchRequest = null;
-
-        if (array_key_exists("roll", $get))
-            $this->rollRequest = $get["roll"];
-        else
-            $this->rollRequest = null;
+        $this->getParams = array();
+        
+        $entries = [ "lat", "lng", "loc_accuracy", "azimuth", "pitch", "roll", "uid" ];
+        foreach($entries as $entry) {
+            if (array_key_exists($entry, $get))
+            $this->getParams[$entry] = $get[$entry];
+        }
 
         $this->data = [];
         
@@ -263,7 +235,10 @@ class PigeonNelsonServer {
         $this->defaultPeriodBetweenUpdates = $defaultPeriodBetweenUpdates;
     }
 
-    
+    public function getParameters() {
+        return $this->getParams;
+    }
+        
     public function isRequestedSelfDescription() {
         return $this->requestedSelfDescription;
     }
@@ -274,19 +249,19 @@ class PigeonNelsonServer {
     
 
     public function hasAzimuthRequest() {
-        return $this->azimuthRequest != null;
+        return array_key_exists("azimuth", $this->getParams);
     }
 
     public function hasPitchRequest() {
-        return $this->pitchRequest != null;
+        return array_key_exists("pitch", $this->getParams);
     }
 
     public function hasRollRequest() {
-        return $this->rollRequest != null;
+        return array_key_exists("roll", $this->getParams);        
     }
 
     public function hasCoordinatesRequest() {
-        return $this->latitudeRequest != null && $this->longitudeRequest != null;
+    return array_key_exists("lng", $this->getParams) && array_key_exists("lat", $this->getParams);
     }
     
     private static function replaceBoxInRequest($request, $box_str) {
@@ -297,19 +272,19 @@ class PigeonNelsonServer {
     }
     
     public function getPositionRequest() {
-        return new Geokit\LatLng($this->latitudeRequest, $this->longitudeRequest);
+        return new Geokit\LatLng($this->getParams["lat"], $this->getParams["lng"]);
     }
     
     public function getAzimuthRequestAsClock() {
-        return PNUtil::degreeToClock($this->azimuthRequest);
+        return PNUtil::degreeToClock($this->getParams["azimuth"]);
     }
   
     public function getPitchRequestAsClock() {
-        return PNUtil::degreeToClock($this->pitchRequest);
+        return PNUtil::degreeToClock($this->getParams["pitch"]);
     }
 
     public function getRollRequestAsClock() {
-        return PNUtil::degreeToClock($this->rollRequest);
+        return PNUtil::degreeToClock($this->getParams["roll"]);
     }
     
     private function getBBoxStringFromPositionRequest($radius) {
