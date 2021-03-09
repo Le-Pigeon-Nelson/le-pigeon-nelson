@@ -117,9 +117,9 @@ class Logger {
             $command .= " param1.uid = '" . $uid . "' AND ";
         }
 
-        $command .= "JulianDay(param1.timestamp) * 24 * 60 * 60 - " . $interval . " >
+        $command .= "(JulianDay(param1.timestamp) * 24 * 60 * 60 - " . $interval . " >
         (SELECT max(JulianDay(param2.timestamp) * 24 * 60 * 60) FROM parameters as param2 WHERE param1.uid = param2.uid AND JulianDay(param2.timestamp) < JulianDay(param1.timestamp))
-        OR JulianDay(param1.timestamp) <= (SELECT min(JulianDay(param2.timestamp)) FROM parameters as param2 WHERE param1.uid = param2.uid) ORDER BY param1.timestamp";
+        OR JulianDay(param1.timestamp) <= (SELECT min(JulianDay(param2.timestamp)) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
 
 
         
@@ -143,9 +143,9 @@ class Logger {
             $command .= " param1.uid = '" . $uid . "' AND ";
         }
 
-        $command .= "JulianDay(param1.timestamp) * 24 * 60 * 60 + " . $interval . " <
+        $command .= "(JulianDay(param1.timestamp) * 24 * 60 * 60 + " . $interval . " <
         (SELECT min(JulianDay(param2.timestamp) * 24 * 60 * 60) FROM parameters as param2 WHERE param1.uid = param2.uid AND JulianDay(param2.timestamp) > JulianDay(param1.timestamp))
-        OR JulianDay(param1.timestamp) >= (SELECT max(JulianDay(param2.timestamp)) FROM parameters as param2 WHERE param1.uid = param2.uid) ORDER BY param1.timestamp";
+        OR JulianDay(param1.timestamp) >= (SELECT max(JulianDay(param2.timestamp)) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
 
         $result = array();
         $results = $this->db->query($command);

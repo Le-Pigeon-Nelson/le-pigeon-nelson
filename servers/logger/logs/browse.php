@@ -37,6 +37,11 @@ if (array_key_exists("series", $_GET))
 if (strcmp($SSERIES, "all") == 0)
     $SSERIES = NULL;
     
+if ($SSERIES != NULL && $SUID == NULL) {
+    $SUID = explode("-", $SSERIES)[0];
+    echo '<script>console.log("suid: ' . $SUID . '");</script>';
+}
+    
 $logger = new Logger();
 
 $uids = $logger->getUIDs();
