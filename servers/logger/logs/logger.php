@@ -35,6 +35,9 @@ class Entry {
     public function getAccuracy() {
         return $this->parameters["loc_accuracy"];
     }
+    public function getAzimuth() {
+        return $this->parameters["azimuth"];
+    }
 
 }
 
@@ -63,16 +66,21 @@ class Logger {
     }
     
     private function createTablesIfNotExist() {
-        $commands = [ 'CREATE TABLE IF NOT EXISTS parameters (
+        $commands = [ 'CREATE TABLE IF NOT EXISTS parameters_intsec (
                             uid TEXT NOT NULL,
-                            timestamp TEXT NOT NULL,
+                            timestamp INTEGER NOT NULL,
                             key TEXT NOT NULL,
-                            value TEXT NOT NULL)' ];
+                            value TEXT NOT NULL)',
+                        'CREATE TABLE IF NOT EXISTS series_insec (
+                            uid TEXT NOT NULL,
+                            begin INTEGER NOT NULL,
+                            end INTEGER NOT NULL,
+                            nbEntries INTEGER NOT NULL)' ];
     
         foreach ($commands as $command) {
             $this->db->exec($command);
         }
-    
+        
     }
 
     public function log($entries) {
@@ -84,9 +92,9 @@ class Logger {
         
         foreach($entries as $key => $value) {
             if (strcmp($key, "uid") != 0) {
-                $command = "INSERT INTO parameters(uid, timestamp, key, value) 
+                $command = "INSERT INTO parameters_intsec(uid, timestamp, key, value) 
                 VALUES('" . SQLite3::escapeString($uid) . "', 
-                '"  . SQLite3::escapeString($timestamp) . "', 
+                CAST(JulianDay('"  . SQLite3::escapeString($timestamp) . ") * 24 * 60 * 60 as INTEGER)', 
                 '"  . SQLite3::escapeString($key) . "', 
                 '"  . SQLite3::escapeString($value) . "')";
                 $this->db->exec($command);
@@ -98,7 +106,7 @@ class Logger {
     }
     
     public function getUIDs() {
-        $command = "SELECT DISTINCT uid FROM parameters";
+        $command = "SELECT DISTINCT uid FROM parameters_intsec";
         $result = [];
         
         $results = $this->db->query($command);
@@ -110,16 +118,18 @@ class Logger {
     
     }
     
-    private function getSeriesBegins($uid, $interval) {
-        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters as param1 WHERE ";
-                
+    private function getSeriesBegins($uid, $interval, $date) {
+        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters_intsec as param1 WHERE ";
+        if ($date != NULL)
+            $command .= "param1.timestamp > " . $date . " AND ";
+            
         if ($uid != NULL) {
             $command .= " param1.uid = '" . $uid . "' AND ";
         }
 
-        $command .= "(JulianDay(param1.timestamp) * 24 * 60 * 60 - " . $interval . " >
-        (SELECT max(JulianDay(param2.timestamp) * 24 * 60 * 60) FROM parameters as param2 WHERE param1.uid = param2.uid AND JulianDay(param2.timestamp) < JulianDay(param1.timestamp))
-        OR JulianDay(param1.timestamp) <= (SELECT min(JulianDay(param2.timestamp)) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
+        $command .= "(param1.timestamp - " . $interval . " >
+        (SELECT max(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid AND param2.timestamp < param1.timestamp)
+        OR param1.timestamp <= (SELECT min(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
 
 
         
@@ -136,16 +146,18 @@ class Logger {
         
     }
     
-    private function getSeriesEnds($uid, $interval) {
-        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters as param1 WHERE ";
+    private function getSeriesEnds($uid, $interval, $date) {
+        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters_intsec as param1 WHERE ";
+        if ($date != NULL)
+            $command .= "param1.timestamp > " . $date . " AND ";
                 
         if ($uid != NULL) {
             $command .= " param1.uid = '" . $uid . "' AND ";
         }
 
-        $command .= "(JulianDay(param1.timestamp) * 24 * 60 * 60 + " . $interval . " <
-        (SELECT min(JulianDay(param2.timestamp) * 24 * 60 * 60) FROM parameters as param2 WHERE param1.uid = param2.uid AND JulianDay(param2.timestamp) > JulianDay(param1.timestamp))
-        OR JulianDay(param1.timestamp) >= (SELECT max(JulianDay(param2.timestamp)) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
+        $command .= "(param1.timestamp + " . $interval . " <
+        (SELECT min(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid AND param2.timestamp > param1.timestamp)
+        OR param1.timestamp >= (SELECT max(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
 
         $result = array();
         $results = $this->db->query($command);
@@ -163,9 +175,9 @@ class Logger {
     
     private function setNbRecordings($description) {
     
-        $command = "SELECT COUNT(DISTINCT timestamp) AS nb FROM parameters WHERE uid = '" . $description->uid ."'
-                AND JulianDay(parameters.timestamp) >= JulianDay('" . $description->start . "') 
-                AND JulianDay(parameters.timestamp) <= JulianDay('" . $description->end . "')";
+        $command = "SELECT COUNT(DISTINCT timestamp) AS nb FROM parameters_intsec WHERE uid = '" . $description->uid ."'
+                AND timestamp >= " . $description->start . " 
+                AND timestamp <= " . $description->end;
         $result = array();
         $results = $this->db->query($command);
         $row = $results->fetchArray();
@@ -173,12 +185,43 @@ class Logger {
     }
     
     
-    public function getSeriesDescriptions($uid = NULL, $interval) {
+    public function loadSeriesDescriptions($uid) {
         $result = [];
+        
+        $command = "SELECT uid, begin, end, nbEntries FROM series_insec";
+        if ($uid != NULL)
+            $command .= " WHERE uid = '" . $uid . "'";
+        $results = $this->db->query($command);
+        while ($row = $results->fetchArray()) {
+            $description = new SeriesDescription($row["uid"], $row["begin"], $row["end"]);
+            $description->setNbRecordings($row["nbEntries"]);
+            array_push($result, $description);
+        }
+        
+        return $result;
+    }
     
+    public function storeSeriesDescription($desc) {
+        $command = "INSERT INTO series_insec(uid, begin, end, nbEntries) 
+                VALUES('" . SQLite3::escapeString($desc->uid) . "', 
+                "  . $desc->start . ", 
+                "  . $desc->end . ", 
+                "  . $desc->nbRecordings . ")";
+        $this->db->exec($command);
+    }
     
-        $begins = $this->getSeriesBegins($uid, $interval);
-        $ends = $this->getSeriesEnds($uid, $interval);
+    public function getSeriesDescriptions($uid = NULL, $interval) {
+        $result = $this->loadSeriesDescriptions($uid);
+        
+        $start = NULL;
+        foreach($result as $desc) {
+            if ($start == NULL || $start < $desc->end) {
+                $start = $desc->end;
+            }
+        }
+    
+        $begins = $this->getSeriesBegins($uid, $interval, $start);
+        $ends = $this->getSeriesEnds($uid, $interval, $start);
         
         
         foreach($begins as $luid => $beginTSs) {
@@ -186,7 +229,9 @@ class Logger {
                 $endTS = $ends[$luid][$id];
                 $description = new SeriesDescription($luid, $beginTS, $endTS);
                 $this->setNbRecordings($description);
+                $this->storeSeriesDescription($description);
                 array_push($result, $description);
+                
             }
         }
         
@@ -195,9 +240,9 @@ class Logger {
     }
     
     public function getSeries($desc) {
-        $command = "select * from parameters where uid = '" . $desc->uid . "'
-                AND JulianDay(parameters.timestamp) >= JulianDay('" . $desc->start . "') 
-                AND JulianDay(parameters.timestamp) <= JulianDay('" . $desc->end . "')";
+        $command = "select * from parameters_intsec where uid = '" . $desc->uid . "'
+                AND timestamp >= " . $desc->start . " 
+                AND timestamp <= " . $desc->end;
         $result = new Series();
         $results = $this->db->query($command);
         while ($row = $results->fetchArray()) {
@@ -206,6 +251,13 @@ class Logger {
         
         return $result;
     }   
+    
+    public function rebuildSeriesDescriptions($interval) {
+        $command = "DELETE FROM series_insec";
+        $this->db->exec($command);
+        echo "<p>Rebuilding database...</p>";
+        $this->getSeriesDescriptions(NULL, $interval);
+    }
     
 }
 

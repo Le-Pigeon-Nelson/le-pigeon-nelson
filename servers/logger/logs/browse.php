@@ -22,7 +22,16 @@
    <h1>Data browser for <strong>Le Pigeon Nelson</strong></h1>
 <?php
 
+$interval = 60;
+
 include 'logger.php';
+
+$logger = new Logger();
+
+
+if (array_key_exists("rebuild", $_GET)) {
+    $logger->rebuildSeriesDescriptions($interval);
+}
 
 $SUID = NULL;
 if (array_key_exists("uid", $_GET))
@@ -42,7 +51,6 @@ if ($SSERIES != NULL && $SUID == NULL) {
     echo '<script>console.log("suid: ' . $SUID . '");</script>';
 }
     
-$logger = new Logger();
 
 $uids = $logger->getUIDs();
 
@@ -67,7 +75,7 @@ echo "</div>";
 echo '<div class="col-sm">';
 
 echo '<select class="form-select" aria-label="Series" id="series">';
-$descriptions = $logger->getSeriesDescriptions($SUID, 5);
+$descriptions = $logger->getSeriesDescriptions($SUID, $interval);
 
 echo "<option ";
 if ($SSERIES == NULL)
@@ -87,7 +95,7 @@ foreach($descriptions as $desc) {
 }
 echo "</select>";
 echo "</div>";
-echo '<div class="col-1">';
+echo '<div class="col-sm">';
 
 echo '<button id="reset" class="btn btn-primary">Reset</button>';
 echo "</div>";
@@ -97,11 +105,21 @@ echo "</div>";
 
 ?>
 <div id="map" class="map map-home" style="height: 800px; margin-top: 50px"></div>
+
+
+<div class="container">
+<div class="row">
+<div class="col-sm">
+<button id="rebuild" class="btn btn-primary">Rebuild series (can be very long)</button>
+</div>
+</div>
+</div>
+
 <script>
 <?php
 if ($SSERIES == NULL) {
     // default: Clermont-Ferrand
-    echo "var map = L.map('map').setView([45.7871, 3.1127], 13);";
+    echo "var map = L.map('map', {maxZoom: 21 }).setView([45.7871, 3.1127], 13);";
 }
 else {
     $series = $logger->getSeries($SDEC);
@@ -117,12 +135,17 @@ else {
             echo "centers.push(coords);\n";
             echo "c = L.circle(coords, {radius: ". $entry->getAccuracy() . "});\n";
             echo "list.push(c);\n";
-
+            $radius = 0.00001 * $entry->getAccuracy();
+            echo "var end_x = coords.lat + " . $radius . " * Math.cos(" . $entry->getAzimuth() . " * Math.PI / 180);\n";
+            echo "var end_y = coords.lng + " . $radius . " * Math.sin(" . $entry->getAzimuth() . " * Math.PI / 180);\n";
+            echo "var coordsshift = L.latLng(end_x, end_y);"; 
+            echo 'var azimuth = L.polyline([coords, coordsshift], {color: "white"});';
+            echo "list.push(azimuth);";
         }
     ?>
         
+    var polyline = L.polyline(centers, {color: "#0000cc"}).addTo(map);
     var group = new L.featureGroup(list).addTo(map);
-    var polyline = L.polyline(centers).addTo(map);
     
     map.fitBounds(group.getBounds());
     <?php
@@ -146,6 +169,9 @@ else {
             });
             $('#reset').click(function(){
                 window.location.href = location.protocol + '//' + location.host + location.pathname;
+            });
+            $('#rebuild').click(function(){
+                window.location.href = location.protocol + '//' + location.host + location.pathname + "?rebuild";
             });
         });
     </script>
