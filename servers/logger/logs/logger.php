@@ -94,7 +94,7 @@ class Logger {
             if (strcmp($key, "uid") != 0) {
                 $command = "INSERT INTO parameters_intsec(uid, timestamp, key, value) 
                 VALUES('" . SQLite3::escapeString($uid) . "', 
-                CAST(JulianDay('"  . SQLite3::escapeString($timestamp) . ") * 24 * 60 * 60 as INTEGER)', 
+                CAST(JulianDay('"  . SQLite3::escapeString($timestamp) . "') * 24 * 60 * 60 as INTEGER), 
                 '"  . SQLite3::escapeString($key) . "', 
                 '"  . SQLite3::escapeString($value) . "')";
                 $this->db->exec($command);
