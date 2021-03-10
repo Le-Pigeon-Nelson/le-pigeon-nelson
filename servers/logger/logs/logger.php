@@ -11,6 +11,20 @@ class SeriesDescription {
     public function setNbRecordings($nb) {
         $this->nbRecordings = $nb;
     }
+    
+    public function toString() {
+        return $this->jdToString($this->start) . " => ". $this->jdToString($this->end) ." (". $this->nbRecordings . " recordings)";
+    }
+    
+    private function jdToString($date) {
+        $shift = 11; /* fix halfday*/
+    
+        $start = $date /( 24*60*60);
+        $startInt = intval($start);
+        $diff = $date + ($shift - $startInt * 24) * 60 * 60;
+        $unix = jdtounix($start) + $diff;
+        return date("d/m/Y H:i:s", $unix);
+    }
 
 }
 

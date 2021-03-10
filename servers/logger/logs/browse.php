@@ -90,7 +90,8 @@ foreach($descriptions as $desc) {
             echo "selected";
             $SDEC = $desc;
         }
-        echo ' value="'. $val .'">'. $desc->start . " => " . $desc->end ." (". $desc->nbRecordings . " recordings)</option>";
+        
+        echo ' value="'. $val .'">'. $desc->toString() . "</option>";
         
 }
 echo "</select>";
