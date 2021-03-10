@@ -134,7 +134,7 @@ else {
         foreach($series->entries as $timestamp => $entry) {
             echo "coords = L.latLng(" . $entry->getLat().", ". $entry->getLng() . ");\n";
             echo "centers.push(coords);\n";
-            echo "c = L.circle(coords, {radius: ". $entry->getAccuracy() . "});\n";
+            echo "c = L.circle(coords, {radius: ". $entry->getAccuracy() . "}).bindPopup('".$entry->toHTML()."');\n";
             echo "list.push(c);\n";
             $radius = 0.00001 * $entry->getAccuracy();
             echo "var end_x = coords.lat + " . $radius . " * Math.cos(" . $entry->getAzimuth() . " * Math.PI / 180);\n";

@@ -16,7 +16,7 @@ class SeriesDescription {
         return $this->jdToString($this->start) . " => ". $this->jdToString($this->end) ." (". $this->nbRecordings . " recordings)";
     }
     
-    private function jdToString($date) {
+    public static function jdToString($date) {
         $shift = 11; /* fix halfday*/
     
         $start = $date /( 24*60*60);
@@ -51,6 +51,18 @@ class Entry {
     }
     public function getAzimuth() {
         return $this->parameters["azimuth"];
+    }
+    
+    public function toHTML() {
+        $result = "<h4>" . SeriesDescription::jdToString($this->timestamp) . "</h4>";
+        $result .= "<strong>coords:</strong> ". $this->getLat(). ", " . $this->getLng() . "<br />";
+        $result .= "<strong>accuracy:</strong> " . $this->getAccuracy() . " meters <br />";
+        $result .= "<strong>azimuth:</strong> " . $this->parameters["azimuth"] . " degrees<br />";
+        $result .= "<strong>roll:</strong> " . $this->parameters["roll"] . " degrees<br />";
+        $result .= "<strong>pitch:</strong> " . $this->parameters["pitch"] . " degrees<br />";
+        
+        
+        return $result;
     }
 
 }
