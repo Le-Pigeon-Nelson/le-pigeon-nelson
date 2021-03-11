@@ -52,14 +52,17 @@ class Entry {
     public function getAzimuth() {
         return $this->parameters["azimuth"];
     }
+    public function getPitch() {
+        return $this->parameters["azimuth"];
+    }
     
     public function toHTML() {
         $result = "<h4>" . SeriesDescription::jdToString($this->timestamp) . "</h4>";
         $result .= "<strong>coords:</strong> ". $this->getLat(). ", " . $this->getLng() . "<br />";
         $result .= "<strong>accuracy:</strong> " . $this->getAccuracy() . " meters <br />";
-        $result .= "<strong>azimuth:</strong> " . $this->parameters["azimuth"] . " degrees<br />";
+        $result .= "<strong>azimuth:</strong> " . $this->getAzimuth() . " degrees<br />";
         $result .= "<strong>roll:</strong> " . $this->parameters["roll"] . " degrees<br />";
-        $result .= "<strong>pitch:</strong> " . $this->parameters["pitch"] . " degrees<br />";
+        $result .= "<strong>pitch:</strong> " . $this->getPitch() . " degrees<br />";
         
         
         return $result;

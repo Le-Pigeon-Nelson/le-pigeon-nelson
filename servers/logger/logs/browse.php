@@ -137,8 +137,9 @@ else {
             echo "c = L.circle(coords, {radius: ". $entry->getAccuracy() . "}).bindPopup('".$entry->toHTML()."');\n";
             echo "list.push(c);\n";
             $radius = 0.00001 * $entry->getAccuracy();
-            echo "var end_x = coords.lat + " . $radius . " * Math.cos(" . $entry->getAzimuth() . " * Math.PI / 180);\n";
-            echo "var end_y = coords.lng + " . $radius . " * Math.sin(" . $entry->getAzimuth() . " * Math.PI / 180);\n";
+            $pitch = " * Math.abs(Math.sin(" . $entry->getPitch() . " * Math.PI / 180))";
+            echo "var end_x = coords.lat + " . $radius . " * Math.cos(" . $entry->getAzimuth() . " * Math.PI / 180) " . $pitch . ";\n";
+            echo "var end_y = coords.lng + " . $radius . " * Math.sin(" . $entry->getAzimuth() . " * Math.PI / 180) " . $pitch . ";\n";
             echo "var coordsshift = L.latLng(end_x, end_y);"; 
             echo 'var azimuth = L.polyline([coords, coordsshift], {color: "white"});';
             echo "list.push(azimuth);";
