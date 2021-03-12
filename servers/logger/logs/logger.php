@@ -64,6 +64,18 @@ class Entry {
         $result .= "<strong>roll:</strong> " . $this->parameters["roll"] . " degrees<br />";
         $result .= "<strong>pitch:</strong> " . $this->getPitch() . " degrees<br />";
         
+        return $result;
+    }
+    
+    public function toHTMLArray() {
+        $result = "<tr><th>" .  SeriesDescription::jdToString($this->timestamp) . "</th>";
+        $result .= "<td>" . $this->getLat(). "</td>";
+        $result .= "<td>" . $this->getLng() . "</td>";
+        $result .= "<td>" . $this->getAccuracy() . "</td>";
+        $result .= "<td>" . $this->getAzimuth()  . "</td>";
+        $result .= "<td>" . $this->parameters["roll"]  . "</td>";
+        $result .= "<td>" . $this->getPitch() . "</td>";
+        $result .= "</tr>";
         
         return $result;
     }

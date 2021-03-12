@@ -51,6 +51,7 @@ if ($SSERIES != NULL && $SUID == NULL) {
     echo '<script>console.log("suid: ' . $SUID . '");</script>';
 }
     
+    
 
 $uids = $logger->getUIDs();
 
@@ -94,6 +95,14 @@ foreach($descriptions as $desc) {
         echo ' value="'. $val .'">'. $desc->toString() . "</option>";
         
 }
+if ($SSERIES == NULL) {
+    $series = null;
+}
+else {
+    $series = $logger->getSeries($SDEC);
+}
+
+
 echo "</select>";
 echo "</div>";
 echo '<div class="col-sm">';
@@ -101,29 +110,72 @@ echo '<div class="col-sm">';
 echo '<button id="reset" class="btn btn-primary">Reset</button>';
 echo "</div>";
 echo "</div>";
-echo "</div>";
 
 
 ?>
-<div id="map" class="map map-home" style="height: 800px; margin-top: 50px"></div>
+<div class="row top8" style="margin-top: 2em">
+    <div class="col-sm">
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" aria-current="page" id="map-tab" href="#map-container" data-bs-toggle="tab" data-bs-target="#map-container">Map</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="table-tab" href="#table-container" data-bs-toggle="tab" data-bs-target="#table-container">Table</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="map-container" role="tabpanel" aria-labelledby="map-tab">
+            <div id="map" class="map map-home" style="height: 800px; margin-top: 20px"></div>
+    </div>
+    <div class="tab-pane active" id="table-container" role="tabpanel" aria-labelledby="table-tab">
+            <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Timestamp</th>
+      <th scope="col">latitude</th>
+      <th scope="col">longitude</th>
+      <th scope="col">accuracy (m)</th>
+      <th scope="col">azimuth</th>
+      <th scope="col">roll</th>
+      <th scope="col">pitch</th>
+    </tr>
+  </thead>
+  <tbody>
+  <?php
+  
+    if ($series != NULL) {
+        foreach($series->entries as $timestamp => $entry) {
+            echo $entry->toHTMLArray();
+        }
+    
+    }
+    ?>
+    
+    </tbody>
+    </table>
+    </div>
+</div>
+</div>
 
 
-<div class="container">
+<!--div class="container">
 <div class="row">
 <div class="col-sm">
 <button id="rebuild" class="btn btn-primary">Rebuild series (can be very long)</button>
 </div>
 </div>
+</div-->
+
 </div>
 
 <script>
 <?php
-if ($SSERIES == NULL) {
+if ($series == NULL) {
     // default: Clermont-Ferrand
     echo "var map = L.map('map', {maxZoom: 21 }).setView([45.7871, 3.1127], 13);";
 }
 else {
-    $series = $logger->getSeries($SDEC);
     ?>
     var map = L.map('map').setView([45.7871, 3.1127], 13);
     
