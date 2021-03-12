@@ -27,7 +27,7 @@ else {
     
     $logger = new Logger();
     if ($logger->log($server->getParameters())) {
-        $message = PigeonNelsonMessage::makeTxtMessage("donnée enregistrée", "fr");
+        $message = PigeonNelsonMessage::makeTxtMessage("donnée enregistrée, précision de " . intval($server->getParameters()["loc_accuracy"]) . " mètres", "fr");
     }
     else {
         $message = PigeonNelsonMessage::makeTxtMessage("erreur pendant l'enregistrmeent", "fr");
