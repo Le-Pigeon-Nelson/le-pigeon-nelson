@@ -121,6 +121,7 @@ class PigeonNelsonMessage {
         $this->lang = null;
         $this->audioURL = null;
         $this->priority = 1;
+        $this->period = null;
         $this->requiredConditions = [];
         $this->forgettingConditions = [];
     }
@@ -138,6 +139,9 @@ class PigeonNelsonMessage {
     }
     public function setPriority($priority) {
         $this->priority = $priority;
+    }
+    public function setPeriod($period) {
+        $this->period = $period;
     }
     public function addRequiredCondition($condition) {
         array_push($this->requiredConditions, $condition);
@@ -170,6 +174,9 @@ class PigeonNelsonMessage {
         }
         if ($this->priority != null) {
             $result .= '"priority": '. $this->priority .',';
+        }
+        if ($this->period != null) {
+            $result .= '"period": '. $this->period .',';
         }
         $result .= '"requiredConditions": [';
         $first = true;
@@ -262,6 +269,14 @@ class PigeonNelsonServer {
 
     public function hasCoordinatesRequest() {
     return array_key_exists("lng", $this->getParams) && array_key_exists("lat", $this->getParams);
+    }
+    
+    public function hasCoordinatesAccuracy() {
+        return array_key_exists("loc_accuracy", $this->getParams);
+    }
+    
+    public function getCoordinatesAccuracy() {
+        return $this->getParams["loc_accuracy"];
     }
     
     private static function replaceBoxInRequest($request, $box_str) {

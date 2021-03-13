@@ -16,6 +16,7 @@ public class MessageQueue extends Handler {
 
 
     private int serverPeriod;
+    private int tempServerPeriod;
     private int refreshDelay;
     private MessagePlayer messagePlayer;
 
@@ -44,6 +45,7 @@ public class MessageQueue extends Handler {
 
     public void setServerPeriod(int serverPeriod) {
         this.serverPeriod = serverPeriod;
+        this.tempServerPeriod = serverPeriod;
     }
 
 
@@ -83,7 +85,7 @@ public class MessageQueue extends Handler {
     }
 
     private void playNextMessage() {
-        if (serverPeriod == 0 && queue.size() == 0) {
+        if (tempServerPeriod == 0 && queue.size() == 0) {
             uiHandler.sendEmptyMessage(UIHandler.END_OF_BROADCAST);
         }
 
@@ -114,7 +116,10 @@ public class MessageQueue extends Handler {
                         if (m.getPeriod() != BMessage.DEFAULT_PERIOD) {
                             Log.d("MessageQueue", "Specific period: " + m.getPeriod());
                             messageCollector.collectMessages(m.getPeriodMs());
+                            tempServerPeriod = m.getPeriod();
                         }
+                        else
+                            tempServerPeriod = serverPeriod;
 
                         // remove this message from the queue
                         iterator.remove();
@@ -129,7 +134,8 @@ public class MessageQueue extends Handler {
             }
             // if no message has been sent, and no other message will be obtained
             // from the server (period = 0), end of broadcast
-            if (!playing && serverPeriod == 0) {
+            if (!playing && tempServerPeriod == 0) {
+                Log.d("Queue", "End of messages.");
                 uiHandler.sendEmptyMessage(UIHandler.END_OF_BROADCAST);
             }
             if (!playing && existsTimeConstraint) {

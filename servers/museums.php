@@ -51,36 +51,47 @@ if ($server->isRequestedSelfDescription()) {
 
 // coordinates is required
 if (!$server->hasCoordinatesRequest()) {
-    echo "[]";
-    return;
-}
-
-
-$server->getOSMData('[out:json][timeout:25];(node["tourism"="museum"]({{box}});way["tourism"="museum"]({{box}}););out center;', $radiusSearch);
-
-$position = $server->getPositionRequest();
-
-
-
-
-$minDist = PNUtil::geoDistanceMeters($radiusPlayable);
-
-if ($server->hasEntries()) {
-    foreach($server->getEntries() as $key => $row) {
-        if (isset($row["tags"]) && isset($row["tags"]["tourism"]) && $row["tags"]["tourism"] == "museum") {
-            $loc = addMuseum($row, $server);
-            $dist = PNUtil::distance($position, $loc);
-            if ($dist < $minDist)
-                $minDist = $dist;
-        }
-    }
-
-}
-
-if ($minDist->meters() >= $radiusPlayable) {
-    $message = PigeonNelsonMessage::makeTxtMessage("Il n'y a aucun musée autour de vous.", "fr");
+    $message = PigeonNelsonMessage::makeTxtMessage("Je n'ai pas réussi à vous localiser.", "fr");
     $message->setPriority(0);
     $server->addMessage($message);
+}
+if ($server->hasCoordinatesAccuracy() && $server->getCoordinatesAccuracy() > 30) {
+    $message = PigeonNelsonMessage::makeTxtMessage("J'ai du mal à vous localiser. Attendez quelques instants, je vais réessayer.", "fr");
+    $message->setPriority(0);
+    $message->setPeriod(10);
+    $server->addMessage($message);
+
+}
+else {    
+
+
+
+    $server->getOSMData('[out:json][timeout:25];(node["tourism"="museum"]({{box}});way["tourism"="museum"]({{box}}););out center;', $radiusSearch);
+
+    $position = $server->getPositionRequest();
+
+
+
+
+    $minDist = PNUtil::geoDistanceMeters($radiusPlayable);
+
+    if ($server->hasEntries()) {
+        foreach($server->getEntries() as $key => $row) {
+            if (isset($row["tags"]) && isset($row["tags"]["tourism"]) && $row["tags"]["tourism"] == "museum") {
+                $loc = addMuseum($row, $server);
+                $dist = PNUtil::distance($position, $loc);
+                if ($dist < $minDist)
+                    $minDist = $dist;
+            }
+        }
+
+    }
+
+    if ($minDist->meters() >= $radiusPlayable) {
+        $message = PigeonNelsonMessage::makeTxtMessage("Il n'y a aucun musée autour de vous.", "fr");
+        $message->setPriority(0);
+        $server->addMessage($message);
+    }
 }
     
 $server->printMessages();
