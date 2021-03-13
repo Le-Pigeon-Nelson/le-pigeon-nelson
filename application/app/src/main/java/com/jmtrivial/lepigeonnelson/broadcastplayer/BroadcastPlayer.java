@@ -1,17 +1,22 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import static android.content.Context.POWER_SERVICE;
+
 public class BroadcastPlayer extends HandlerThread {
 
+    private static final String WAKELOCK_TAG = "PLAYER:";
     private final Activity activity;
     private int refreshDelay;
     private MessageCollector messageCollector;
@@ -25,6 +30,8 @@ public class BroadcastPlayer extends HandlerThread {
 
     private Context context;
     private boolean working;
+    private PowerManager powerManager;
+    private PowerManager.WakeLock wakeLock;
 
     public BroadcastPlayer(Activity activity, int refreshDelay, UIHandler uiHandler) {
         super("BroadcastPlayer");
@@ -60,6 +67,11 @@ public class BroadcastPlayer extends HandlerThread {
             msg.what = messageCollector.startCollect;
             messageCollector.sendMessage(msg);
             working = true;
+
+            powerManager = (PowerManager) activity.getSystemService(POWER_SERVICE);
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
+            wakeLock.acquire();
+
         }
     }
 
@@ -67,6 +79,8 @@ public class BroadcastPlayer extends HandlerThread {
         if (messageCollector != null && messageQueue != null) {
             messageCollector.sendEmptyMessage(messageCollector.stopCollect);
             messageQueue.sendEmptyMessage(messageQueue.stopBroadcast);
+            if (wakeLock.isHeld())
+                wakeLock.release();
         }
         working = false;
     }
