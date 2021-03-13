@@ -392,10 +392,6 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         super.onDestroy();
     }
 
-    public BroadcastPlayer getPlayer() {
-        return player;
-    }
-
     public void enableDebugServers(boolean showDebugServers) {
         this.showDebugServers = showDebugServers;
         buildServerList();
