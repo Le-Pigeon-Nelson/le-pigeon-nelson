@@ -189,6 +189,7 @@ public class MessageCollector extends Handler {
             params.addParameter("lat", location.getLatitude());
             params.addParameter("lng", location.getLongitude());
             params.addParameter("loc_accuracy", location.getAccuracy());
+            params.addParameter("loc_timestamp", location.getTime());
             params.addParameter("azimuth", azimuth);
             params.addParameter("pitch", pitch);
             params.addParameter("roll", roll);

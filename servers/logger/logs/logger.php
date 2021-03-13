@@ -13,17 +13,11 @@ class SeriesDescription {
     }
     
     public function toString() {
-        return $this->jdToString($this->start) . " => ". $this->jdToString($this->end) ." (". $this->nbRecordings . " recordings)";
+        return $this->epochToString($this->start) . " => ". $this->epochToString($this->end) ." (". $this->nbRecordings . " recordings)";
     }
     
-    public static function jdToString($date) {
-        $shift = 11; /* fix halfday*/
-    
-        $start = $date /( 24*60*60);
-        $startInt = intval($start);
-        $diff = $date + ($shift - $startInt * 24) * 60 * 60;
-        $unix = jdtounix($start) + $diff;
-        return date("d/m/Y H:i:s", $unix);
+    public static function epochToString($date) {
+        return date("d/m/Y H:i:s", $date);
     }
 
 }
@@ -41,39 +35,54 @@ class Entry {
     }
     
     public function getLat() {
-        return $this->parameters["lat"];
+        return $this->getParameter("lat");
     }
     public function getLng() {
-        return $this->parameters["lng"];
+        return $this->getParameter("lng");
     }
     public function getAccuracy() {
-        return $this->parameters["loc_accuracy"];
+        return $this->getParameter("loc_accuracy");
     }
     public function getAzimuth() {
-        return $this->parameters["azimuth"];
+        return $this->getParameter("azimuth");
     }
     public function getPitch() {
-        return $this->parameters["azimuth"];
+        return $this->getParameter("azimuth");
+    }
+    public function getGPSTimestamp() {
+        return $this->getParameter("loc_timestamp");
+    }
+    public function getRoll() {
+        return $this->getParameter("roll");
+    }
+    
+    public function getParameter($key) {
+        if (array_key_exists($key, $this->parameters))
+            return $this->parameters[$key];
+        else
+            return "N/A";
     }
     
     public function toHTML() {
-        $result = "<h4>" . SeriesDescription::jdToString($this->timestamp) . "</h4>";
+        $result = "<h4>" . SeriesDescription::epochToString($this->timestamp) . "</h4>";
+        $result .= "<strong>GPS timestamp:</strong> ". SeriesDescription::epochToString($this->getGPSTimestamp()/1000) . "<br />";
         $result .= "<strong>coords:</strong> ". $this->getLat(). ", " . $this->getLng() . "<br />";
         $result .= "<strong>accuracy:</strong> " . $this->getAccuracy() . " meters <br />";
         $result .= "<strong>azimuth:</strong> " . $this->getAzimuth() . " degrees<br />";
-        $result .= "<strong>roll:</strong> " . $this->parameters["roll"] . " degrees<br />";
+        $result .= "<strong>roll:</strong> " . $this->getRoll() . " degrees<br />";
         $result .= "<strong>pitch:</strong> " . $this->getPitch() . " degrees<br />";
         
         return $result;
     }
     
     public function toHTMLArray() {
-        $result = "<tr><th>" .  SeriesDescription::jdToString($this->timestamp) . "</th>";
+        $result = "<tr><th>" .  SeriesDescription::epochToString($this->timestamp). "</th>";
+        $result .= "<td>" .  SeriesDescription::epochToString($this->getGPSTimestamp() / 1000) . "</td>";
         $result .= "<td>" . $this->getLat(). "</td>";
         $result .= "<td>" . $this->getLng() . "</td>";
         $result .= "<td>" . $this->getAccuracy() . "</td>";
         $result .= "<td>" . $this->getAzimuth()  . "</td>";
-        $result .= "<td>" . $this->parameters["roll"]  . "</td>";
+        $result .= "<td>" . $this->getRoll()  . "</td>";
         $result .= "<td>" . $this->getPitch() . "</td>";
         $result .= "</tr>";
         
@@ -107,12 +116,12 @@ class Logger {
     }
     
     private function createTablesIfNotExist() {
-        $commands = [ 'CREATE TABLE IF NOT EXISTS parameters_intsec (
+        $commands = [ 'CREATE TABLE IF NOT EXISTS parameters (
                             uid TEXT NOT NULL,
                             timestamp INTEGER NOT NULL,
                             key TEXT NOT NULL,
                             value TEXT NOT NULL)',
-                        'CREATE TABLE IF NOT EXISTS series_insec (
+                        'CREATE TABLE IF NOT EXISTS series (
                             uid TEXT NOT NULL,
                             begin INTEGER NOT NULL,
                             end INTEGER NOT NULL,
@@ -125,7 +134,7 @@ class Logger {
     }
 
     public function log($entries) {
-        $timestamp = date('Y-m-d H:i:s');
+        $timestamp = time();
         if (!array_key_exists("uid", $entries))
             return false;
             
@@ -133,9 +142,9 @@ class Logger {
         
         foreach($entries as $key => $value) {
             if (strcmp($key, "uid") != 0) {
-                $command = "INSERT INTO parameters_intsec(uid, timestamp, key, value) 
+                $command = "INSERT INTO parameters(uid, timestamp, key, value) 
                 VALUES('" . SQLite3::escapeString($uid) . "', 
-                CAST(JulianDay('"  . SQLite3::escapeString($timestamp) . "') * 24 * 60 * 60 as INTEGER), 
+                ". $timestamp . ", 
                 '"  . SQLite3::escapeString($key) . "', 
                 '"  . SQLite3::escapeString($value) . "')";
                 $this->db->exec($command);
@@ -147,7 +156,7 @@ class Logger {
     }
     
     public function getUIDs() {
-        $command = "SELECT DISTINCT uid FROM parameters_intsec";
+        $command = "SELECT DISTINCT uid FROM parameters";
         $result = [];
         
         $results = $this->db->query($command);
@@ -160,7 +169,7 @@ class Logger {
     }
     
     private function getSeriesBegins($uid, $interval, $date) {
-        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters_intsec as param1 WHERE ";
+        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters as param1 WHERE ";
         if ($date != NULL)
             $command .= "param1.timestamp > " . $date . " AND ";
             
@@ -169,8 +178,8 @@ class Logger {
         }
 
         $command .= "(param1.timestamp - " . $interval . " >
-        (SELECT max(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid AND param2.timestamp < param1.timestamp)
-        OR param1.timestamp <= (SELECT min(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
+        (SELECT max(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid AND param2.timestamp < param1.timestamp)
+        OR param1.timestamp <= (SELECT min(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
 
 
         
@@ -188,7 +197,7 @@ class Logger {
     }
     
     private function getSeriesEnds($uid, $interval, $date) {
-        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters_intsec as param1 WHERE ";
+        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters as param1 WHERE ";
         if ($date != NULL)
             $command .= "param1.timestamp > " . $date . " AND ";
                 
@@ -197,8 +206,8 @@ class Logger {
         }
 
         $command .= "(param1.timestamp + " . $interval . " <
-        (SELECT min(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid AND param2.timestamp > param1.timestamp)
-        OR param1.timestamp >= (SELECT max(param2.timestamp) FROM parameters_intsec as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
+        (SELECT min(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid AND param2.timestamp > param1.timestamp)
+        OR param1.timestamp >= (SELECT max(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
 
         $result = array();
         $results = $this->db->query($command);
@@ -216,7 +225,7 @@ class Logger {
     
     private function setNbRecordings($description) {
     
-        $command = "SELECT COUNT(DISTINCT timestamp) AS nb FROM parameters_intsec WHERE uid = '" . $description->uid ."'
+        $command = "SELECT COUNT(DISTINCT timestamp) AS nb FROM parameters WHERE uid = '" . $description->uid ."'
                 AND timestamp >= " . $description->start . " 
                 AND timestamp <= " . $description->end;
         $result = array();
@@ -229,7 +238,7 @@ class Logger {
     public function loadSeriesDescriptions($uid) {
         $result = [];
         
-        $command = "SELECT uid, begin, end, nbEntries FROM series_insec";
+        $command = "SELECT uid, begin, end, nbEntries FROM series";
         if ($uid != NULL)
             $command .= " WHERE uid = '" . $uid . "'";
         $results = $this->db->query($command);
@@ -243,7 +252,7 @@ class Logger {
     }
     
     public function storeSeriesDescription($desc) {
-        $command = "INSERT INTO series_insec(uid, begin, end, nbEntries) 
+        $command = "INSERT INTO series(uid, begin, end, nbEntries) 
                 VALUES('" . SQLite3::escapeString($desc->uid) . "', 
                 "  . $desc->start . ", 
                 "  . $desc->end . ", 
@@ -281,7 +290,7 @@ class Logger {
     }
     
     public function getSeries($desc) {
-        $command = "select * from parameters_intsec where uid = '" . $desc->uid . "'
+        $command = "select * from parameters where uid = '" . $desc->uid . "'
                 AND timestamp >= " . $desc->start . " 
                 AND timestamp <= " . $desc->end;
         $result = new Series();
@@ -294,7 +303,7 @@ class Logger {
     }   
     
     public function rebuildSeriesDescriptions($interval) {
-        $command = "DELETE FROM series_insec";
+        $command = "DELETE FROM series";
         $this->db->exec($command);
         echo "<p>Rebuilding database...</p>";
         $this->getSeriesDescriptions(NULL, $interval);

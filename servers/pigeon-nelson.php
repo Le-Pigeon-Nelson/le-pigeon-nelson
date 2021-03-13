@@ -207,7 +207,7 @@ class PigeonNelsonServer {
         $this->requestedSelfDescription = array_key_exists("self-description", $get);
         $this->getParams = array();
         
-        $entries = [ "lat", "lng", "loc_accuracy", "azimuth", "pitch", "roll", "uid" ];
+        $entries = [ "lat", "lng", "loc_accuracy", "azimuth", "pitch", "roll", "uid", "loc_timestamp" ];
         foreach($entries as $entry) {
             if (array_key_exists($entry, $get))
             $this->getParams[$entry] = $get[$entry];

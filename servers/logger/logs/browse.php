@@ -128,11 +128,12 @@ echo "</div>";
   <div class="tab-pane active" id="map-container" role="tabpanel" aria-labelledby="map-tab">
             <div id="map" class="map map-home" style="height: 800px; margin-top: 20px"></div>
     </div>
-    <div class="tab-pane active" id="table-container" role="tabpanel" aria-labelledby="table-tab">
+    <div class="tab-pane" id="table-container" role="tabpanel" aria-labelledby="table-tab">
             <table class="table">
   <thead>
     <tr>
-      <th scope="col">Timestamp</th>
+      <th scope="col">Server timestamp</th>
+      <th scope="col">GPS timestamp</th>
       <th scope="col">latitude</th>
       <th scope="col">longitude</th>
       <th scope="col">accuracy (m)</th>

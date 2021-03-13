@@ -25,6 +25,10 @@ public class URLParamBuilder {
         return addParameter(key, String.valueOf(value));
     }
 
+    public URLParamBuilder addParameter(String key, long value) {
+        return addParameter(key, String.valueOf(value));
+    }
+
     public String toString() {
         String result = "?";
         boolean first = true;
