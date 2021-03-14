@@ -49,10 +49,10 @@ public class BroadcastPlayer extends HandlerThread {
             messagePlayer = new MessagePlayer(context);
         if (messageQueue == null)
             messageQueue = new MessageQueue(messagePlayer, refreshDelay, uiHandler);
-        if (messageCollector == null)
+        if (messageCollector == null) {
             messageCollector = new MessageCollector(messageQueue, context, uiHandler);
-        if (messageQueue == null)
             messageQueue.setCollector(messageCollector);
+        }
     }
 
     public void playBroadcast() {
