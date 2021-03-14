@@ -43,7 +43,7 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     private LocationRequest request;
 
     private final int refreshDelayGPSms = 500;
-    private final int smallestDisplacementGPS = 10;
+    private final int smallestDisplacementGPS = 5;
 
     private float[] fusedOrientation = new float[3];
 
