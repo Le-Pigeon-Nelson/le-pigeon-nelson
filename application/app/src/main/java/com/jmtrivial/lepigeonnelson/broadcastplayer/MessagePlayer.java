@@ -28,7 +28,7 @@ public class MessagePlayer extends Handler {
     public static final int playMessage = 0;
     public static final int stopMessage = 1;
 
-    private TextToSpeech tts;
+    private volatile TextToSpeech tts;
     private HashMap<String, String> map;
     private MediaPlayer mPlayer;
 
@@ -85,14 +85,16 @@ public class MessagePlayer extends Handler {
 
         this.messageQueue = null;
         this.isPlaying = false;
+        Log.d("THREAD", "thread id for message player " + Thread.currentThread().getId());
 
         // set text-to-speech method with the good language
-        tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+        tts = new TextToSpeech(context.getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR) {
                         tts.setLanguage(Locale.FRANCE);
                 }
+                Log.d("THREAD", "thread id for TTS init " + Thread.currentThread().getId());
                 tts.setOnUtteranceProgressListener(mProgressListener);
             }
         });

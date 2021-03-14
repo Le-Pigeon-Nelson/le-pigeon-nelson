@@ -1,6 +1,7 @@
 package com.jmtrivial.lepigeonnelson.db_storage;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
@@ -69,6 +70,7 @@ public abstract class AppDatabase extends RoomDatabase {
             @Override
             public void run() {
                 List<ServerDescriptionEntity> list = getDao().getAll();
+                Log.d("AppDatabase", "found " + list.size() + " elements in db");
 
                 for (ServerDescriptionEntity entity : list) {
                     // find if entity.url is in servers
@@ -78,10 +80,15 @@ public abstract class AppDatabase extends RoomDatabase {
                     } else {
                         // add a new entry in the server list
                         servers.add(convert(entity));
+                        Log.d("AppDatabase", "add new server " + entity.url);
                     }
                 }
-                if (listener != null)
+                if (listener != null) {
                     listener.onServerListUpdatedFromDatabase();
+                }
+                else {
+                    Log.d("AppDatabase", "listener not yet ready");
+                }
             }
         });
     }

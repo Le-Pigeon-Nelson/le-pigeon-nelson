@@ -21,4 +21,6 @@
     <string name="server_description">server_description</string>
     <string name="server_encoding">Encodage</string>
     <string name="refresh_messages">Récupérer régulièrement de nouveaux messages</string>
+    <string name="channel_name">le pigeon nelson</string>
+    <string name="channel_description">Notifications for the pigeon nelson service</string>
 </resources>

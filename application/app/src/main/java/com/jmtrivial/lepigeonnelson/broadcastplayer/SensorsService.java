@@ -37,7 +37,6 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
 
     private static SensorsService instance = null;
     private final Context context;
-    private final Activity activity;
     public static final int REQUEST_CHECK_SETTINGS = 100;
     private final KalmanGyroscopeSensor sensor;
     private final MeanFilter meanFilter;
@@ -75,9 +74,9 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     /**
      * Singleton implementation
      */
-    public static SensorsService getSensorsService(Activity activity) {
+    public static SensorsService getSensorsService(Context context) {
         if (instance == null) {
-            instance = new SensorsService(activity);
+            instance = new SensorsService(context);
         }
         return instance;
     }
@@ -96,9 +95,8 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     /**
      * Local constructor
      */
-    private SensorsService(Activity activity) {
-        this.context = activity.getApplicationContext();
-        this.activity = activity;
+    private SensorsService(Context context) {
+        this.context = context;
         broadcastPlayer = null;
         this.sensor = new KalmanGyroscopeSensor(context);
         this.sensor.register(sensorObserver);
@@ -198,11 +196,12 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                 case Status.RESOLUTION_REQUIRED:
                     Log.d("SensorsService", "resolution required");
                     // Location requirements are not satisfied. Redirect user to system settings for resolution.
-                    try {
-                        status.startResolutionForResult(activity, REQUEST_CHECK_SETTINGS);
+                    /*try {
+                        // TODO: not implemented yet (in a service, not a straight way to do it)
+                        // status.startResolutionForResult(context, REQUEST_CHECK_SETTINGS);
                     } catch (IntentSender.SendIntentException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                     break;
                 case Status.INTERNAL_ERROR:
                 case Status.INTERRUPTED:

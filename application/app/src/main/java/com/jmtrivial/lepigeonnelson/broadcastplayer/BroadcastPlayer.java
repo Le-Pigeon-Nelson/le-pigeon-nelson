@@ -1,7 +1,5 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -16,8 +14,7 @@ import static android.content.Context.POWER_SERVICE;
 
 public class BroadcastPlayer extends HandlerThread {
 
-    private static final String WAKELOCK_TAG = "PLAYER:";
-    private final Activity activity;
+    private final Context context;
     private int refreshDelay;
     private MessageCollector messageCollector;
     private MessagePlayer messagePlayer;
@@ -28,37 +25,38 @@ public class BroadcastPlayer extends HandlerThread {
 
     private ServerDescription currentServer;
 
-    private Context context;
     private boolean working;
-    private PowerManager powerManager;
-    private PowerManager.WakeLock wakeLock;
 
-    public BroadcastPlayer(Activity activity, int refreshDelay, UIHandler uiHandler) {
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public BroadcastPlayer(Context context, int refreshDelay, UIHandler uiHandler) {
         super("BroadcastPlayer");
-        this.activity = activity;
-        this.context = activity.getApplicationContext();
+        this.context = context;
         this.refreshDelay = refreshDelay;
-        SensorsService.getSensorsService(activity).register(this);
+        SensorsService.getSensorsService(this.context).register(this);
         messagePlayer = null;
         messageCollector = null;
         messageQueue = null;
         working = false;
 
-
-
         this.uiHandler = uiHandler;
+        init();
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    protected void onLooperPrepared() {
-        messagePlayer = new MessagePlayer(context);
-        messageQueue = new MessageQueue(messagePlayer, refreshDelay, uiHandler);
-        messageCollector = new MessageCollector(messageQueue, activity, uiHandler);
-        messageQueue.setCollector(messageCollector);
+    private void init() {
+        if (messagePlayer == null)
+            messagePlayer = new MessagePlayer(context);
+        if (messageQueue == null)
+            messageQueue = new MessageQueue(messagePlayer, refreshDelay, uiHandler);
+        if (messageCollector == null)
+            messageCollector = new MessageCollector(messageQueue, context, uiHandler);
+        if (messageQueue == null)
+            messageQueue.setCollector(messageCollector);
     }
 
     public void playBroadcast() {
+
         if (messageCollector != null) {
             messageCollector.setCurrentServer(currentServer);
             messageQueue.setServerPeriod(currentServer.getPeriod());
@@ -67,11 +65,6 @@ public class BroadcastPlayer extends HandlerThread {
             msg.what = messageCollector.startCollect;
             messageCollector.sendMessage(msg);
             working = true;
-
-            powerManager = (PowerManager) activity.getSystemService(POWER_SERVICE);
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
-            wakeLock.acquire();
-
         }
     }
 
@@ -79,8 +72,6 @@ public class BroadcastPlayer extends HandlerThread {
         if (messageCollector != null && messageQueue != null) {
             messageCollector.sendEmptyMessage(messageCollector.stopCollect);
             messageQueue.sendEmptyMessage(messageQueue.stopBroadcast);
-            if (wakeLock.isHeld())
-                wakeLock.release();
         }
         working = false;
     }
@@ -110,12 +101,16 @@ public class BroadcastPlayer extends HandlerThread {
         return working;
     }
 
+    public boolean isPlaying() {
+        return messagePlayer.isPlaying();
+    }
+
     public void setListener(BroadcastPlayerListener listener) {
         uiHandler.setListener(listener);
     }
 
     public void checkSensorsSettings() {
-        SensorsService service = SensorsService.getSensorsService(activity);
+        SensorsService service = SensorsService.getSensorsService(context);
         if (service != null) {
             service.checkSensorsSettings();
         }
@@ -145,6 +140,11 @@ public class BroadcastPlayer extends HandlerThread {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void restartPlayer() {
+        messagePlayer = new MessagePlayer(context);
+    }
+
     public interface BroadcastPlayerListener {
         void onEndOfBroadcast();
 
@@ -157,5 +157,11 @@ public class BroadcastPlayer extends HandlerThread {
         void onServerDescriptionUpdate(ServerDescription description);
 
         void onServerListUpdated();
+
+        void onCurrentServerRequest(ServerDescription description);
+
+        void onStatusPlaying();
+
+        void onStatusNotPlaying();
     };
 }

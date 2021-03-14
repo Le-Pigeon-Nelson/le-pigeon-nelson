@@ -1,6 +1,6 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
-import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
@@ -45,9 +45,9 @@ public class MessageCollector extends Handler {
 
     private UIHandler uiHandler;
 
-    public MessageCollector(MessageQueue msg, Activity activity, UIHandler uiHandler) {
+    public MessageCollector(MessageQueue msg, Context context, UIHandler uiHandler) {
 
-        sensorManager = SensorsService.getSensorsService(activity);
+        sensorManager = SensorsService.getSensorsService(context);
         cFactory = new ConditionFactory();
         this.newMessages = new ArrayList<>();
         this.msgQueue = msg;
@@ -56,7 +56,7 @@ public class MessageCollector extends Handler {
 
         this.uiHandler = uiHandler;
 
-        this.deviceID = Settings.Secure.getString(activity.getContentResolver(),
+        this.deviceID = Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
     }
 

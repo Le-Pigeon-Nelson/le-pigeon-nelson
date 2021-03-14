@@ -2,6 +2,8 @@ package com.jmtrivial.lepigeonnelson.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -94,11 +96,17 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
     @Override
     public void onUpdatedDescription(ServerDescription description) {
         activity.saveServerDescription(description);
-        serverListAdapter.notifyDataSetChanged();
+
+        notifyDataSetChanged();
     }
 
     public void notifyDataSetChanged() {
-        serverListAdapter.notifyDataSetChanged();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                serverListAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private class ServerListAdapter extends ArrayAdapter<ServerDescription> {

@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
 
 public class ListenBroadcastFragment extends Fragment {
 
@@ -36,6 +37,7 @@ public class ListenBroadcastFragment extends Fragment {
         view.findViewById(R.id.button_second).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                activity.stopBroadcast();
                 NavHostFragment.findNavController(ListenBroadcastFragment.this).popBackStack();
             }
         });
@@ -44,17 +46,16 @@ public class ListenBroadcastFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        TextView text = getView().findViewById(R.id.textview_second);
-        text.setText("Vous écoutez " + activity.getActiveServer().getName());
+        activity.getActiveServer();
         activity.setActiveFragment(MainActivity.LISTEN_BROADCAST_FRAGMENT, this);
         activity.playBroadcast();
     }
 
-    @Override
-    public void onStop() {
-        activity.stopBroadcast();
-        super.onStop();
+    public void setActiveServer(String name) {
+        TextView text = getView().findViewById(R.id.textview_second);
+        text.setText("Vous écoutez " + name);
     }
+
 
 
 

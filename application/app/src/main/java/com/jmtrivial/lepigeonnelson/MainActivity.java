@@ -1,9 +1,11 @@
 package com.jmtrivial.lepigeonnelson;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.UIHandler;
 import com.jmtrivial.lepigeonnelson.db_storage.AppDatabase;
 import com.jmtrivial.lepigeonnelson.ui.EditServerFragment;
+import com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment;
 import com.jmtrivial.lepigeonnelson.ui.ServerSelectionFragment;
 
 import androidx.appcompat.app.AlertDialog;
@@ -23,9 +26,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +43,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MainActivity extends AppCompatActivity implements BroadcastPlayer.BroadcastPlayerListener, AppDatabase.AppDataBaseListener {
+public class MainActivity extends AppCompatActivity implements AppDatabase.AppDataBaseListener,
+        PigeonNelsonService.ServiceCallbacks {
 
     public static final int EDIT_SERVER_FRAGMENT = 1;
     public static final int SERVER_SELECTION_FRAGMENT = 2;
@@ -48,13 +56,17 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
     public ArrayList<ServerDescription> userDefinedServers;
     public ArrayList<ServerDescription> servers;
 
-    private BroadcastPlayer player;
     private AppDatabase db;
     private int activeFragmentType;
     private MenuItem itemSettings;
     private ServerDescription editedServer;
     private Fragment activeFragment;
     private boolean editedServerIsNew;
+
+    PigeonNelsonService mService;
+    boolean mBound = false;
+    private PigeonNelsonServiceConnection connection;
+
 
     public boolean isMainFragment() {
         return activeFragmentType == SERVER_SELECTION_FRAGMENT;
@@ -64,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
     private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
     private boolean showDebugServers;
     private Toolbar toolbar;
-    private UIHandler uiHandler;
 
     // a function to request permissions
     private void requestPermission(String permissionName, int permissionRequestCode) {
@@ -154,14 +165,61 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         }
 
         editedServerIsNew = false;
-        uiHandler = new UIHandler();
 
-
+        // load preferences
         loadPreferences();
 
-        this.loadServers();
+        // load servers
+        loadServers();
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // start service
+        connection = new PigeonNelsonServiceConnection(this);
+        Intent intent = new Intent(this, PigeonNelsonService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mBound) {
+            mService.stopBroadcast();
+            mService.reset();
+        }
+        Log.d("MainActivity", "on destroy, stop broadcasting");
+        super.onDestroy();
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private class PigeonNelsonServiceConnection implements ServiceConnection {
+
+        private final MainActivity activity;
+
+        public PigeonNelsonServiceConnection(MainActivity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PigeonNelsonService.PigeonNelsonBinder binder = (PigeonNelsonService.PigeonNelsonBinder) service;
+            mService = binder.getService();
+            mService.setCallbacks(activity);
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -199,6 +257,10 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
             else
                 onBackPressed();
         }
+        else if (activeFragmentType == LISTEN_BROADCAST_FRAGMENT) {
+            stopBroadcast();
+            onBackPressed();
+        }
         else
             onBackPressed();
         return true;
@@ -210,10 +272,6 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         debugServers = new ArrayList<>();
         userDefinedServers = new ArrayList<>();
 
-        player = new BroadcastPlayer(this, 100, uiHandler);
-        player.setListener(this);
-        player.start();
-
 
         createDebugServers();
 
@@ -221,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
         // load server descriptions from room
         db.loadAll(userDefinedServers);
+        Log.d("LoadServers", "number of user defined servers: " + userDefinedServers.size());
 
         buildServerList();
 
@@ -315,15 +374,36 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         servers.addAll(coreServers);
         servers.addAll(userDefinedServers);
 
-        // refresh descriptions from server
-        for(ServerDescription server: this.servers) {
-            if (server.isSelfDescribed() && server.missingDescription()) {
-                Log.d("DefaultServers", "load self description for " + server.getUrl());
-                player.collectServerDescription(server);
+        buildServerListInternal();
+    }
+
+    private void buildServerListInternal() {
+        if(mBound) {
+            // refresh descriptions from server
+            for (ServerDescription server : this.servers) {
+                if (server.isSelfDescribed() && server.missingDescription()) {
+                    Log.d("DefaultServers", "load self description for " + server.getUrl());
+                    if (mBound)
+                        mService.collectServerDescription(server);
+                    else {
+                        Log.d("DefaultServers", "Service not ready");
+                    }
+                } else
+                    Log.d("DefaultServers", "not self described " + server.getUrl());
             }
-            else
-                Log.d("DefaultServers", "not self described " + server.getUrl());
         }
+        else {
+            Log.d("DefaultServers", "Service not available, waiting for it.");
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    buildServerListInternal();
+                }
+
+            }, 1000);
+        }
+
     }
 
     @Override
@@ -354,20 +434,26 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         return super.onOptionsItemSelected(item);
     }
 
-    public ServerDescription getActiveServer() {
-        return player.getCurrentServer();
+    public void getActiveServer() {
+        if (mBound)
+            mService.getCurrentServer();
+
     }
 
     public void setActiveServer(ServerDescription activeServer) {
-        player.setCurrentServer(activeServer);
+        if (mBound)
+            mService.setCurrentServer(activeServer);
     }
 
     public void playBroadcast() {
-        player.playBroadcast();
+        if (mBound)
+            mService.playBroadcast();
     }
 
     public void stopBroadcast() {
-        player.stopBroadcast();
+        Log.d("MainActivity", "stop broadcast");
+        if (mBound)
+            mService.stopBroadcast();
     }
 
     @Override
@@ -377,20 +463,21 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
             // back to the main fragment
             onBackPressed();
         }
-        stopBroadcast();
-
-        // TODO: stop sensor acquisition
 
     }
-
-    // TODO: add an onResume and start sensor acquisition
 
     @Override
-    protected void onDestroy() {
-        player.stopBroadcast();
-        player.reset();
-        super.onDestroy();
+    protected void onResume() {
+        super.onResume();
+        if (mService != null) {
+            mService.askForStatus();
+            Log.d("MainActivity", "ask for status");
+        }
+        else {
+            Log.d("MainActivity", "pas de services");
+        }
     }
+
 
     public void enableDebugServers(boolean showDebugServers) {
         this.showDebugServers = showDebugServers;
@@ -402,7 +489,8 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case SensorsService.REQUEST_CHECK_SETTINGS:
-                player.checkSensorsSettings();
+                if (mBound)
+                    mService.checkSensorsSettings();
                 break;
             default:
                 break;
@@ -417,7 +505,6 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
     }
 
-    @Override
     public void onEndOfBroadcast() {
         if (!isMainFragment()) {
             try {
@@ -429,28 +516,25 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
             }
         }
     }
-    @Override
+
     public void onServerError() {
         Toast.makeText(this, R.string.server_access_error, Toast.LENGTH_SHORT).show();
         if (!isMainFragment())
             onBackPressed();
     }
 
-    @Override
     public void onServerContentError() {
         Toast.makeText(this, R.string.server_content_error, Toast.LENGTH_SHORT).show();
         if (!isMainFragment())
             onBackPressed();
     }
 
-    @Override
     public void onServerGPSError() {
         Toast.makeText(this, R.string.no_GPS_connection, Toast.LENGTH_SHORT).show();
         if (!isMainFragment())
             onBackPressed();
     }
 
-    @Override
     public void onServerDescriptionUpdate(ServerDescription description) {
         Log.d("DefaultServers", "new description for " + description.getUrl());
         for (ServerDescription server : servers) {
@@ -461,7 +545,7 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
         }
     }
 
-    @Override
+
     public void onServerListUpdated() {
         buildServerList();
         if (isMainFragment()) {
@@ -469,6 +553,34 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
             fragment.notifyDataSetChanged();
         }
     }
+
+    @Override
+    public void onCurrentServerRequest(ServerDescription description) {
+        Log.d("UIHandling", "current server: " + description.getName());
+        if (activeFragmentType == LISTEN_BROADCAST_FRAGMENT) {
+            ListenBroadcastFragment fragment = (ListenBroadcastFragment) activeFragment;
+            fragment.setActiveServer(description.getName());
+        }
+    }
+
+    @Override
+    public void onStatusPlaying() {
+        Log.d("MainActivity", "onStatusPlaying & " + activeFragmentType);
+        if (activeFragmentType == SERVER_SELECTION_FRAGMENT) {
+            NavHostFragment.findNavController(activeFragment)
+                    .navigate(R.id.action_ListFragment_to_ListenFragment);
+            // TODO
+        }
+    }
+
+    @Override
+    public void onStatusNotPlaying() {
+        Log.d("MainActivity", "onStatusNotPlaying & " + activeFragmentType);
+        if (activeFragmentType == LISTEN_BROADCAST_FRAGMENT) {
+            onBackPressed();
+        }
+    }
+
 
     public void updateEditedServer(ServerDescription description) {
         // if this description is a new one, add it to the list
@@ -490,7 +602,8 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
             if (description.isSelfDescribed()) {
                 Log.d("PigeonNelson", "self descripted server, ask for its description");
-                player.collectServerDescription(description);
+                if (mBound)
+                    mService.collectServerDescription(description);
             }
 
             Log.d("PigeonNelson", "build server list");
@@ -551,7 +664,26 @@ public class MainActivity extends AppCompatActivity implements BroadcastPlayer.B
 
     @Override
     public void onServerListUpdatedFromDatabase() {
-        uiHandler.sendEmptyMessage(uiHandler.UPDATE_LIST);
+        if (mBound)
+            mService.updateList();
+        else {
+            Log.d("AppDatabase", "service not ready, waiting for it");
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mService.updateList();
+                        }
+
+                    }, 1000);
+                }
+            });
+
+        }
+
     }
 
     public void deleteSelectedServer() {
