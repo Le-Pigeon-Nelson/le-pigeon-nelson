@@ -163,7 +163,7 @@ echo "</div>";
 <div class="container">
 <div class="row">
 <div class="col-sm">
-<button id="rebuild" class="btn btn-primary">Rebuild series (can be very long)</button>
+<button id="rebuild" class="btn btn-primary">Rebuild series</button>
 </div>
 </div>
 </div>
