@@ -27,7 +27,29 @@ else {
     
     $logger = new Logger();
     if ($logger->log($server->getParameters())) {
-        $message = PigeonNelsonMessage::makeTxtMessage("donnée enregistrée, précision de " . intval($server->getParameters()["loc_accuracy"]) . " mètres", "fr");
+        if (array_key_exists("loc_timestamp", $server->getParameters())) {
+        $shift = intval(time() - $server->getParameters()["loc_timestamp"] / 1000);
+        if ($shift < 60) {
+            $shiftHuman = intval($shift) . " secondes";
+        }
+        else {
+            $shift %= 60;
+            if ($shift < 60) {
+                $shiftHuman = intval($shift) . " minutes";
+            }
+            else {
+                $shift %= 60;
+                $shiftHuman = intval($shift) . " heures";
+            }
+        }
+        
+        if ($shift > 0)
+            $message = PigeonNelsonMessage::makeTxtMessage("Acquisition il y a " . $shiftHuman . ", précision de " . intval($server->getParameters()["loc_accuracy"]) . " mètres", "fr");
+        else
+            $message = PigeonNelsonMessage::makeTxtMessage("donnée enregistrée (timestamp décalé), précision de " . intval($server->getParameters()["loc_accuracy"]) . " mètres", "fr");
+        }
+        else
+            $message = PigeonNelsonMessage::makeTxtMessage("donnée enregistrée (sans timestamp), précision de " . intval($server->getParameters()["loc_accuracy"]) . " mètres", "fr");
     }
     else {
         $message = PigeonNelsonMessage::makeTxtMessage("erreur pendant l'enregistrmeent", "fr");
