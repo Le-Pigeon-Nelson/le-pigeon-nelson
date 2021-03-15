@@ -1,6 +1,5 @@
 package com.jmtrivial.lepigeonnelson;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,7 +15,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -25,7 +23,6 @@ import androidx.core.app.NotificationCompat;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.UIHandler;
-import com.jmtrivial.lepigeonnelson.ui.ServerSelectionFragment;
 
 public class PigeonNelsonService extends Service implements BroadcastPlayer.BroadcastPlayerListener {
 
@@ -48,6 +45,8 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
     private static final int CHECK_SENSORS_SETTINGS = 8;
     private static final int STOP_SERVICE = 9;
     private static final int ASK_FOR_STATUS = 10;
+    private static final int START_SENSOR_SERVICE = 11;
+    private static final int STOP_SENSOR_SERVICE = 12;
 
 
     private UIHandler uiHandler = null;
@@ -100,35 +99,11 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
     }
 
     public void playBroadcast() {
-        builder = new NotificationCompat.Builder(this, CHANNEL_ID);
-
-        notifyIntent = new Intent(this, MainActivity.class);
-        // display a notification to the user
-        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        pendingIntent = PendingIntent.getActivity(getBaseContext(),
-                0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // force CPU to work on this service
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
         wakeLock.acquire();
-
-        builder
-                // Add the metadata for the currently playing track
-                .setContentTitle("Le Pigeon Nelson")
-                .setOngoing(true)
-                // Enable launching the player by clicking the notification
-                .setContentIntent(pendingIntent)
-                // Make the transport controls visible on the lockscreen
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.drawable.ic_le_pigeon_nelson_logo_icon);
-            builder.setColor(getResources().getColor(R.color.ap_transparent));
-        } else {
-            builder.setSmallIcon(R.drawable.ic_le_pigeon_nelson_logo_icon);
-        }
-        startForeground(NOTIFICATION_ID, builder.build());
 
         Message msg = serviceHandler.obtainMessage();
         msg.what = PLAY_BROADCAST;
@@ -212,6 +187,31 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
         Message msg = serviceHandler.obtainMessage();
         msg.what = START_SERVICE;
         serviceHandler.sendMessage(msg);
+
+        builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+
+        notifyIntent = new Intent(this, MainActivity.class);
+        // display a notification to the user
+        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        pendingIntent = PendingIntent.getActivity(getBaseContext(),
+                0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder
+                // Add the metadata for the currently playing track
+                .setContentTitle("Le Pigeon Nelson")
+                .setOngoing(true)
+                // Enable launching the player by clicking the notification
+                .setContentIntent(pendingIntent)
+                // Make the transport controls visible on the lockscreen
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(R.drawable.ic_le_pigeon_nelson_logo_icon);
+            builder.setColor(getResources().getColor(R.color.ap_transparent));
+        } else {
+            builder.setSmallIcon(R.drawable.ic_le_pigeon_nelson_logo_icon);
+        }
+        startForeground(NOTIFICATION_ID, builder.build());
     }
 
     @Override
@@ -224,9 +224,22 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+
+        Message msg = serviceHandler.obtainMessage();
+        msg.what = START_SENSOR_SERVICE;
+        serviceHandler.sendMessage(msg);
+
         return binder;
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Message msg = serviceHandler.obtainMessage();
+        msg.what = STOP_SENSOR_SERVICE;
+        serviceHandler.sendMessage(msg);
+
+        return false;
+    }
 
     @Override
     public void onEndOfBroadcast() {
@@ -359,7 +372,12 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
                     nmsg.what = uiHandler.STATUS_NOT_PLAYING;
                     uiHandler.sendMessage(nmsg);
                 }
-
+            }
+            else if (msg.what == START_SENSOR_SERVICE) {
+                player.startSensorService();
+            }
+            else if (msg.what == STOP_SENSOR_SERVICE) {
+                player.stopSensorService(false);
             }
             else if (msg.what == STOP_SERVICE) {
                 Log.d("Service", "Stop service");

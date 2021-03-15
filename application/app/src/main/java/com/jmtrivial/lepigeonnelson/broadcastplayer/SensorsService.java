@@ -40,6 +40,7 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     public static final int REQUEST_CHECK_SETTINGS = 100;
     private final KalmanGyroscopeSensor sensor;
     private final MeanFilter meanFilter;
+    private boolean running;
     private LocationRequest request;
 
     private final int refreshDelayGPSms = 500;
@@ -111,6 +112,7 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
         lostApiClient = new LostApiClient.Builder(context).addConnectionCallbacks(this).build();
         lostApiClient.connect();
 
+        running = true;
         Log.d("LocationService", "LocationService created");
     }
 
@@ -126,6 +128,22 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
     @Override
     public void onConnectionSuspended() {
         location = null;
+    }
+
+    public void suspendDataCollection() {
+        if (running) {
+            this.sensor.stop();
+            lostApiClient.disconnect();
+            running = false;
+        }
+    }
+
+    public void startDataCollection() {
+        if (!running) {
+            this.sensor.start();
+            lostApiClient.connect();
+            running = true;
+        }
     }
 
     public Location getLocation() {

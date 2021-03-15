@@ -145,6 +145,22 @@ public class BroadcastPlayer extends HandlerThread {
         messagePlayer = new MessagePlayer(context);
     }
 
+    public void startSensorService() {
+        SensorsService service = SensorsService.getSensorsService(context);
+        if (service != null) {
+            service.startDataCollection();
+        }
+    }
+
+    public void stopSensorService(boolean force) {
+        if (force || !working) {
+            SensorsService service = SensorsService.getSensorsService(context);
+            if (service != null) {
+                service.suspendDataCollection();
+            }
+        }
+    }
+
     public interface BroadcastPlayerListener {
         void onEndOfBroadcast();
 
