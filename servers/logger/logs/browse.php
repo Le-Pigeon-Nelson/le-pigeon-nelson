@@ -160,13 +160,13 @@ echo "</div>";
 </div>
 
 
-<!--div class="container">
+<div class="container">
 <div class="row">
 <div class="col-sm">
 <button id="rebuild" class="btn btn-primary">Rebuild series (can be very long)</button>
 </div>
 </div>
-</div-->
+</div>
 
 </div>
 

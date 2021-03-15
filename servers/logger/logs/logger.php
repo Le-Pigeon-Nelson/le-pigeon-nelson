@@ -56,6 +56,14 @@ class Entry {
         return $this->getParameter("roll");
     }
     
+    public function getGPSTimestampToString() {
+        if (array_key_exists("loc_timestamp", $this->parameters))
+            return SeriesDescription::epochToString($this->getGPSTimestamp()/1000);
+        else
+            return "N/A";
+    }
+
+    
     public function getParameter($key) {
         if (array_key_exists($key, $this->parameters))
             return $this->parameters[$key];
@@ -65,7 +73,7 @@ class Entry {
     
     public function toHTML() {
         $result = "<h4>" . SeriesDescription::epochToString($this->timestamp) . "</h4>";
-        $result .= "<strong>GPS timestamp:</strong> ". SeriesDescription::epochToString($this->getGPSTimestamp()/1000) . "<br />";
+        $result .= "<strong>GPS timestamp:</strong> ". $this->getGPSTimestampToString() . "<br />";
         $result .= "<strong>coords:</strong> ". $this->getLat(). ", " . $this->getLng() . "<br />";
         $result .= "<strong>accuracy:</strong> " . $this->getAccuracy() . " meters <br />";
         $result .= "<strong>azimuth:</strong> " . $this->getAzimuth() . " degrees<br />";
@@ -77,7 +85,7 @@ class Entry {
     
     public function toHTMLArray() {
         $result = "<tr><th>" .  SeriesDescription::epochToString($this->timestamp). "</th>";
-        $result .= "<td>" .  SeriesDescription::epochToString($this->getGPSTimestamp() / 1000) . "</td>";
+        $result .= "<td>" .  $this->getGPSTimestampToString() . "</td>";
         $result .= "<td>" . $this->getLat(). "</td>";
         $result .= "<td>" . $this->getLng() . "</td>";
         $result .= "<td>" . $this->getAccuracy() . "</td>";
@@ -125,7 +133,13 @@ class Logger {
                             uid TEXT NOT NULL,
                             begin INTEGER NOT NULL,
                             end INTEGER NOT NULL,
-                            nbEntries INTEGER NOT NULL)' ];
+                            nbEntries INTEGER NOT NULL)',
+                            'CREATE TABLE IF NOT EXISTS pred (
+                            uid TEXT NOT NULL,
+                            timestamp INTEGER NOT NULL,
+                            pred_ts INTEGER NOT NULL)'
+                            
+                        ];
     
         foreach ($commands as $command) {
             $this->db->exec($command);
@@ -133,6 +147,20 @@ class Logger {
         
     }
 
+    public function getPreviousEntry($uid, $timestamp) {
+        $command = "SELECT DISTINCT max(timestamp) AS max FROM parameters WHERE uid = '". 
+        SQLite3::escapeString($uid) . "' AND timestamp < " . $timestamp;
+        
+        $results = $this->db->query($command);
+        $row = $results->fetchArray();
+        if (array_key_exists("max", $row) && $row["max"] != "")
+            return $row["max"];
+        else
+            return 0;
+ 
+    
+    }
+    
     public function log($entries) {
         $timestamp = time();
         if (!array_key_exists("uid", $entries))
@@ -140,6 +168,18 @@ class Logger {
             
         $uid = $entries["uid"];
         
+        // find previous entry
+        $previous = $this->getPreviousEntry($uid, $timestamp);
+        
+        // store previous timestamp
+        $command = "INSERT INTO pred(uid, timestamp, pred_ts) 
+                VALUES('" . SQLite3::escapeString($uid) . "', 
+                ". $timestamp . ",
+                " . $previous  .")";
+
+        $this->db->exec($command);
+        
+        // save entries
         foreach($entries as $key => $value) {
             if (strcmp($key, "uid") != 0) {
                 $command = "INSERT INTO parameters(uid, timestamp, key, value) 
@@ -169,17 +209,16 @@ class Logger {
     }
     
     private function getSeriesBegins($uid, $interval, $date) {
-        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters as param1 WHERE ";
+        $command = "SELECT DISTINCT parameters.uid, parameters.timestamp FROM parameters, pred WHERE ";
+        $command .= " parameters.uid = pred.uid AND parameters.timestamp = pred.timestamp ";
         if ($date != NULL)
-            $command .= "param1.timestamp > " . $date . " AND ";
+            $command .= " AND parameters.timestamp > " . $date;
             
         if ($uid != NULL) {
-            $command .= " param1.uid = '" . $uid . "' AND ";
+            $command .= " AND parameters.uid = '" . $uid . "'";
         }
 
-        $command .= "(param1.timestamp - " . $interval . " >
-        (SELECT max(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid AND param2.timestamp < param1.timestamp)
-        OR param1.timestamp <= (SELECT min(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
+        $command .= " AND parameters.timestamp - " . $interval . " > pred.pred_ts";
 
 
         
@@ -197,17 +236,18 @@ class Logger {
     }
     
     private function getSeriesEnds($uid, $interval, $date) {
-        $command = "SELECT DISTINCT param1.uid, param1.timestamp FROM parameters as param1 WHERE ";
+        $command = "SELECT DISTINCT parameters.uid, parameters.timestamp FROM parameters ";
+        $command .= " LEFT JOIN pred ON parameters.uid = pred.uid AND parameters.timestamp = pred.pred_ts ";
+        $command .= " WHERE ";
         if ($date != NULL)
-            $command .= "param1.timestamp > " . $date . " AND ";
+            $command .= " parameters.timestamp > " . $date . " AND ";
                 
         if ($uid != NULL) {
-            $command .= " param1.uid = '" . $uid . "' AND ";
+            $command .= " parameters.uid = '" . $uid . "' AND ";
         }
+        
 
-        $command .= "(param1.timestamp + " . $interval . " <
-        (SELECT min(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid AND param2.timestamp > param1.timestamp)
-        OR param1.timestamp >= (SELECT max(param2.timestamp) FROM parameters as param2 WHERE param1.uid = param2.uid)) ORDER BY param1.timestamp";
+        $command .= "(parameters.timestamp + " . $interval . " < pred.timestamp OR pred.uid IS NULL)";
 
         $result = array();
         $results = $this->db->query($command);
@@ -272,6 +312,8 @@ class Logger {
     
         $begins = $this->getSeriesBegins($uid, $interval, $start);
         $ends = $this->getSeriesEnds($uid, $interval, $start);
+        
+
         
         
         foreach($begins as $luid => $beginTSs) {
