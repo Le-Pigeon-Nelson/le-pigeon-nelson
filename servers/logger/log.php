@@ -33,12 +33,12 @@ else {
             $shiftHuman = intval($shift) . " secondes";
         }
         else {
-            $shift %= 60;
+            $shift /= 60;
             if ($shift < 60) {
                 $shiftHuman = intval($shift) . " minutes";
             }
             else {
-                $shift %= 60;
+                $shift /= 60;
                 $shiftHuman = intval($shift) . " heures";
             }
         }
