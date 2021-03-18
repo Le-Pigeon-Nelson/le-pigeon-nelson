@@ -19,7 +19,9 @@
   </head>
   <body>
   <div class="container">
-   <h1>Data browser for <strong>Le Pigeon Nelson</strong></h1>
+   <h1><a href="<?php 
+    $current_request = preg_replace("/\?.*$/","",$_SERVER["REQUEST_URI"]);
+    echo $current_request; ?>">Data browser</a> for <strong>Le Pigeon Nelson</strong></h1>
 <?php
 
 $interval = 60;
@@ -48,7 +50,6 @@ if (strcmp($SSERIES, "all") == 0)
     
 if ($SSERIES != NULL && $SUID == NULL) {
     $SUID = explode("-", $SSERIES)[0];
-    echo '<script>console.log("suid: ' . $SUID . '");</script>';
 }
     
     
@@ -110,9 +111,26 @@ echo '<div class="col-sm">';
 echo '<button id="reset" class="btn btn-primary">Reset</button>';
 echo "</div>";
 echo "</div>";
-
+echo "</div>";
 
 ?>
+    <script>
+        $(document).ready(function(){
+            $('#series').change(function(){
+                window.location.href = location.protocol + '//' + location.host + location.pathname + '?series=' + $(this).val();
+            });
+            $('#devices').change(function(){
+                window.location.href = location.protocol + '//' + location.host + location.pathname + '?uid=' + $(this).val();
+            });
+            $('#reset').click(function(){
+                window.location.href = location.protocol + '//' + location.host + location.pathname;
+            });
+            $('#rebuild').click(function(){
+                window.location.href = location.protocol + '//' + location.host + location.pathname + "?rebuild";
+            });
+        });
+    </script>
+
 <div class="row top8" style="margin-top: 2em">
     <div class="col-sm">
 <ul class="nav nav-tabs">
@@ -216,22 +234,6 @@ else {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 
-    <script>
-        $(document).ready(function(){
-            $('#series').change(function(){
-                window.location.href = location.protocol + '//' + location.host + location.pathname + '?series=' + $(this).val();
-            });
-            $('#devices').change(function(){
-                window.location.href = location.protocol + '//' + location.host + location.pathname + '?uid=' + $(this).val();
-            });
-            $('#reset').click(function(){
-                window.location.href = location.protocol + '//' + location.host + location.pathname;
-            });
-            $('#rebuild').click(function(){
-                window.location.href = location.protocol + '//' + location.host + location.pathname + "?rebuild";
-            });
-        });
-    </script>
     </div>
   </body>
 </html>
