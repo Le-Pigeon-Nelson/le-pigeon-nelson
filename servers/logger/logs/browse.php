@@ -49,7 +49,12 @@ if (strcmp($SSERIES, "all") == 0)
     $SSERIES = NULL;
     
 if ($SSERIES != NULL && $SUID == NULL) {
-    $SUID = explode("-", $SSERIES)[0];
+    $elements = explode("-", $SSERIES);
+    $elements=array_slice($elements,0,count($elements)-1);
+
+
+    $SUID = implode($elements, "-");
+    
 }
     
     
