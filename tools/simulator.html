@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <!-- Leaflet -->
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    
+    <!-- datetime picker -->
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+
+    <style>
+        .hidden { display: none; }
+    </style>
+    
+    <title>Le Pigeon Nelson Simulator</title>
+  </head>
+  <body>
+  <div class="container">
+   <h1><strong>Le Pigeon Nelson</strong> Simulator</h1>
+
+
+
+    <form>
+
+    <div class="container">
+    
+    <div class="card mb-3">
+        <h2 class="card-header">Generated request</h2>
+        <div class="card-body">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Request" id="url">
+                <div class="input-group-btn btn-group" role="group">
+                <!-- button class="btn btn-secondary" type="button" id="get-button"
+                    data-toggle="tooltip" data-placement="button"
+                    title="Get server result">get</button-->
+                <button class="btn btn-primary" type="button" id="open-button"
+                    data-toggle="tooltip" data-placement="button"
+                    title="Browse URL">open</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-3">
+        <h2 class="card-header">Settings</h2>
+        <div class="card-body">
+        <h3>Server selection</h3>
+    <div class="form-group">
+        <label for="server-selection">Server URL</label>
+        <select id="server-selection" class="form-select" aria-label="Server selection" aria-describedby="server_selection_help">
+            <option selected value="compass">https://lepigeonnelson.jmfavreau.info/compass.php</option>
+            <option value="museums">https://lepigeonnelson.jmfavreau.info/museums.php</option>
+            <option value="logger">https://lepigeonnelson.jmfavreau.info/dev/log.php</option>
+            <option value="counter">https://lepigeonnelson.jmfavreau.info/formulaire/compteur.php</option>
+            <option value="custom">Custom server</option>
+        </select>
+        <small id="server_selection_help" class="form-text text-muted">Select a server URL.</small>
+        </div>
+        
+        <div class="form-group hidden" id="custom-block">
+                <label for="custom-server">Custom URL</label>
+                <input class="form-control" id="custom-server" aria-describedby="custom_server_help" placeholder="Custom URL" value="https://..." /> 
+                <small id="custom_server_help" class="form-text text-muted">Your custom server URL.</small>
+            </div>
+
+    
+        <div class="row">
+            <div class="col-sm">
+            <h3>Compass</h3>
+            
+            <div class="row">
+                <div class="col-sm">
+                    <img class="img-fluid" src="images/compass.png" alt="Azimuth, roll and pitch in a smartphone" title="Azimuth is the angle with respect to the North. Roll corresponds to the angle with respect to the horizontal position, according to the top/bottom axis of the screen. Pitch corresponds to the angle with respect to the horizontal position, according to the left/right axis of the screen. " />
+                </div>
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="azimuth">Azimuth</label>
+                        <input type="number" class="form-control" step="1" min="0" max="360" id="azimuth" aria-describedby="azimuth_help" placeholder="Azimuth" /> 
+                        <small id="azimuth_help" class="form-text text-muted">Give <strong>azimuth</strong> angle in degree with respect to the North (0°: North, 90°: West, 180°: South, 270°: West).</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roll">Roll</label>
+                        <input type="number" class="form-control" step="1" min="-180" max="180" id="roll" aria-describedby="roll_help" placeholder="Roll" /> 
+                        <small id="roll_help" class="form-text text-muted">Give relative <strong>roll</strong> angle in degree with respect to the horizontal position.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pitch">Pitch</label>
+                        <input type="number" class="form-control" step="1" min="0" max="360" id="pitch" aria-describedby="pitch_help" placeholder="Pitch" /> 
+                        <small id="pitch_help" class="form-text text-muted">Give relative <strong>pitch</strong> angle in degree with respect to the horizontal position.</small>
+                    </div>
+                </div>
+
+            </div>
+            
+            <h3>Application specific information</h3>
+            <div class="form-group">
+                <label for="uid">UID</label>
+                <input class="form-control" id="uid" aria-describedby="uid_help" placeholder="UID" /> 
+                <small id="uid_help" class="form-text text-muted">A unique ID.</small>
+            </div>
+  
+            <h3>Timestamp</h3>
+
+            
+            <div class="form-group" style="position: relative; z-index: 10000;">
+                <label for="loc_accuracy">GPS timestamp</label>
+                <input type="text" class="form-control" id="loc_timestamp" aria-describedby="loc_timestamp_help">
+                <small id="loc_timestamp_help" class="form-text text-muted">Timestamp corresponding to the GPS acquisition (date and time in second).</small>
+            </div>
+            <script>
+                $(function() {
+                    $('#loc_timestamp').datetimepicker({
+                    locale: 'fr',
+                    format: 'DD/MM/YYYY HH:mm:ss',
+                    sideBySide: true,
+                    defaultDate: new Date(),
+                    widgetPositioning: {
+                            horizontal: 'auto',
+                            vertical: 'auto'
+                        }
+                    });
+                });
+            </script>
+  
+            </div>
+            <div class="col-sm">
+            <h3>GPS information</h3>
+
+            <div class="form-group">
+                <label for="loc_accuracy">GPS accuracy</label>
+                <input type="number" class="form-control" step="5" id="loc_accuracy" aria-describedby="loc_accuracy_help" placeholder="GPS accuracy" /> 
+                <small id="loc_accuracy_help" class="form-text text-muted">Give an accuracy for the GPS location (in meter).</small>
+            </div>
+
+            
+            <div class="row">
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="latitude">GPS latitude</label>
+                        <input type="number" step="0.00001"  class="form-control" id="latitude" placeholder="Latitude" />                         
+                    </div>
+                </div>
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="longitude">GPS longitude</label>
+                        <input type="number" step="0.00001" class="form-control" id="longitude" placeholder="Longitude" />                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-1">
+                <div class="form-group">
+                        <button type="button" id="reset_gps" class="btn btn-danger btn-block">Reset location and accuracy</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>GPS location</label>
+                <div id="map" class="map map-home" style="height: 400px"></div>                
+            </div>
+            <div class="mt-1">
+                        <button type="button" id="recenter" class="btn btn-primary btn-block">Recenter view</button>
+            </div>
+            <script>
+                $(document).ready(function() {
+                    var coords = [45.75915, 3.11084];
+                    var radius = 50;
+                    var map = L.map('map').setView(coords, 13);
+                    
+                    var marker = L.marker(coords).addTo(map);
+                    var circle = L.circle(coords, {radius: radius}).addTo(map);
+
+                    map.on('click', function(e) {
+                        $("#latitude").val(e.latlng.lat);
+                        $("#longitude").val(e.latlng.lng);
+                        var radius = $("#loc_accuracy").val();
+                        redrawMap(e.latlng, radius);
+                        updateURLFromForms();
+                    });
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+                    
+                    function redrawMap(latlng, radius) {
+                        if(marker)
+                            map.removeLayer(marker);
+                        if(circle)
+                            map.removeLayer(circle);
+
+                        marker = L.marker(latlng).addTo(map);
+                        circle = L.circle(latlng, {radius: radius }).addTo(map);
+                        
+                    }
+
+                    function redrawMapFromForms() {
+                        var latlng = L.latLng($("#latitude").val(), $("#longitude").val());
+                        var radius = $("#loc_accuracy").val();
+                        redrawMap(latlng, radius);
+                        
+                    }
+                    function recenter() {
+                        map.fitBounds(circle.getBounds(), {padding: [100, 100]});
+                    }
+                    function resetGPS() {
+                        $("#loc_accuracy").val(radius);
+                        $("#latitude").val(coords[0]);
+                        $("#longitude").val(coords[1]);
+                        redrawMapFromForms();
+                        recenter();
+
+                    }
+                    $("#loc_accuracy").on("input", function() {
+                        redrawMapFromForms();
+                        updateURLFromForms();
+                    });
+                    $("#latitude").on("input", function() {
+                        redrawMapFromForms();
+                        updateURLFromForms();
+                    });
+                    $("#longitude").on("input", function() {
+                        redrawMapFromForms();
+                        updateURLFromForms();
+                    });
+                    $("#reset_gps").on("click", function() {
+                        resetGPS();
+                        updateURLFromForms();
+                    });
+                    $("#recenter").on("click", function() {
+                        recenter();
+                    });
+                    
+                    
+                    function resetCompassForms() {
+                        $("#roll").val(0);
+                        $("#pitch").val(0);
+                        $("#azimuth").val(0);
+                    }  
+                    function resetUID() {
+                        $("#uid").val("simulatorooGh4om2");
+                    }
+                    
+                    function updateURLFromForms() {
+                        var url;
+                        if ($("#server-selection").val() == "custom") {
+                            url = $("#custom-server").val();
+                        }
+                        else {
+                            url = $("#server-selection option:selected").text();
+                        }
+                        
+                        url += "?lng=" + $("#longitude").val();
+                        url += "&lat=" + $("#latitude").val();
+                        url += "&loc_accuracy=" + $("#loc_accuracy").val();
+                        url += "&loc_timestamp=" + $("#loc_timestamp").data("DateTimePicker").date();
+                        
+                        url += "&azimuth=" + $("#azimuth").val();
+                        url += "&roll=" + $("#roll").val();
+                        url += "&pitch=" + $("#pitch").val();
+                        
+                        url += "&uid=" + $("#uid").val();
+                        
+                        $("#url").val(url);
+                    }
+                    
+                    resetGPS();                    
+                    resetCompassForms();
+                    resetUID();
+                    
+                    updateURLFromForms();
+                    
+                    $("#server-selection").on("input", function() {
+                        if ($("#server-selection").val() == "custom") {
+                            $("#custom-block").removeClass("hidden");
+                        }
+                        else {
+                            $("#custom-block").addClass("hidden");
+                        }
+                        updateURLFromForms();
+                    });
+                    
+                    $("#open-button").on("click", function() {
+                        var win = window.open($("#url").val(), '_blank');
+                    });
+                    
+                    });
+            </script>
+            </div>
+        </div>
+                </div>
+    </div>
+
+        <div>
+        </div>
+    </div>
+
+    </form>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <script src="js/moment-with-locales.min.js"></script>
+    <script src="js/bootstrap-datetimepicker.min.js"></script>
+    </div>
+  </body>
+</html>
+
