@@ -5,12 +5,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-
-import static android.content.Context.POWER_SERVICE;
 
 public class BroadcastPlayer extends HandlerThread {
 
@@ -161,6 +158,13 @@ public class BroadcastPlayer extends HandlerThread {
         }
     }
 
+    public void onSensorSettingsResult(int value) {
+        Message msg = uiHandler.obtainMessage();
+        msg.obj = value;
+        msg.what = uiHandler.SENSOR_SETTINGS_RESULT;
+        uiHandler.sendMessage(msg);
+    }
+
     public interface BroadcastPlayerListener {
         void onEndOfBroadcast();
 
@@ -179,5 +183,7 @@ public class BroadcastPlayer extends HandlerThread {
         void onStatusPlaying();
 
         void onStatusNotPlaying();
+
+        void onSensorSettingsInit(int error);
     };
 }

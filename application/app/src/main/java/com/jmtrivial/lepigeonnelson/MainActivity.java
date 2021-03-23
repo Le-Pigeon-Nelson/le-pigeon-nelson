@@ -12,8 +12,6 @@ import android.os.Bundle;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
-import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
-import com.jmtrivial.lepigeonnelson.broadcastplayer.UIHandler;
 import com.jmtrivial.lepigeonnelson.db_storage.AppDatabase;
 import com.jmtrivial.lepigeonnelson.ui.EditServerFragment;
 import com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment;
@@ -66,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     PigeonNelsonService mService;
     boolean mBound = false;
     private PigeonNelsonServiceConnection connection;
+    private int currentSensorSettingResult;
 
 
     public boolean isMainFragment() {
@@ -130,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         activeFragmentType = SERVER_SELECTION_FRAGMENT;
         super.onCreate(savedInstanceState);
 
+        currentSensorSettingResult = -1;
         editedServer = null;
         activeFragment = null;
 
@@ -193,6 +193,11 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         }
         Log.d("MainActivity", "on destroy, stop broadcasting");
         super.onDestroy();
+    }
+
+    public void checkSensorsSettings() {
+        if (mBound)
+            mService.checkSensorsSettings();
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -579,6 +584,19 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if (activeFragmentType == LISTEN_BROADCAST_FRAGMENT) {
             onBackPressed();
         }
+    }
+
+    @Override
+    public void onSensorSettingsInit(int result) {
+        currentSensorSettingResult = result;
+        if (isMainFragment()) {
+            ServerSelectionFragment fragment = (ServerSelectionFragment)activeFragment;
+            fragment.updateGPSMessage();
+        }
+    }
+
+    public int getCurrentSensorSettingResult() {
+        return currentSensorSettingResult;
     }
 
 

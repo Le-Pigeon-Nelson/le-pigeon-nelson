@@ -6,10 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".ui.ServerSelectionFragment">
 
-    <ListView
-        android:id="@+id/list_view"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/message_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Connexion au GPS..."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:gravity="center"
+                android:background="@color/colorPrimary"
+                android:textColor="#ffffff"
+                android:id="@+id/message_text"></TextView>
+            <Button
+                android:id="@+id/message_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryDark"
+                android:textColor="#ffffff"
+                android:text="Recharger" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_button"
@@ -19,5 +50,4 @@
         android:src="@drawable/ic_baseline_add_24"
         android:contentDescription="@string/add"
         android:layout_margin="16dp" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

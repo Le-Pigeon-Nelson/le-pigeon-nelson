@@ -15,6 +15,7 @@ public class UIHandler extends Handler {
     public static final int CURRENT_SERVER = 6;
     public static final int STATUS_PLAYING = 7;
     public static final int STATUS_NOT_PLAYING = 8;
+    public static final int SENSOR_SETTINGS_RESULT = 9;
 
     private BroadcastPlayer.BroadcastPlayerListener listener;
 
@@ -63,6 +64,10 @@ public class UIHandler extends Handler {
         }
         else if (what == STATUS_PLAYING) {
             listener.onStatusPlaying();
+        }
+        else if (what == SENSOR_SETTINGS_RESULT) {
+            int error = (int) msg.obj;
+            listener.onSensorSettingsInit(error);
         }
     }
 

@@ -21,6 +21,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.jmtrivial.lepigeonnelson.broadcastplayer.BroadcastPlayer;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.UIHandler;
 
@@ -288,6 +289,12 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
             serviceCallbacks.onStatusNotPlaying();
     }
 
+    @Override
+    public void onSensorSettingsInit(int result) {
+        if (serviceCallbacks != null)
+            serviceCallbacks.onSensorSettingsInit(result);
+    }
+
 
     @Override
     public void onServerListUpdated() {
@@ -313,6 +320,8 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
         void onStatusPlaying();
 
         void onStatusNotPlaying();
+
+        void onSensorSettingsInit(int result);
     }
 
     // Handler that receives messages from the thread

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
 import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
 
 import java.util.ArrayList;
@@ -27,6 +29,10 @@ import java.util.ArrayList;
 public class ServerSelectionFragment extends Fragment implements ServerDescription.ServerDescriptionListener {
     private ServerListAdapter serverListAdapter;
     private MainActivity activity;
+    private View messageBar;
+    private TextView messageText;
+    private Button messageButton;
+    private ListView list;
 
     @Override
     public View onCreateView(
@@ -47,7 +53,7 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
             server.setListener(this);
         }
 
-        ListView list = view.findViewById(R.id.list_view);
+        list = view.findViewById(R.id.list_view);
         list.setAdapter(serverListAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -83,6 +89,17 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
             }
         });
 
+        messageBar = view.findViewById(R.id.message_bar);
+        messageText = view.findViewById(R.id.message_text);
+        messageButton = view.findViewById(R.id.message_button);
+
+        messageButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.checkSensorsSettings();
+                    }});
+
     }
 
     @Override
@@ -107,6 +124,31 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
                 serverListAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    public void updateGPSMessage() {
+        int result = activity.getCurrentSensorSettingResult();
+        if (result == SensorsService.INIT_OK) {
+            messageBar.setVisibility(View.GONE);
+            list.setEnabled(true);
+        }
+        else {
+            switch(result) {
+                case SensorsService.ERROR_DURING_INITIALIZATION:
+                    messageText.setText("Erreur d'initialisation du GPS");
+                    break;
+                case SensorsService.MISSING_PERMISSIONS:
+                    messageText.setText("Permissions GPS manquantes");
+                    break;
+                case SensorsService.RESOLUTION_REQUIRED:
+                default:
+                    messageText.setText("Veuillez activer le GPS");
+                    break;
+            }
+            messageBar.setVisibility(View.VISIBLE);
+            list.setEnabled(false);
+        }
+
     }
 
     private class ServerListAdapter extends ArrayAdapter<ServerDescription> {

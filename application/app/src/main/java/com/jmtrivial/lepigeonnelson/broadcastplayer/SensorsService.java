@@ -1,22 +1,12 @@
 package com.jmtrivial.lepigeonnelson.broadcastplayer;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LiveData;
 
 import com.kircherelectronics.fsensor.filter.averaging.MeanFilter;
 import com.kircherelectronics.fsensor.observer.SensorSubject;
@@ -34,6 +24,11 @@ import java.util.ArrayList;
 
 
 public class SensorsService implements LostApiClient.ConnectionCallbacks {
+
+    public static final int INIT_OK = 0;
+    public static final int MISSING_PERMISSIONS = 1;
+    public static final int RESOLUTION_REQUIRED = 2;
+    public static final int ERROR_DURING_INITIALIZATION = 3;
 
     private static SensorsService instance = null;
     private final Context context;
@@ -186,6 +181,11 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                             Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                             ActivityCompat.checkSelfPermission(context,
                                     Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // this application requires access to GPS location
+                        if (broadcastPlayer != null)
+                            broadcastPlayer.onSensorSettingsResult(SensorsService.MISSING_PERMISSIONS);
+                        // TODO: if broadcastPlayer is not available, try again after x seconds
+                        locationAvailable = false;
                         return;
                     }
                     Location loc = LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
@@ -210,9 +210,16 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                     };
                     LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient,
                             request, listener);
+                    locationAvailable = true;
+
+                    if (broadcastPlayer != null)
+                        broadcastPlayer.onSensorSettingsResult(SensorsService.INIT_OK);
                     break;
                 case Status.RESOLUTION_REQUIRED:
                     Log.d("SensorsService", "resolution required");
+                    if (broadcastPlayer != null)
+                        broadcastPlayer.onSensorSettingsResult(SensorsService.RESOLUTION_REQUIRED);
+                    // TODO: if broadcastPlayer is not available, try again after x seconds
                     // Location requirements are not satisfied. Redirect user to system settings for resolution.
                     /*try {
                         // TODO: not implemented yet (in a service, not a straight way to do it)
@@ -220,17 +227,20 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                     } catch (IntentSender.SendIntentException e) {
                         e.printStackTrace();
                     }*/
+                    locationAvailable = false;
                     break;
                 case Status.INTERNAL_ERROR:
                 case Status.INTERRUPTED:
                 case Status.TIMEOUT:
                 case Status.CANCELLED:
+                default:
                     Log.d("SensorsService", "error during initialization");
+                    if (broadcastPlayer != null)
+                        broadcastPlayer.onSensorSettingsResult(SensorsService.ERROR_DURING_INITIALIZATION);
+                    // TODO: if broadcastPlayer is not available, try again after x seconds
 
                     // Location settings are not satisfied and cannot be resolved.
                     locationAvailable = false;
-                    break;
-                default:
                     break;
             }
         }
