@@ -178,9 +178,7 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                     Log.d("SensorsService", "success");
                     locationAvailable = true;
                     if (ActivityCompat.checkSelfPermission(context,
-                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(context,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         // this application requires access to GPS location
                         if (broadcastPlayer != null)
                             broadcastPlayer.onSensorSettingsResult(SensorsService.MISSING_PERMISSIONS);
@@ -220,13 +218,7 @@ public class SensorsService implements LostApiClient.ConnectionCallbacks {
                     if (broadcastPlayer != null)
                         broadcastPlayer.onSensorSettingsResult(SensorsService.RESOLUTION_REQUIRED);
                     // TODO: if broadcastPlayer is not available, try again after x seconds
-                    // Location requirements are not satisfied. Redirect user to system settings for resolution.
-                    /*try {
-                        // TODO: not implemented yet (in a service, not a straight way to do it)
-                        // status.startResolutionForResult(context, REQUEST_CHECK_SETTINGS);
-                    } catch (IntentSender.SendIntentException e) {
-                        e.printStackTrace();
-                    }*/
+
                     locationAvailable = false;
                     break;
                 case Status.INTERNAL_ERROR:

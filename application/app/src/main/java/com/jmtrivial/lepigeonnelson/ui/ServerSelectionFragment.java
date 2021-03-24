@@ -107,7 +107,7 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
         serverListAdapter.notifyDataSetChanged();
         super.onResume();
         activity.setActiveFragment(MainActivity.SERVER_SELECTION_FRAGMENT, this);
-
+        updateGPSMessage();
     }
 
     @Override

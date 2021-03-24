@@ -31,6 +31,7 @@ import androidx.room.Room;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -71,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         return activeFragmentType == SERVER_SELECTION_FRAGMENT;
     }
 
-    private final int REQUEST_PERMISSION_COARSE_LOCATION = 1;
     private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
     private boolean showDebugServers;
     private Toolbar toolbar;
@@ -109,16 +109,9 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Accès localisation précise accordée.", Toast.LENGTH_SHORT).show();
+                    checkSensorsSettings();
                } else {
                     Toast.makeText(this, "Accès localisation précise refusée.", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            case REQUEST_PERMISSION_COARSE_LOCATION:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Accès localisation accordée.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Accès localisation refusée.", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -138,24 +131,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         db.setListener(this);
 
         // first of all, check permissions for location
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                showExplanation("Accès localisation requise", "Rationale",
-                        Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
-            } else {
-                requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, REQUEST_PERMISSION_COARSE_LOCATION);
-            }
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showExplanation("Accès localisation précise requise", "Rationale",
-                        Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_PERMISSION_FINE_LOCATION);
-            } else {
-                requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_PERMISSION_FINE_LOCATION);
-            }
-        }
+        checkGPSPermission();
 
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
@@ -172,6 +148,18 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         // load servers
         loadServers();
 
+    }
+
+    private void checkGPSPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showExplanation("Accès localisation précise requise", "Le Pigeon Nelson a besoin d'un accès au GPS pour fonctionner.",
+                        Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_PERMISSION_FINE_LOCATION);
+            } else {
+                requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_PERMISSION_FINE_LOCATION);
+            }
+        }
     }
 
     @Override
@@ -592,6 +580,35 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if (isMainFragment()) {
             ServerSelectionFragment fragment = (ServerSelectionFragment)activeFragment;
             fragment.updateGPSMessage();
+        }
+        switch (result) {
+            case SensorsService.RESOLUTION_REQUIRED:
+                // Location requirements are not satisfied. Redirect user to system settings for resolution.
+                final AlertDialog.Builder builder =  new AlertDialog.Builder(this);
+                final String message = "Voulez-vous activer le GPS?";
+
+                builder.setMessage(message);
+                builder.setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), SensorsService.REQUEST_CHECK_SETTINGS);
+                                d.dismiss();
+                            }
+                        });
+                builder.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                d.cancel();
+                            }
+                        });
+                builder.create().show();
+                break;
+            case SensorsService.INIT_OK:
+                Toast.makeText(this, "Localisation GPS active.", Toast.LENGTH_SHORT).show();
+                break;
+            case SensorsService.MISSING_PERMISSIONS:
+                checkGPSPermission();
+                break;
         }
     }
 
