@@ -28,6 +28,10 @@ See [technical notes](technical-notes.md)  and [protocol details](protocol-detai
 * Offer on-demand information on the services available in the area (e.g. [museums](https://github.com/jmtrivial/le-pigeon-nelson/blob/master/servers/museums.php))
 * Play selected music according to the location of the listener
 
+## Development tools
+
+* A [simulator](https://jmtrivial.github.io/le-pigeon-nelson/tools/simulator.html) as been developped as a tool to help during server development. It is a web interface that simulates the application, and build an URL address with parameters to visualize the server answer.
+* A [logger server](https://github.com/jmtrivial/le-pigeon-nelson/tree/master/servers/logger) as been developped and a running instance is available (both [server for the application](https://lepigeonnelson.jmfavreau.info/dev/log.php) and [a browser on the logged data](https://lepigeonnelson.jmfavreau.info/dev/logs/browse.php)) to log the collected data, and browse the result.
 
 ## License
 
