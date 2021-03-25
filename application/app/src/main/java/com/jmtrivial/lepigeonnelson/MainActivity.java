@@ -666,7 +666,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     }
 
 
-    public void updateEditedServer(ServerDescription description) {
+    public void updateServer(ServerDescription description) {
         // if this description is a new one, add it to the list
         String previousURL = "";
         boolean save = false;

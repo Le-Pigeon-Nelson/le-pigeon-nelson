@@ -1,29 +1,18 @@
 package com.jmtrivial.lepigeonnelson.ui;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
-import com.jmtrivial.lepigeonnelson.broadcastplayer.SensorsService;
-import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
-
-import java.util.ArrayList;
 
 public class PublicServerSelectionFragment extends Fragment {
 
@@ -52,7 +41,8 @@ public class PublicServerSelectionFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO
+                activity.updateServer(serverListAdapter.getItem(position));
+                NavHostFragment.findNavController(getParentFragment()).popBackStack();
             }
         });
 

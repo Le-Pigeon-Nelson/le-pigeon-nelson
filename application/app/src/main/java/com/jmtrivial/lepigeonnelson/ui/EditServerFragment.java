@@ -260,7 +260,7 @@ public class EditServerFragment extends Fragment {
         else {
             Log.d("EditServerFragment", "save modifications");
             ServerDescription newDescription = buildDescriptionFromForm();
-            activity.updateEditedServer(newDescription);
+            activity.updateServer(newDescription);
 
             NavHostFragment.findNavController(this).popBackStack();
         }
