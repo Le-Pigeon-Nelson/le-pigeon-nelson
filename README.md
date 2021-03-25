@@ -54,7 +54,8 @@ Imagine for a moment a pigeon singing *On the rrrrrroad again* (Willie Nelson). 
 <br />
 
 A list of servers to be played, and a playing server.
-  
+
+---  
 
 ### Add a new server
 
