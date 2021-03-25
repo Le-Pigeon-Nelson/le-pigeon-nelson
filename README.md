@@ -49,7 +49,7 @@ Imagine for a moment a pigeon singing *On the rrrrrroad again* (Willie Nelson). 
 
 ### Server list and broadcast panel
 
-<p style="align: center; width: 100%">
+<p width="100%">
   <a href="./images/Screenshot1.png"><img src="./images/Screenshot1.png" width="150px" alt="A list of servers to be played" align="left" margin="1em"></a>
   <a href="./images/Screenshot2.png"><img src="./images/Screenshot2.png" width="150px" alt="A playing server" align="left" margin="1em"></a>
 </p>
