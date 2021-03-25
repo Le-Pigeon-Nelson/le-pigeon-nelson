@@ -1,6 +1,8 @@
 package com.jmtrivial.lepigeonnelson.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +15,9 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.jmtrivial.lepigeonnelson.MainActivity;
 import com.jmtrivial.lepigeonnelson.R;
+import com.jmtrivial.lepigeonnelson.broadcastplayer.ServerDescription;
 
-public class PublicServerSelectionFragment extends Fragment {
+public class PublicServerSelectionFragment extends Fragment implements ServerDescription.ServerDescriptionListener {
 
     private ServerListAdapter serverListAdapter;
     private MainActivity activity;
@@ -32,6 +35,10 @@ public class PublicServerSelectionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         activity = (MainActivity) getActivity();
+
+        for (ServerDescription server: activity.servers) {
+            server.setListener(this);
+        }
 
         serverListAdapter = new ServerListAdapter(view.getContext(), this, activity.publicServers);
 
@@ -52,6 +59,22 @@ public class PublicServerSelectionFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // update list
+        notifyDataSetChanged();
     }
 
+    @Override
+    public void onUpdatedDescription(ServerDescription description) {
+        description.setListener(this);
+        notifyDataSetChanged();
+    }
+
+    public void notifyDataSetChanged() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                serverListAdapter.notifyDataSetChanged();
+            }
+        });
+    }
 }
