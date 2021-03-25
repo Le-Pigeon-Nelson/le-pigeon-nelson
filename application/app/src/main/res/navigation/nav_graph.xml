@@ -21,6 +21,10 @@
         <action
             android:id="@+id/action_edit"
             app:destination="@id/EditServer" />
+
+        <action
+            android:id="@+id/action_add"
+            app:destination="@id/AddServer" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -34,5 +38,8 @@
 
     <fragment android:id="@+id/EditServer"
         android:name="com.jmtrivial.lepigeonnelson.ui.EditServerFragment" />
+
+    <fragment android:id="@+id/AddServer"
+        android:name="com.jmtrivial.lepigeonnelson.ui.AddServerFragment" />
 
 </navigation>

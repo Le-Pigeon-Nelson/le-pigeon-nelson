@@ -47,7 +47,7 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
 
         activity = (MainActivity) getActivity();
 
-        serverListAdapter = new ServerListAdapter(view.getContext(), activity.servers);
+        serverListAdapter = new ServerListAdapter(view.getContext(), this, activity.servers);
 
         for (ServerDescription server: activity.servers) {
             server.setListener(this);
@@ -85,7 +85,7 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
             public void onClick(View view) {
                 activity.setEditNewServer();
                 NavHostFragment.findNavController(ServerSelectionFragment.this)
-                        .navigate(R.id.action_edit);
+                        .navigate(R.id.action_add);
             }
         });
 
@@ -151,32 +151,4 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
 
     }
 
-    private class ServerListAdapter extends ArrayAdapter<ServerDescription> {
-
-
-        public ServerListAdapter(@NonNull Context context, ArrayList<ServerDescription> servers) {
-            super(context, 0, servers);
-        }
-
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup container) {
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.item_serverlist, container, false);
-            }
-
-            ((TextView) convertView.findViewById(R.id.serverName)).setText(getItem(position).getName());
-            ((TextView) convertView.findViewById(R.id.serverDescription)).setText(getItem(position).getDescription());
-            if (getItem(position).getPeriod() != 0) {
-                convertView.findViewById(R.id.broadcastSingle).setVisibility(View.GONE);
-                convertView.findViewById(R.id.broadcastStreaming).setVisibility(View.VISIBLE);
-            }
-            else {
-                convertView.findViewById(R.id.broadcastSingle).setVisibility(View.VISIBLE);
-                convertView.findViewById(R.id.broadcastStreaming).setVisibility(View.GONE);
-            }
-
-            return convertView;
-        }
-    }
 }

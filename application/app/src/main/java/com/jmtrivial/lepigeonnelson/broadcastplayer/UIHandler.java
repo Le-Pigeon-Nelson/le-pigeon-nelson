@@ -16,6 +16,7 @@ public class UIHandler extends Handler {
     public static final int STATUS_PLAYING = 7;
     public static final int STATUS_NOT_PLAYING = 8;
     public static final int SENSOR_SETTINGS_RESULT = 9;
+    public static final int NEW_PUBLIC_SERVER = 10;
 
     private BroadcastPlayer.BroadcastPlayerListener listener;
 
@@ -58,6 +59,10 @@ public class UIHandler extends Handler {
             Log.d("BroadcastPlayer", "Asking for current server");
             ServerDescription description = (ServerDescription) msg.obj;
             listener.onCurrentServerRequest(description);
+        }
+        else if (what == NEW_PUBLIC_SERVER) {
+            String url = (String) msg.obj;
+            listener.onNewPublicServer(url);
         }
         else if (what == STATUS_NOT_PLAYING) {
             listener.onStatusNotPlaying();

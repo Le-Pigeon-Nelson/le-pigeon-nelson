@@ -45,8 +45,6 @@ public class EditServerFragment extends Fragment {
     private View fragment;
     private Button deleteButton;
 
-    // TODO: add a button to delete a server in this fragment
-
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -192,8 +190,11 @@ public class EditServerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setActiveFragment(MainActivity.EDIT_SERVER_FRAGMENT, this);
-        activity.setToolbarTitle("Édition d'un serveur");
+
+        if (!activity.isEditedServerNew()) {
+            activity.setActiveFragment(MainActivity.EDIT_SERVER_FRAGMENT, this);
+        }
+
         server = activity.getEditedServer();
 
         force.setChecked(!server.isSelfDescribed());
@@ -210,6 +211,7 @@ public class EditServerFragment extends Fragment {
             period.setValue(server.getPeriod());
 
         if (activity.isEditedServerNew()) {
+            button.setText("Ajouter le serveur");
             deleteButton.setVisibility(View.INVISIBLE);
         }
         else {

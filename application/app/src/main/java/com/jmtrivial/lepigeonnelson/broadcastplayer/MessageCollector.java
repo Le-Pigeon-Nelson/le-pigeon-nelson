@@ -24,6 +24,8 @@ import java.util.Date;
 
 
 public class MessageCollector extends Handler {
+    public static final int PROTOCOL_VERSION = 2;
+
     public static final int startCollect = 0;
     public static final int stopCollect = 1;
     public static final int processCollect = 2;
@@ -347,6 +349,83 @@ public class MessageCollector extends Handler {
 
     public void setCurrentServer(ServerDescription currentServer) {
         this.currentServer = currentServer;
+    }
+
+    public void getPublicServers() {
+        URL url;
+        try {
+            url = new URL("https://jmtrivial.github.io/le-pigeon-nelson/servers/serverlist.json");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        HttpURLConnection urlConnection;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        JsonReader reader;
+        try {
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+
+            // for each server
+            reader.beginArray();
+            while (reader.hasNext()) {
+
+                String sURL = "";
+                int sMinVersion = PROTOCOL_VERSION;
+                int sMaxVersion = PROTOCOL_VERSION;
+                reader.beginObject();
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    if (name.equals("url")) {
+                        sURL = reader.nextString();
+                    }
+                    else if (name.equals("min-version")) {
+                        sMinVersion = reader.nextInt();
+                    }
+                    else if (name.equals("max-version")) {
+                        sMaxVersion = reader.nextInt();
+                    }
+                    if (isCompatibleVersion(sMinVersion, sMaxVersion) && sURL != "") {
+                        Message msg = uiHandler.obtainMessage();
+                        msg.obj = sURL;
+                        msg.what = uiHandler.NEW_PUBLIC_SERVER;
+                        uiHandler.sendMessage(msg);
+                    }
+                }
+
+
+            }
+            reader.endArray();
+
+
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            if (urlConnection != null)
+                urlConnection.disconnect();
+        }
+
+        try {
+            if (reader != null)
+                reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+    }
+
+    private boolean isCompatibleVersion(int sMinVersion, int sMaxVersion) {
+        return sMinVersion <= PROTOCOL_VERSION && sMaxVersion >= PROTOCOL_VERSION;
     }
 
 

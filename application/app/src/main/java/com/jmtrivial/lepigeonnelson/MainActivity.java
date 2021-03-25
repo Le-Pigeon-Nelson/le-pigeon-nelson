@@ -49,11 +49,14 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     public static final int SERVER_SELECTION_FRAGMENT = 2;
     public static final int SETTINGS_FRAGMENT = 3;
     public static final int LISTEN_BROADCAST_FRAGMENT = 4;
+    public static final int ADD_SERVER_FRAGMENT = 5;
 
     public ArrayList<ServerDescription> debugServers;
     public ArrayList<ServerDescription> coreServers;
     public ArrayList<ServerDescription> userDefinedServers;
     public ArrayList<ServerDescription> servers;
+
+    public ArrayList<ServerDescription> publicServers;
 
     private AppDatabase db;
     private int activeFragmentType;
@@ -265,6 +268,8 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         debugServers = new ArrayList<>();
         userDefinedServers = new ArrayList<>();
 
+        publicServers = new ArrayList<>();
+
 
         createDebugServers();
 
@@ -277,9 +282,15 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         buildServerList();
 
 
+        populatePublicServers();
 
 
 
+    }
+
+    private void populatePublicServers() {
+        if (mBound)
+            mService.getPublicServers();
     }
 
     private void createCoreServers() {
@@ -530,7 +541,17 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
     public void onServerDescriptionUpdate(ServerDescription description) {
         Log.d("DefaultServers", "new description for " + description.getUrl());
+
+        // check if the server is in the user list
         for (ServerDescription server : servers) {
+            if (description.getUrl().equals(server.getUrl())) {
+                server.update(description);
+                break;
+            }
+        }
+
+        // check if the server is in the list of public servers
+        for (ServerDescription server : publicServers) {
             if (description.getUrl().equals(server.getUrl())) {
                 server.update(description);
                 break;
@@ -612,6 +633,14 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         }
     }
 
+    @Override
+    public void onNewPublicServer(String url) {
+        ServerDescription newServer = new ServerDescription(url);
+        publicServers.add(newServer);
+        if (mBound)
+            mService.collectServerDescription(newServer);
+    }
+
     public int getCurrentSensorSettingResult() {
         return currentSensorSettingResult;
     }
@@ -625,7 +654,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
             save = true;
         }
         else {
-            if (editedServer == null) {
+            if (editedServer != null) {
                 // update the edited server
                 editedServer.update(description);
                 save = true;
@@ -634,6 +663,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if (save) {
 
             saveServerDescription(description);
+
 
             if (description.isSelfDescribed()) {
                 Log.d("PigeonNelson", "self descripted server, ask for its description");
@@ -650,12 +680,13 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
     }
 
-    public void setToolbarTitle(String s) {
-        // TODO ???
-    }
 
     public void setActiveFragment(int active, Fragment fragment) {
         switch (active) {
+            case ADD_SERVER_FRAGMENT:
+                toolbar.setTitle(R.string.add_server_fragment);
+                toolbar.setNavigationIcon(R.drawable.ic_baseline_close_24);
+                break;
             case EDIT_SERVER_FRAGMENT:
                 toolbar.setTitle(R.string.edit_server_fragment);
                 toolbar.setNavigationIcon(R.drawable.ic_baseline_close_24);

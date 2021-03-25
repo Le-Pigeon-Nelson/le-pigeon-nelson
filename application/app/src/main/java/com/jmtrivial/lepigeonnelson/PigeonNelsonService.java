@@ -48,6 +48,7 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
     private static final int ASK_FOR_STATUS = 10;
     private static final int START_SENSOR_SERVICE = 11;
     private static final int STOP_SENSOR_SERVICE = 12;
+    private static final int GET_PUBLIC_SERVERS = 13;
 
 
     private UIHandler uiHandler = null;
@@ -143,6 +144,12 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
     public void askForStatus() {
         Message msg = serviceHandler.obtainMessage();
         msg.what = ASK_FOR_STATUS;
+        serviceHandler.sendMessage(msg);
+    }
+
+    public void getPublicServers() {
+        Message msg = serviceHandler.obtainMessage();
+        msg.what = GET_PUBLIC_SERVERS;
         serviceHandler.sendMessage(msg);
     }
 
@@ -295,6 +302,12 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
             serviceCallbacks.onSensorSettingsInit(result);
     }
 
+    @Override
+    public void onNewPublicServer(String url) {
+        if (serviceCallbacks != null)
+            serviceCallbacks.onNewPublicServer(url);
+    }
+
 
     @Override
     public void onServerListUpdated() {
@@ -322,6 +335,8 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
         void onStatusNotPlaying();
 
         void onSensorSettingsInit(int result);
+
+        void onNewPublicServer(String url);
     }
 
     // Handler that receives messages from the thread
@@ -355,7 +370,9 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
             else if (msg.what == SET_CURRENT_SERVER) {
                 ServerDescription activeServer = (ServerDescription) msg.obj;
                 player.setCurrentServer(activeServer);
-
+            }
+            else if (msg.what == GET_PUBLIC_SERVERS) {
+                player.getPublicServers();
             }
             else if (msg.what == PLAY_BROADCAST) {
                 player.playBroadcast();

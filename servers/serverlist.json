@@ -1,21 +1,15 @@
 [
     { 
-        "name": "Logger",
-        "description": "Un serveur utile au développement qui enregistre les données collectées",
         "url": "https://lepigeonnelson.jmfavreau.info/dev/log.php",
-        "compatibility": { "min": "0.6" }
-    },
+        "min-version": 2
+        },
     {
-        "name": "Éléments",
-        "description": "Un serveur qui compte des éléments, dont le comportement est modifiable par interface web",
         "url": "https://lepigeonnelson.jmfavreau.info/formulaire/compteur.php",
-        "compatibility": { "min": "0.6" }
+        "min-version": 2
     },
     {
-        "name": "Haiku",
-        "description": "Un serveur qui génère un Haiku en fonction de votre environnement",
         "url": "https://osco.anatidaepho.be/PigeonHaiku/haiku.php",
-        "compatibility": { "min": "0.6" }
+        "min-version": 2
     }
 
 ]

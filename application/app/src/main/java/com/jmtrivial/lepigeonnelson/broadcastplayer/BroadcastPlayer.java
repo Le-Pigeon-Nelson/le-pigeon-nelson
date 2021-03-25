@@ -165,6 +165,10 @@ public class BroadcastPlayer extends HandlerThread {
         uiHandler.sendMessage(msg);
     }
 
+    public void getPublicServers() {
+        messageCollector.getPublicServers();
+    }
+
     public interface BroadcastPlayerListener {
         void onEndOfBroadcast();
 
@@ -185,5 +189,7 @@ public class BroadcastPlayer extends HandlerThread {
         void onStatusNotPlaying();
 
         void onSensorSettingsInit(int error);
+
+        void onNewPublicServer(String url);
     };
 }
