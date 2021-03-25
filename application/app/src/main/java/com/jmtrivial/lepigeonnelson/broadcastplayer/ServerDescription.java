@@ -18,6 +18,7 @@ public class ServerDescription {
     private boolean hasDescription;
     private ServerDescriptionListener listener;
     private boolean editable;
+    private boolean inEdition;
 
 
     public ServerDescription(String url) {
@@ -32,8 +33,16 @@ public class ServerDescription {
         this.encoding = "UTF-8";
         selfDescribed = true;
         this.editable = true;
+        this.inEdition = false;
 
         this.listener = null;
+    }
+
+    public boolean getInEdition() {
+        return inEdition;
+    }
+    public void setInEdition(boolean v) {
+        inEdition = v;
     }
 
     public boolean isEditable() {

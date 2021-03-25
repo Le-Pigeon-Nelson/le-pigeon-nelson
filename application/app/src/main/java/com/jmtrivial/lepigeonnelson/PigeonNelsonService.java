@@ -372,6 +372,7 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
                 player.setCurrentServer(activeServer);
             }
             else if (msg.what == GET_PUBLIC_SERVERS) {
+                Log.d("PublicServerCollect", "receive request from main activity");
                 player.getPublicServers();
             }
             else if (msg.what == PLAY_BROADCAST) {

@@ -18,4 +18,7 @@ public interface ServerDescriptionDao {
 
         @Delete
         void delete(ServerDescriptionEntity serverDescriptionEntity);
+
+        @Query("DELETE FROM server_description WHERE url = :url")
+        void deleteByURL(String url);
 }

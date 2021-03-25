@@ -57,6 +57,15 @@ public abstract class AppDatabase extends RoomDatabase {
         });
     }
 
+    public void deleteByURL(final String url) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                getDao().deleteByURL(url);
+            }
+        });
+    }
+
     public ServerDescription findServerByURL(ArrayList<ServerDescription> servers, String url) {
         for(ServerDescription server: servers) {
             if (server.getUrl().equals(url))

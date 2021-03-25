@@ -352,10 +352,12 @@ public class MessageCollector extends Handler {
     }
 
     public void getPublicServers() {
+        Log.d("PublicServerCollect", "Start collecting server list");
         URL url;
         try {
             url = new URL("https://jmtrivial.github.io/le-pigeon-nelson/servers/serverlist.json");
         } catch (Exception e) {
+            Log.d("PublicServerCollect", "URL error");
             e.printStackTrace();
             return;
         }
@@ -365,6 +367,7 @@ public class MessageCollector extends Handler {
             urlConnection = (HttpURLConnection) url.openConnection();
 
         } catch (IOException e) {
+            Log.d("PublicServerCollect", "Connection error");
             e.printStackTrace();
             return;
         }
@@ -393,20 +396,23 @@ public class MessageCollector extends Handler {
                     else if (name.equals("max-version")) {
                         sMaxVersion = reader.nextInt();
                     }
-                    if (isCompatibleVersion(sMinVersion, sMaxVersion) && sURL != "") {
-                        Message msg = uiHandler.obtainMessage();
-                        msg.obj = sURL;
-                        msg.what = uiHandler.NEW_PUBLIC_SERVER;
-                        uiHandler.sendMessage(msg);
-                    }
                 }
+                reader.endObject();
 
+                if (isCompatibleVersion(sMinVersion, sMaxVersion) && sURL != "") {
+                    Log.d("PublicServerCollect", "Found a new server: " + sURL);
+                    Message msg = uiHandler.obtainMessage();
+                    msg.obj = sURL;
+                    msg.what = uiHandler.NEW_PUBLIC_SERVER;
+                    uiHandler.sendMessage(msg);
+                }
 
             }
             reader.endArray();
 
 
         } catch (IOException | NumberFormatException e) {
+            Log.d("PublicServerCollect", "Format error");
             e.printStackTrace();
             return;
         } finally {
@@ -418,6 +424,7 @@ public class MessageCollector extends Handler {
             if (reader != null)
                 reader.close();
         } catch (IOException e) {
+            Log.d("PublicServerCollect", "Cannot close reader");
             e.printStackTrace();
             return;
         }

@@ -112,7 +112,7 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
 
     @Override
     public void onUpdatedDescription(ServerDescription description) {
-        activity.saveServerDescription(description);
+        activity.saveServerDescription(description, "");
 
         notifyDataSetChanged();
     }

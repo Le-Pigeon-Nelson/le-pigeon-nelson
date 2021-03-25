@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     private MenuItem itemSettings;
     private ServerDescription editedServer;
     private Fragment activeFragment;
-    private boolean editedServerIsNew;
 
     PigeonNelsonService mService;
     boolean mBound = false;
@@ -143,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        editedServerIsNew = false;
 
         // load preferences
         loadPreferences();
@@ -189,6 +187,13 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     public void checkSensorsSettings() {
         if (mBound)
             mService.checkSensorsSettings();
+    }
+
+    public boolean isEditedServerNew() {
+        if (editedServer == null)
+            return false;
+        else
+            return !editedServer.getInEdition();
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -291,6 +296,17 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     private void populatePublicServers() {
         if (mBound)
             mService.getPublicServers();
+        else {
+            Log.d("PublicServerCollect", "Service not ready to collect public servers. Retry later.");
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    populatePublicServers();
+                }
+
+            }, 1000);
+        }
     }
 
     private void createCoreServers() {
@@ -501,11 +517,14 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         }
     }
 
-    public void saveServerDescription(ServerDescription description) {
+    public void saveServerDescription(ServerDescription description, String previousURL) {
         Log.d("PigeonNelson", "Save server description " + description.getUrl());
         // save in room this server description
         if (description.isEditable())
             db.add(description);
+        if (previousURL != "" && previousURL != description.getUrl()) {
+            db.deleteByURL(previousURL);
+        }
 
     }
 
@@ -635,6 +654,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
     @Override
     public void onNewPublicServer(String url) {
+        Log.d("PublicServerCollect", "Receive a new server: " + url);
         ServerDescription newServer = new ServerDescription(url);
         publicServers.add(newServer);
         if (mBound)
@@ -648,21 +668,25 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
     public void updateEditedServer(ServerDescription description) {
         // if this description is a new one, add it to the list
+        String previousURL = "";
         boolean save = false;
-        if (editedServerIsNew) {
+        if (!description.getInEdition()) {
+            Log.d("UpdateEditedServer", "not from edition");
             userDefinedServers.add(description);
             save = true;
         }
         else {
             if (editedServer != null) {
+                Log.d("UpdateEditedServer", "from edition");
                 // update the edited server
+                previousURL = editedServer.getUrl();
                 editedServer.update(description);
                 save = true;
             }
         }
         if (save) {
 
-            saveServerDescription(description);
+            saveServerDescription(description, previousURL);
 
 
             if (description.isSelfDescribed()) {
@@ -716,11 +740,10 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
     public void setEditNewServer() {
         editedServer = new ServerDescription("");
-        editedServerIsNew = true;
     }
     public void setEditServer(ServerDescription server) {
         editedServer = server;
-        editedServerIsNew = false;
+        editedServer.setInEdition(true);
 
     }
     public ServerDescription getEditedServer() {
@@ -771,9 +794,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         buildServerList();
     }
 
-    public boolean isEditedServerNew() {
-        return editedServerIsNew;
-    }
 
     public boolean hasServerWithAddress(String address) {
         for(ServerDescription server: servers) {

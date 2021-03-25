@@ -276,6 +276,9 @@ public class EditServerFragment extends Fragment {
         if (!refresh.isChecked())
             result.setPeriod(0);
 
+        result.setInEdition(!activity.isEditedServerNew());
+
+
         return result;
     }
 
