@@ -47,23 +47,17 @@ Imagine for a moment a pigeon singing *On the rrrrrroad again* (Willie Nelson). 
 
 ## Screenshots
 
-### Server list and broadcast panel
 
-<a href="./images/Screenshot1.png"><img src="./images/Screenshot1.png" width="150px" alt="A list of servers to be played" align="left" margin="1em"></a>
-<a href="./images/Screenshot2.png"><img src="./images/Screenshot2.png" width="150px" alt="A playing server" align="left" margin="1em"></a>
 
-\ 
+  <a href="./images/Screenshot1.png"><img src="./images/Screenshot1.png" width="150px" alt="A list of servers to be played" align="left" margin="1em"></a>
+  <a href="./images/Screenshot2.png"><img src="./images/Screenshot2.png" width="150px" alt="A playing server" align="left" margin="1em"></a>
 
-### Add a new server
+  <a href="./images/Screenshot6.png"><img src="./images/Screenshot6.png" width="150px" alt="Add a new server from public list" align="left" margin="1em"></a>
+  <a href="./images/Screenshot7.png"><img src="./images/Screenshot7.png" width="150px" alt="Add a new server from URL" align="left" margin="1em"></a>
+  <a href="./images/Screenshot8.png"><img src="./images/Screenshot8.png" width="150px" alt="Add a new server from URL with details" align="left" margin="1em"></a>
 
-<a href="./images/Screenshot6.png"><img src="./images/Screenshot6.png" width="150px" alt="Add a new server from public list" align="left" margin="1em"></a>
-<a href="./images/Screenshot7.png"><img src="./images/Screenshot7.png" width="150px" alt="Add a new server from URL" align="left" margin="1em"></a>
-<a href="./images/Screenshot8.png"><img src="./images/Screenshot8.png" width="150px" alt="Add a new server from URL with details" align="left" margin="1em"></a>
 
-\ 
-
-### Edit a known server
-
-<a href="./images/Screenshot3.png"><img src="./images/Screenshot3.png" width="150px" alt="Edit a server (simple)" align="left" margin="1em"></a>
-<a href="./images/Screenshot4.png"><img src="./images/Screenshot4.png" width="150px" alt="Edit a server (with details)" align="left" margin="1em"></a>
-<a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="150px" alt="Edit a server (with refresh delay)" align="left" margin="1em"></a>
+  <a href="./images/Screenshot3.png"><img src="./images/Screenshot3.png" width="150px" alt="Edit a server (simple)" align="left" margin="1em"></a>
+  <a href="./images/Screenshot4.png"><img src="./images/Screenshot4.png" width="150px" alt="Edit a server (with details)" align="left" margin="1em"></a>
+  <a href="./images/Screenshot5.png"><img src="./images/Screenshot5.png" width="150px" alt="Edit a server (with refresh delay)" align="left" margin="1em"></a>
+</p>
