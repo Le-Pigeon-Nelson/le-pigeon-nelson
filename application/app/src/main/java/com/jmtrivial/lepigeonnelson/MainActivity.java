@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     public static final int ADD_SERVER_FRAGMENT = 5;
 
     public ArrayList<ServerDescription> debugServers;
-    public ArrayList<ServerDescription> coreServers;
     public ArrayList<ServerDescription> userDefinedServers;
     public ArrayList<ServerDescription> servers;
 
@@ -269,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
     private void loadServers() {
         servers = new ArrayList<>();
-        coreServers = new ArrayList<>();
         debugServers = new ArrayList<>();
         userDefinedServers = new ArrayList<>();
 
@@ -277,8 +275,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
 
         createDebugServers();
-
-        createCoreServers();
 
         // load server descriptions from room
         db.loadAll(userDefinedServers);
@@ -309,19 +305,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         }
     }
 
-    private void createCoreServers() {
-        // a server to find Museum in neighborhood
-        ServerDescription server1 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/museums.php");
-        server1.setIsEditable(false);
-
-        // a server for orientation
-        ServerDescription server2 = new ServerDescription("https://lepigeonnelson.jmfavreau.info/compass.php");
-        server2.setIsEditable(false);
-
-        coreServers.add(server1);
-        coreServers.add(server2);
-
-    }
 
     private void createDebugServers() {
 
@@ -391,7 +374,6 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if (showDebugServers) {
             servers.addAll(debugServers);
         }
-        servers.addAll(coreServers);
         servers.addAll(userDefinedServers);
 
         buildServerListInternal();
