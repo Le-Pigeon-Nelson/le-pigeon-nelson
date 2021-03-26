@@ -3,10 +3,13 @@ package com.jmtrivial.lepigeonnelson.ui;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +25,7 @@ public class PublicServerSelectionFragment extends Fragment implements ServerDes
     private ServerListAdapter serverListAdapter;
     private MainActivity activity;
     private ListView list;
+    private EditText filterText;
 
     @Override
     public View onCreateView(
@@ -39,6 +43,26 @@ public class PublicServerSelectionFragment extends Fragment implements ServerDes
         for (ServerDescription server: activity.servers) {
             server.setListener(this);
         }
+
+        filterText = (EditText) view.findViewById(R.id.filter_text);
+
+        filterText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                // When user changed the Text
+                serverListAdapter.getFilter().filter(cs);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                          int arg3) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+            }
+        });
 
         serverListAdapter = new ServerListAdapter(view.getContext(), this, activity.publicServers);
 
@@ -73,7 +97,7 @@ public class PublicServerSelectionFragment extends Fragment implements ServerDes
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                serverListAdapter.notifyDataSetChanged();
+                serverListAdapter.updateList();
             }
         });
     }

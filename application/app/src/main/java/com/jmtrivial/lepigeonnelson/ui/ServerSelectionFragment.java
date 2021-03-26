@@ -104,7 +104,7 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
 
     @Override
     public void onResume() {
-        serverListAdapter.notifyDataSetChanged();
+        serverListAdapter.updateList();
         super.onResume();
         activity.setActiveFragment(MainActivity.SERVER_SELECTION_FRAGMENT, this);
         updateGPSMessage();
@@ -121,7 +121,7 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                serverListAdapter.notifyDataSetChanged();
+                serverListAdapter.updateList();
             }
         });
     }
