@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.jmtrivial.lepigeonnelson.ui.ServerSelectionFragment"
+        android:name="fr.lepigeonnelson.player.ui.ServerSelectionFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_server_selection">
 
@@ -28,18 +28,18 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.jmtrivial.lepigeonnelson.ui.ListenBroadcastFragment"
+        android:name="fr.lepigeonnelson.player.ui.ListenBroadcastFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_listen_broadcast">
     </fragment>
 
     <fragment android:id="@+id/Settings"
-        android:name="com.jmtrivial.lepigeonnelson.ui.SettingsFragment" />
+        android:name="fr.lepigeonnelson.player.ui.SettingsFragment" />
 
     <fragment android:id="@+id/EditServer"
-        android:name="com.jmtrivial.lepigeonnelson.ui.EditServerFragment" />
+        android:name="fr.lepigeonnelson.player.ui.EditServerFragment" />
 
     <fragment android:id="@+id/AddServer"
-        android:name="com.jmtrivial.lepigeonnelson.ui.AddServerFragment" />
+        android:name="fr.lepigeonnelson.player.ui.AddServerFragment" />
 
 </navigation>
