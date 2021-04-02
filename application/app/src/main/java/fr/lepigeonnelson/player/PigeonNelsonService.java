@@ -154,6 +154,13 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
         serviceHandler.sendMessage(msg);
     }
 
+    public void destroy() {
+        uiHandler = null;
+        thread.quit();
+        thread.interrupt();
+        thread = null;
+    }
+
 
     /**
      * Class used for the client Binder.  Because we know this service always

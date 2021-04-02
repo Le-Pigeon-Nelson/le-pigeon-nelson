@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if (mBound) {
             mService.stopBroadcast();
             mService.reset();
+            mService.destroy();
         }
         Log.d("MainActivity", "on destroy, stop broadcasting");
         super.onDestroy();
