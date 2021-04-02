@@ -3,6 +3,7 @@ package fr.lepigeonnelson.player.ui;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,12 +108,16 @@ public class ServerSelectionFragment extends Fragment implements ServerDescripti
 
     @Override
     public void onUpdatedDescription(ServerDescription description) {
+        Log.d("ServerSelectionFragment", "onUpdatedDescription" + description.getUrl());
         activity.saveServerDescription(description, "");
         description.setListener(this);
         notifyDataSetChanged();
     }
 
     public void notifyDataSetChanged() {
+        for(ServerDescription desc: activity.servers) {
+            desc.setListener(this);
+        }
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {

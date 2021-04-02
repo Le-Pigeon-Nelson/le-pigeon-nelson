@@ -24,4 +24,5 @@
     <string name="channel_name">le pigeon nelson</string>
     <string name="channel_description">Notifications for the pigeon nelson service</string>
     <string name="add_server_fragment">Ajouter un serveur</string>
+    <string name="action_reload">Recharger</string>
 </resources>

@@ -83,8 +83,13 @@ public class ServerDescription {
         this.hasDescription = true;
         Log.d("ServerDescription", "update");
 
-        if (listener != null)
+        if (listener != null) {
+            Log.d("updateServer", "notify listener for desc " + url);
             listener.onUpdatedDescription(this);
+        }
+        else {
+            Log.d("updateServer", "no listener for desc " + url);
+        }
     }
 
     public void setIsSelfDescribed(Boolean selfDescribed) {

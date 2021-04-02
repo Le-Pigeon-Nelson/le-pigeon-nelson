@@ -67,10 +67,15 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     boolean mBound = false;
     private PigeonNelsonServiceConnection connection;
     private int currentSensorSettingResult;
+    private MenuItem reload;
 
 
     public boolean isMainFragment() {
         return activeFragmentType == SERVER_SELECTION_FRAGMENT;
+    }
+
+    public boolean isAddFragment() {
+        return activeFragmentType == ADD_SERVER_FRAGMENT;
     }
 
     private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
@@ -291,8 +296,10 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     }
 
     private void populatePublicServers() {
-        if (mBound)
+        if (mBound) {
+            publicServers.clear();
             mService.getPublicServers();
+        }
         else {
             Log.d("PublicServerCollect", "Service not ready to collect public servers. Retry later.");
             Handler handler = new Handler();
@@ -384,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if(mBound) {
             // refresh descriptions from server
             for (ServerDescription server : this.servers) {
-                if (server.isSelfDescribed() && server.missingDescription()) {
+                if (server.isSelfDescribed()) {
                     Log.d("DefaultServers", "load self description for " + server.getUrl());
                     if (mBound)
                         mService.collectServerDescription(server);
@@ -418,6 +425,9 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
 
         itemSettings.setVisible(activeFragmentType == SERVER_SELECTION_FRAGMENT);
 
+        reload = menu.findItem(R.id.action_reload);
+        reload.setVisible(activeFragmentType == SERVER_SELECTION_FRAGMENT || activeFragmentType == ADD_SERVER_FRAGMENT);
+
         return true;
     }
 
@@ -432,6 +442,15 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if (id == R.id.action_settings) {
             Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.action_settings);
             return true;
+        }
+        else if (id == R.id.action_reload) {
+            if (isMainFragment()) {
+                buildServerList();
+            }
+            else if (isAddFragment()) {
+                populatePublicServers();
+            }
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -717,6 +736,8 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         }
         if (itemSettings != null)
             itemSettings.setVisible(active == SERVER_SELECTION_FRAGMENT);
+        if (reload != null)
+            reload.setVisible(active == SERVER_SELECTION_FRAGMENT || active == ADD_SERVER_FRAGMENT);
         activeFragmentType = active;
         activeFragment = fragment;
     }

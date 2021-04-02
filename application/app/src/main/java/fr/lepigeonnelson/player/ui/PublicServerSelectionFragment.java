@@ -94,6 +94,9 @@ public class PublicServerSelectionFragment extends Fragment implements ServerDes
     }
 
     public void notifyDataSetChanged() {
+        for(ServerDescription desc: activity.publicServers) {
+            desc.setListener(this);
+        }
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
