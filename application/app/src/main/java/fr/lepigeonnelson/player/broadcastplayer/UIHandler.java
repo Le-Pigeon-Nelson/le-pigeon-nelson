@@ -32,47 +32,58 @@ public class UIHandler extends Handler {
         if (what == END_OF_BROADCAST) {
             if (listener != null) {
                 Log.d("BroadcastPlayer", "End of broadcast sent to UI");
-                listener.onEndOfBroadcast();
+                if (listener != null)
+                    listener.onEndOfBroadcast();
             }
         }
         else if (what == SERVER_ERROR) {
             Log.d("BroadcastPlayer", "Error while reading server");
-            listener.onServerError();
+            if (listener != null)
+                listener.onServerError();
         }
         else if (what == SERVER_CONTENT_ERROR) {
             Log.d("BroadcastPlayer", "Error while reading server (content error)");
-            listener.onServerContentError();
+            if (listener != null)
+                listener.onServerContentError();
         }
         else if (what == NO_GPS) {
             Log.d("BroadcastPlayer", "Cannot get GPS coordinate");
-            listener.onServerGPSError();
+            if (listener != null)
+                listener.onServerGPSError();
         }
         else if (what == NEW_SERVER_DESCRIPTION) {
             Log.d("BroadcastPlayer", "New server description received");
             ServerDescription description = (ServerDescription) msg.obj;
-            listener.onServerDescriptionUpdate(description);
+            if (listener != null)
+                listener.onServerDescriptionUpdate(description);
         }
         else if (what == UPDATE_LIST) {
-            listener.onServerListUpdated();
+            if (listener != null)
+                listener.onServerListUpdated();
         }
         else if (what == CURRENT_SERVER) {
             Log.d("BroadcastPlayer", "Asking for current server");
             ServerDescription description = (ServerDescription) msg.obj;
-            listener.onCurrentServerRequest(description);
+            if (listener != null)
+                listener.onCurrentServerRequest(description);
         }
         else if (what == NEW_PUBLIC_SERVER) {
             String url = (String) msg.obj;
-            listener.onNewPublicServer(url);
+            if (listener != null)
+                listener.onNewPublicServer(url);
         }
         else if (what == STATUS_NOT_PLAYING) {
-            listener.onStatusNotPlaying();
+            if (listener != null)
+                listener.onStatusNotPlaying();
         }
         else if (what == STATUS_PLAYING) {
-            listener.onStatusPlaying();
+            if (listener != null)
+                listener.onStatusPlaying();
         }
         else if (what == SENSOR_SETTINGS_RESULT) {
             int error = (int) msg.obj;
-            listener.onSensorSettingsInit(error);
+            if (listener != null)
+                listener.onSensorSettingsInit(error);
         }
     }
 
