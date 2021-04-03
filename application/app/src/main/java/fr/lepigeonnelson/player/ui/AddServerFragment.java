@@ -33,7 +33,7 @@ public class AddServerFragment extends Fragment {
 
         activity = (MainActivity) getActivity();
 
-        pagerAdapter = new AddServerPagerAdapter(getChildFragmentManager());
+        pagerAdapter = new AddServerPagerAdapter(getChildFragmentManager(), this);
         viewPager = view.findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
 

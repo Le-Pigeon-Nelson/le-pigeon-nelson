@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import fr.lepigeonnelson.player.broadcastplayer.SensorsService;
@@ -15,6 +16,7 @@ import fr.lepigeonnelson.player.broadcastplayer.ServerDescription;
 import fr.lepigeonnelson.player.db_storage.AppDatabase;
 import fr.lepigeonnelson.player.ui.EditServerFragment;
 import fr.lepigeonnelson.player.ui.ListenBroadcastFragment;
+import fr.lepigeonnelson.player.ui.ScannerFragment;
 import fr.lepigeonnelson.player.ui.ServerSelectionFragment;
 
 import androidx.appcompat.app.AlertDialog;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     }
 
     private final int REQUEST_PERMISSION_FINE_LOCATION = 2;
+    private final int REQUEST_PERMISSION_CAMERA = 3;
     private boolean showDebugServers;
     private Toolbar toolbar;
 
@@ -120,6 +123,15 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
                     Toast.makeText(this, "Accès localisation précise refusée.", Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case REQUEST_PERMISSION_CAMERA:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Accès caméra accordée.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Accès caméra refusée.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
         }
     }
 
@@ -199,6 +211,20 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
             return false;
         else
             return !editedServer.getInEdition();
+    }
+
+    public void checkCameraPermission(ScannerFragment scannerFragment) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                scannerFragment.setPermission(false);
+                requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_PERMISSION_CAMERA);
+            } else {
+                scannerFragment.setPermission(true);
+            }
+        } else {
+            scannerFragment.setPermission(true);
+        }
+
     }
 
     /** Defines callbacks for service binding, passed to bindService() */

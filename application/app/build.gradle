@@ -41,5 +41,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
+    implementation 'com.budiyev.android:code-scanner:2.1.0'
+
 }
 
