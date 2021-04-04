@@ -14,11 +14,15 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
+import android.util.ArrayMap;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+
+import java.util.ArrayList;
 
 import fr.lepigeonnelson.player.R;
 
@@ -316,6 +320,12 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
             serviceCallbacks.onNewPublicServer(url);
     }
 
+    @Override
+    public void onInternalValues(ArrayList<Pair<String, String>> values) {
+        if (serviceCallbacks != null)
+            serviceCallbacks.onInternalValues(values);
+    }
+
 
     @Override
     public void onServerListUpdated() {
@@ -345,6 +355,8 @@ public class PigeonNelsonService extends Service implements BroadcastPlayer.Broa
         void onSensorSettingsInit(int result);
 
         void onNewPublicServer(String url);
+
+        void onInternalValues(ArrayList<Pair<String, String>> values);
     }
 
     // Handler that receives messages from the thread

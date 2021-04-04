@@ -3,7 +3,11 @@ package fr.lepigeonnelson.player.broadcastplayer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.ArrayMap;
 import android.util.Log;
+import android.util.Pair;
+
+import java.util.ArrayList;
 
 public class UIHandler extends Handler {
     public static final int END_OF_BROADCAST = 0;
@@ -17,6 +21,7 @@ public class UIHandler extends Handler {
     public static final int STATUS_NOT_PLAYING = 8;
     public static final int SENSOR_SETTINGS_RESULT = 9;
     public static final int NEW_PUBLIC_SERVER = 10;
+    public static final int INTERNAL_VALUES = 11;
 
     private BroadcastPlayer.BroadcastPlayerListener listener;
 
@@ -84,6 +89,11 @@ public class UIHandler extends Handler {
             int error = (int) msg.obj;
             if (listener != null)
                 listener.onSensorSettingsInit(error);
+        }
+        else if (what == INTERNAL_VALUES) {
+            ArrayList<Pair<String, String>> values = (ArrayList<Pair<String, String>>) msg.obj;
+            if (listener != null)
+                listener.onInternalValues(values);
         }
     }
 

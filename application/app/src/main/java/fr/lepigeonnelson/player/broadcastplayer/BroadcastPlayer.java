@@ -5,9 +5,13 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.ArrayMap;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.RequiresApi;
+
+import java.util.ArrayList;
 
 public class BroadcastPlayer extends HandlerThread {
 
@@ -17,8 +21,12 @@ public class BroadcastPlayer extends HandlerThread {
     private MessagePlayer messagePlayer;
     private MessageQueue messageQueue;
 
-
     private UIHandler uiHandler;
+
+    private Runnable runnable;
+    private Handler localHandler = new Handler();
+    private final int delay = 1000;
+
 
     private ServerDescription currentServer;
 
@@ -62,6 +70,18 @@ public class BroadcastPlayer extends HandlerThread {
             msg.what = messageCollector.startCollect;
             messageCollector.sendMessage(msg);
             working = true;
+
+
+            localHandler.postDelayed( runnable = new Runnable() {
+                public void run() {
+                    Message msg = uiHandler.obtainMessage();
+                    msg.obj = messageCollector.getURLParameters().getArrayMap();
+                    msg.what = uiHandler.INTERNAL_VALUES;
+                    uiHandler.sendMessage(msg);
+
+                    localHandler.postDelayed(runnable, delay);
+                }
+            }, 0);
         }
     }
 
@@ -70,6 +90,7 @@ public class BroadcastPlayer extends HandlerThread {
             messageCollector.sendEmptyMessage(messageCollector.stopCollect);
             messageQueue.sendEmptyMessage(messageQueue.stopBroadcast);
         }
+        localHandler.removeCallbacks(runnable);
         working = false;
     }
 
@@ -191,5 +212,7 @@ public class BroadcastPlayer extends HandlerThread {
         void onSensorSettingsInit(int error);
 
         void onNewPublicServer(String url);
+
+        void onInternalValues(ArrayList<Pair<String, String>> values);
     };
 }

@@ -131,7 +131,7 @@ public class MessageCollector extends Handler {
             if (description)
                 url = new URL(serverDescription.getUrl() + "?self-description");
             else
-                url = new URL(serverDescription.getUrl() + getURLParameters());
+                url = new URL(serverDescription.getUrl() + getURLParametersString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
@@ -181,13 +181,26 @@ public class MessageCollector extends Handler {
     }
 
 
-    private String getURLParameters() throws Exception {
+
+
+    private String getURLParametersString() throws Exception {
+        URLParamBuilder params = getURLParameters();
+        if (params != null) {
+            return params.toString();
+        }
+        else {
+            throw new Exception();
+        }
+    }
+
+    public URLParamBuilder getURLParameters()  {
+        URLParamBuilder params = new URLParamBuilder();
+
         Location location = sensorManager.getLocation();
         float azimuth = sensorManager.getAzimuth();
         float pitch = sensorManager.getPitch();
         float roll = sensorManager.getRoll();
         if (location != null) {
-            URLParamBuilder params = new URLParamBuilder();
             params.addParameter("lat", location.getLatitude());
             params.addParameter("lng", location.getLongitude());
             params.addParameter("loc_accuracy", location.getAccuracy());
@@ -198,11 +211,9 @@ public class MessageCollector extends Handler {
 
             params.addParameter("uid", deviceID);
 
-            return params.toString();
         }
-        else {
-            throw new Exception();
-        }
+
+        return params;
     }
 
     private void readArray(JsonReader reader,

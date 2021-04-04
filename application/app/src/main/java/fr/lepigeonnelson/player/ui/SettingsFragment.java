@@ -16,6 +16,7 @@ import fr.lepigeonnelson.player.R;
 public class SettingsFragment extends PreferenceFragmentCompat {
     private MainActivity activity;
     private Preference debug_servers;
+    private Preference verbose;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -36,6 +37,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             }
         });
+
+        verbose = getPreferenceManager().findPreference("verbose");
+        verbose.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                activity.setShowVerboseMessages(newValue.toString().equals("true"));
+                return true;
+            }
+        });
+
         return result;
     }
 

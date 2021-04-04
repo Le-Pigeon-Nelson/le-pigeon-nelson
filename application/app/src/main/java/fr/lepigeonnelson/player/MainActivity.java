@@ -34,7 +34,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.ArrayMap;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -70,10 +72,15 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
     private PigeonNelsonServiceConnection connection;
     private int currentSensorSettingResult;
     private MenuItem reload;
+    private boolean showVerboseMessages;
 
 
     public boolean isMainFragment() {
         return activeFragmentType == SERVER_SELECTION_FRAGMENT;
+    }
+
+    public boolean isListenBroadcastFragment() {
+        return activeFragmentType == LISTEN_BROADCAST_FRAGMENT;
     }
 
     public boolean isAddFragment() {
@@ -225,6 +232,10 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
             scannerFragment.setPermission(true);
         }
 
+    }
+
+    public void setShowVerboseMessages(boolean value) {
+        showVerboseMessages = value;
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -400,8 +411,12 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         showDebugServers = preferences.getBoolean("debug_servers", false);
 
+        showVerboseMessages = preferences.getBoolean("verbose", false);
     }
 
+    public boolean getShowVerboseMessages() {
+        return showVerboseMessages;
+    }
     private void buildServerList() {
         servers.clear();
 
@@ -621,6 +636,7 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         if (activeFragmentType == LISTEN_BROADCAST_FRAGMENT) {
             ListenBroadcastFragment fragment = (ListenBroadcastFragment) activeFragment;
             fragment.setActiveServer(description.getName());
+            fragment.setActiveServerDescription(description.getDescription());
         }
     }
 
@@ -687,6 +703,17 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         publicServers.add(newServer);
         if (mBound)
             mService.collectServerDescription(newServer);
+    }
+
+    @Override
+    public void onInternalValues(ArrayList<Pair<String, String>> values) {
+        if (isListenBroadcastFragment()) {
+            ListenBroadcastFragment fragment = (ListenBroadcastFragment) activeFragment;
+            fragment.setInternalValues(values);
+            Log.d("onInternalValues", "Broadcast Fragment");
+        }
+        else
+            Log.d("onInternalValues", "not Broadcast Fragment");
     }
 
     public int getCurrentSensorSettingResult() {

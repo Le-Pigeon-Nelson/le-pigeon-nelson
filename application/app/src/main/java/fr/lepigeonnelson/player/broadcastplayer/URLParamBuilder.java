@@ -1,7 +1,9 @@
 package fr.lepigeonnelson.player.broadcastplayer;
 
 import android.util.ArrayMap;
+import android.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class URLParamBuilder {
@@ -35,6 +37,14 @@ public class URLParamBuilder {
             else
                 result += "&";
             result += v.getKey() + "=" + v.getValue();
+        }
+        return result;
+    }
+
+    public ArrayList<Pair<String, String>> getArrayMap() {
+        ArrayList<Pair<String, String>> result = new ArrayList<>();
+        for(Map.Entry<String, String> v: values.entrySet()) {
+            result.add(new Pair<>(v.getKey(), v.getValue()));
         }
         return result;
     }

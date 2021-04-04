@@ -8,8 +8,8 @@ android {
         applicationId "fr.lepigeonnelson.player"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 3
-        versionName "0.7.5"
+        versionCode 4
+        versionName "0.7.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

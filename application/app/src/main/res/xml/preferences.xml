@@ -8,5 +8,10 @@
             app:title="Proposer les serveurs de débogage"
             app:defaultValue="false"
             app:dialogTitle="Active les serveurs de débogage." />
+        <CheckBoxPreference
+            app:key="verbose"
+            app:title="Afficher les informations envoyées au serveur"
+            app:defaultValue="false"
+            app:dialogTitle="Active l'affichage verbeux." />
     </PreferenceCategory>
 </PreferenceScreen>
