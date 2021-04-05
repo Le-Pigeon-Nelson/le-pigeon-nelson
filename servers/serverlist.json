@@ -19,5 +19,9 @@
         "url": "https://lepigeonnelson.jmfavreau.info/compass.php",
         "min-version": 2
     }    
+    {
+        "url": "https://lepigeonnelson.jmfavreau.info/radiogarden.php",
+        "min-version": 2
+    }    
 
 ]
