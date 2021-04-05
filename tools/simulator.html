@@ -290,6 +290,10 @@
                         updateURLFromForms();
                     });
                     
+                    $("#custom-block").on("input", function() {
+                        updateURLFromForms();
+                    });
+                    
                     $("#open-button").on("click", function() {
                         var win = window.open($("#url").val(), '_blank');
                     });
