@@ -124,8 +124,21 @@ else {
                 }
                 else 
                     $msg .= ", et n'a pas d'adresse connue.";
-                    
-                $msg .= " C'est actuellement son " . get_nom_num( $selected->nb_mandats, false) . " mandat.";
+                
+                if ($selected->sexe[0] == "H")
+                    $msg .= " Ce député";
+                else
+                    $msg .= " Cette députée";
+                
+                if ($selected->nb_mandats == 1) {
+                    $msg .= " n'a pas d'autres mandats.";
+                }
+                else {
+                    if ($selected->nb_mandats == 2)
+                        $msg .= " a un autre mandat en cours.";
+                    else
+                        $msg .= " a " . ($selected->nb_mandats - 1) . " autres mandats en cours.";
+                }
                 
                 $message = PigeonNelsonMessage::makeTxtMessage($msg, "fr");
                 $message->setPriority(1);
