@@ -101,7 +101,13 @@ else {
             
             if ($selected != null) {
                 // print_r($selected);
-                $msg = "Vous êtes actuellement dans la " . get_nom_num($selected->num_circo, true) . " circonscription " . get_liaison_nom_de_le($selected->nom_circo) . ", et le député local s'appelle " . $selected->nom . ". ";
+                $msg = "Vous êtes actuellement dans la " . get_nom_num($selected->num_circo, true) . " circonscription " . get_liaison_nom_de_le($selected->nom_circo) . ", et ";
+                
+                if ($selected->sexe[0] == "H")
+                    $msg .= "le député local";
+                else
+                    $msg .= "la députée locale";
+                $msg .= " s'appelle " . $selected->nom . ". ";
                 
                 if ($selected->sexe[0] == "H")
                     $msg .= "Il";
@@ -110,10 +116,10 @@ else {
                 $msg .= " appartient au " . $selected->groupe_sigle;
                 if (count($selected->adresses) > 0) {
                     $msg .= ", et vous pourrez ";
-                    if ($selected->sexe[0] == "H")
+                if ($selected->sexe[0] == "H")
                     $msg .= "le";
                 else
-                    $msg .= "le";
+                    $msg .= "la";
                     $msg .= " trouver à l'adresse " . $selected->adresses[0]->adresse . ".";
                 }
                 else 
