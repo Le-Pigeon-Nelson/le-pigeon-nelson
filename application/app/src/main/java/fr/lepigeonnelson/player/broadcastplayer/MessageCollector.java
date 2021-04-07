@@ -120,6 +120,9 @@ public class MessageCollector extends Handler {
             sendMessage(msg);
         }
         else {
+            // TODO if no queued message can be activated using a new location or orientation,
+            // TODO and if d is longer than x seconds, then turn off the sensor service and reactivate
+            // TODO it 1 second before the next message collection
             sendMessageDelayed(msg, d);
         }
     }
