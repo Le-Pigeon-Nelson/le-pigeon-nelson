@@ -259,6 +259,9 @@
                     $("#loc_timestamp").on("dp.change", function() {
                         updateURLFromForms();
                     });
+                    $("#uid").on("input", function() {
+                        updateURLFromForms();
+                    });
                     
                     
                     function resetCompassForms() {
