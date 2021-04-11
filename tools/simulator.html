@@ -260,7 +260,14 @@
                             url = $("#server-selection option:selected").text();
                         }
                         
-                        url += "?lng=" + $("#longitude").val();
+                        if (url.includes("?")) {
+                            url += "&";
+                        }
+                        else {
+                            url += "?";
+                        }
+                        
+                        url += "lng=" + $("#longitude").val();
                         url += "&lat=" + $("#latitude").val();
                         url += "&loc_accuracy=" + $("#loc_accuracy").val();
                         url += "&loc_timestamp=" + $("#loc_timestamp").data("DateTimePicker").date();

@@ -132,9 +132,9 @@ public class MessageCollector extends Handler {
         URL url;
         try {
             if (description)
-                url = new URL(serverDescription.getUrl() + "?self-description");
+                url = new URL(getURLSelfDescriptionString(serverDescription.getUrl()));
             else
-                url = new URL(serverDescription.getUrl() + getURLParametersString());
+                url = new URL(getURLParametersString(serverDescription.getUrl()));
         } catch (MalformedURLException e) {
             e.printStackTrace();
             uiHandler.sendEmptyMessage(uiHandler.SERVER_ERROR);
@@ -183,11 +183,15 @@ public class MessageCollector extends Handler {
         return true;
     }
 
+    private String getURLSelfDescriptionString(String url) {
+        URLParamBuilder params = new URLParamBuilder(url);
+        params.addParameter("self-description", "");
+        return params.toString();
+    }
 
 
-
-    private String getURLParametersString() throws Exception {
-        URLParamBuilder params = getURLParameters();
+    private String getURLParametersString(String url) throws Exception {
+        URLParamBuilder params = getURLParameters(url);
         if (params != null) {
             return params.toString();
         }
@@ -196,8 +200,8 @@ public class MessageCollector extends Handler {
         }
     }
 
-    public URLParamBuilder getURLParameters()  {
-        URLParamBuilder params = new URLParamBuilder();
+    public URLParamBuilder getURLParameters(String url)  {
+        URLParamBuilder params = new URLParamBuilder(url);
 
         Location location = sensorManager.getLocation();
         float azimuth = sensorManager.getAzimuth();
@@ -215,6 +219,8 @@ public class MessageCollector extends Handler {
             params.addParameter("uid", deviceID);
 
         }
+        else
+            return null;
 
         return params;
     }

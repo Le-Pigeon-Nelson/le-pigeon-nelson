@@ -75,7 +75,7 @@ public class BroadcastPlayer extends HandlerThread {
             localHandler.postDelayed( runnable = new Runnable() {
                 public void run() {
                     Message msg = uiHandler.obtainMessage();
-                    msg.obj = messageCollector.getURLParameters().getArrayMap();
+                    msg.obj = messageCollector.getURLParameters(currentServer.getUrl()).getArrayMap();
                     msg.what = uiHandler.INTERNAL_VALUES;
                     uiHandler.sendMessage(msg);
 

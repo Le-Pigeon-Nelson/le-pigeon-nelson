@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class URLParamBuilder {
+    private String url;
     private ArrayMap<String, String> values;
 
-    public URLParamBuilder() {
+    public URLParamBuilder(String url) {
+        this.url = url;
         values = new ArrayMap<>();
     }
 
@@ -29,7 +31,11 @@ public class URLParamBuilder {
     }
 
     public String toString() {
-        String result = "?";
+        String result = url;
+        if (url.contains("?"))
+            result += "&";
+        else
+            result += "?";
         boolean first = true;
         for(Map.Entry<String, String> v: values.entrySet()) {
             if (first)
