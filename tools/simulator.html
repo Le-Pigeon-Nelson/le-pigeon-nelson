@@ -118,7 +118,7 @@
 
             
             <div class="form-group" style="position: relative; z-index: 10000;">
-                <label for="loc_accuracy">GPS timestamp</label>
+                <label for="loc_timestamp">GPS timestamp</label>
                 <input type="text" class="form-control" id="loc_timestamp" aria-describedby="loc_timestamp_help">
                 <small id="loc_timestamp_help" class="form-text text-muted">Timestamp corresponding to the GPS acquisition (date and time in second).</small>
             </div>
@@ -254,6 +254,9 @@
                     });
                     $("#reset_compass").on("click", function() {
                         resetCompassForms();
+                        updateURLFromForms();
+                    });
+                    $("#loc_timestamp").on("dp.change", function() {
                         updateURLFromForms();
                     });
                     
