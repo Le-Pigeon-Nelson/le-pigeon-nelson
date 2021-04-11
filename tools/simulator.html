@@ -240,6 +240,15 @@
                     $("#recenter").on("click", function() {
                         recenter();
                     });
+                    $("#roll").on("input", function() {
+                        updateURLFromForms();
+                    });
+                    $("#pitch").on("input", function() {
+                        updateURLFromForms();
+                    });
+                    $("#azimuth").on("input", function() {
+                        updateURLFromForms();
+                    });
                     
                     
                     function resetCompassForms() {
