@@ -100,6 +100,9 @@
                         <input type="number" class="form-control" step="1" min="0" max="360" id="pitch" aria-describedby="pitch_help" placeholder="Pitch" /> 
                         <small id="pitch_help" class="form-text text-muted">Give relative <strong>pitch</strong> angle in degree with respect to the horizontal position.</small>
                     </div>
+                    <div class="form-group mt-1">
+                        <button type="button" id="reset_compass" class="btn btn-danger btn-block">Reset compass</button>
+                    </div>
                 </div>
 
             </div>
@@ -247,6 +250,10 @@
                         updateURLFromForms();
                     });
                     $("#azimuth").on("input", function() {
+                        updateURLFromForms();
+                    });
+                    $("#reset_compass").on("click", function() {
+                        resetCompassForms();
                         updateURLFromForms();
                     });
                     
