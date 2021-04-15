@@ -100,6 +100,9 @@
                         <input type="number" class="form-control" step="1" min="0" max="360" id="pitch" aria-describedby="pitch_help" placeholder="Pitch" /> 
                         <small id="pitch_help" class="form-text text-muted">Give relative <strong>pitch</strong> angle in degree with respect to the horizontal position.</small>
                     </div>
+                    <div class="form-group mt-1">
+                        <button type="button" id="reset_compass" class="btn btn-danger btn-block">Reset compass</button>
+                    </div>
                 </div>
 
             </div>
@@ -115,7 +118,7 @@
 
             
             <div class="form-group" style="position: relative; z-index: 10000;">
-                <label for="loc_accuracy">GPS timestamp</label>
+                <label for="loc_timestamp">GPS timestamp</label>
                 <input type="text" class="form-control" id="loc_timestamp" aria-describedby="loc_timestamp_help">
                 <small id="loc_timestamp_help" class="form-text text-muted">Timestamp corresponding to the GPS acquisition (date and time in second).</small>
             </div>
@@ -239,6 +242,25 @@
                     });
                     $("#recenter").on("click", function() {
                         recenter();
+                    });
+                    $("#roll").on("input", function() {
+                        updateURLFromForms();
+                    });
+                    $("#pitch").on("input", function() {
+                        updateURLFromForms();
+                    });
+                    $("#azimuth").on("input", function() {
+                        updateURLFromForms();
+                    });
+                    $("#reset_compass").on("click", function() {
+                        resetCompassForms();
+                        updateURLFromForms();
+                    });
+                    $("#loc_timestamp").on("dp.change", function() {
+                        updateURLFromForms();
+                    });
+                    $("#uid").on("input", function() {
+                        updateURLFromForms();
                     });
                     
                     
