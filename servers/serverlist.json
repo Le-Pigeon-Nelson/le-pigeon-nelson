@@ -4,10 +4,6 @@
         "min-version": 2
         },
     {
-        "url": "https://lepigeonnelson.jmfavreau.info/formulaire/compteur.php",
-        "min-version": 2
-    },
-    {
         "url": "https://osco.anatidaepho.be/PigeonHaiku/haiku.php",
         "min-version": 2
     }, 
