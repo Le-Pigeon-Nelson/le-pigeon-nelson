@@ -278,6 +278,13 @@ class PigeonNelsonServer {
     public function getCoordinatesAccuracy() {
         return $this->getParams["loc_accuracy"];
     }
+
+    public function hasUid() {
+        return array_key_exists("uid", $this->getParams);
+    }
+    public function getUid() {
+        return $this->getParams["uid"];
+    }
     
     private static function replaceBoxInRequest($request, $box_str) {
         $result = str_replace("{{box}}", $box_str, $request);
