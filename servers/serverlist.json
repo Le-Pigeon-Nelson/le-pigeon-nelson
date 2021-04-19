@@ -26,5 +26,9 @@
     {
         "url": "https://lepigeonnelson.jmfavreau.info/deputes.php",
         "min-version": 2
-    }    
+    },
+    {
+        "url": "https://lepigeonnelson.jmfavreau.info/ballon/ballon.php",
+        "min-version": 2
+    }
 ]
