@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -172,7 +173,43 @@ public class MainActivity extends AppCompatActivity implements AppDatabase.AppDa
         // load servers
         loadServers();
 
+
+        handleIntent(getIntent());
+
     }
+
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        String appLinkAction = intent.getAction();
+        Uri appLinkData = intent.getData();
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+            String address = appLinkData.toString();
+            if (hasServerWithAddress(address)) {
+                AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Adresse existante");
+                alertDialog.setMessage("Ce serveur est déjà disponible dans la liste des serveurs.");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Annuler",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+            else {
+
+                Log.d("PigeonNelson", "new url: " + address);
+
+                ServerDescription description = new ServerDescription(address);
+                updateServer(description);
+            }
+        }
+    }
+
 
     private void checkGPSPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
